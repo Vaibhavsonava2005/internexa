@@ -4,10 +4,10 @@ import { NextResponse } from "next/server";
 // Define protected routes (Admin and Student Dashboard)
 const isProtectedRoute = createRouteMatcher(["/dashboard(.*)", "/admin(.*)"]);
 
-export default clerkMiddleware((auth, req) => {
+export default clerkMiddleware(async (auth, req) => {
   // 1. Authenticate protected routes
   if (isProtectedRoute(req)) {
-    auth().protect();
+    await auth.protect();
   }
 
   const res = NextResponse.next();

@@ -97,7 +97,12 @@ export function Navbar() {
               </button>
 
               {isSignedIn ? (
-                <UserButton />
+                <div className="flex items-center gap-4">
+                  <Button variant="outline" asChild className="hidden sm:flex border-brand-200 dark:border-brand-800 text-brand-700 dark:text-brand-300 hover:bg-brand-50 dark:hover:bg-brand-900">
+                    <Link href="/dashboard">Dashboard</Link>
+                  </Button>
+                  <UserButton />
+                </div>
               ) : (
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" asChild>

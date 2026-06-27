@@ -101,6 +101,12 @@
   }
 }
 
+@layer base {
+  body {
+    @apply bg-brand-50 text-brand-900 dark:bg-[#0a0a0a] dark:text-white antialiased transition-colors duration-300;
+  }
+}
+
 /* Premium Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
