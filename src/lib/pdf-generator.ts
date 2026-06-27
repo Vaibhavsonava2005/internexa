@@ -72,7 +72,7 @@ We look forward to welcoming you aboard and wish you a successful learning journ
     // Upload to Supabase Storage
     const fileName = `${data.offerId}-${uuidv4()}.pdf`;
     
-    const { data: uploadData, error: uploadError } = await supabaseAdmin
+    let { data: uploadData, error: uploadError } = await supabaseAdmin
       .storage
       .from('offer-letters')
       .upload(fileName, pdfBuffer, {
@@ -80,6 +80,25 @@ We look forward to welcoming you aboard and wish you a successful learning journ
         cacheControl: '3600',
         upsert: false
       });
+
+    // If upload fails, it might be because the bucket doesn't exist
+    if (uploadError) {
+      console.warn("Upload failed, attempting to create bucket 'offer-letters'...");
+      await supabaseAdmin.storage.createBucket('offer-letters', { public: true });
+      
+      // Retry upload
+      const retryRes = await supabaseAdmin
+        .storage
+        .from('offer-letters')
+        .upload(fileName, pdfBuffer, {
+          contentType: 'application/pdf',
+          cacheControl: '3600',
+          upsert: false
+        });
+        
+      uploadData = retryRes.data;
+      uploadError = retryRes.error;
+    }
 
     if (uploadError) {
       console.error("Supabase Upload Error:", uploadError);
