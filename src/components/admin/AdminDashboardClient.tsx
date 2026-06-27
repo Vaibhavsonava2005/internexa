@@ -174,7 +174,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                     <td className="px-6 py-4 font-medium text-brand-900 dark:text-white">{u.email}</td>
                     <td className="px-6 py-4">{u.full_name}</td>
                     <td className="px-6 py-4"><Badge variant="secondary">{u.role}</Badge></td>
-                    <td className="px-6 py-4">{new Date(u.created_at).toLocaleDateString()}</td>
+                    <td className="px-6 py-4">{u.created_at ? new Date(u.created_at).toLocaleDateString() : "N/A"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -204,7 +204,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                         {tx.status}
                       </Badge>
                     </td>
-                    <td className="px-6 py-4">{new Date(tx.created_at).toLocaleDateString()}</td>
+                    <td className="px-6 py-4">{tx.created_at ? new Date(tx.created_at).toLocaleDateString() : "N/A"}</td>
                   </tr>
                 ))}
                 {data.transactions.length === 0 && (

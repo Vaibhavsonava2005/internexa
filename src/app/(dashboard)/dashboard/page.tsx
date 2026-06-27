@@ -73,7 +73,12 @@ export default function DashboardHome() {
 
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {STATS.map((stat, i) => {
+        {[
+          { label: "Active Applications", value: isLoading ? "-" : applications.length.toString(), icon: Briefcase, trend: "View status below" },
+          { label: "Total XP Points", value: "0", icon: Zap, trend: "Earn XP by completing tasks" },
+          { label: "Current Streak", value: "0 Days", icon: Flame, trend: "Start learning today!" },
+          { label: "Certificates", value: "0", icon: Award, trend: "Complete internship to earn" },
+        ].map((stat, i) => {
           const Icon = stat.icon;
           return (
             <motion.div

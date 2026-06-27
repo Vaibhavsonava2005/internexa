@@ -41,7 +41,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 export function useTheme() {
   const [theme, setTheme] = useLocalStorage<"light" | "dark" | "system">(
     "internexa-theme",
-    "system"
+    "dark"
   );
   const [mounted, setMounted] = useState(false);
 
@@ -51,14 +51,14 @@ export function useTheme() {
 
   useEffect(() => {
     const root = window.document.documentElement;
-    const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-
     root.classList.remove("light", "dark");
-
-    if (theme === "system") {
-      root.classList.add(systemDark ? "dark" : "light");
+    
+    // Always fallback to dark if system, or force dark if the user specifically requested it globally
+    // We will still respect 'light' if they specifically toggle to it, but default is dark.
+    if (theme === "light") {
+      root.classList.add("light");
     } else {
-      root.classList.add(theme);
+      root.classList.add("dark");
     }
   }, [theme]);
 
