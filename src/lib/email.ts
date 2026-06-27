@@ -127,17 +127,17 @@ export async function sendOfferLetterEmail({
   if (pdfUrl) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     if (supabaseUrl) {
-      const publicUrl = \`\${supabaseUrl}/storage/v1/object/public/offer-letters/\${pdfUrl}\`;
+      const publicUrl = `${supabaseUrl}/storage/v1/object/public/offer-letters/${pdfUrl}`;
       attachment.push({
         url: publicUrl,
-        name: \`Offer_Letter_\${internshipName.replace(/\\s+/g, '_')}.pdf\`
+        name: `Offer_Letter_${internshipName.replace(/\s+/g, '_')}.pdf`
       });
     }
   }
 
   return sendBrevoEmail({
     to: [{ email, name: studentName }],
-    subject: \`🎉 Congratulations! Offer Letter for \${internshipName}\`,
+    subject: `🎉 Congratulations! Offer Letter for ${internshipName}`,
     htmlContent: getBaseTemplate("Offer Letter Issued", content),
     attachment
   });
@@ -155,23 +155,23 @@ interface PaymentEmailProps {
 export async function sendPaymentSuccessEmail({
   studentName, email, internshipName, transactionId, amount
 }: PaymentEmailProps) {
-  const content = \`
-    <p>Dear <strong>\${studentName}</strong>,</p>
-    <p>Your payment of <strong>₹\${amount}</strong> for the <strong>\${internshipName}</strong> program was successful!</p>
+  const content = `
+    <p>Dear <strong>${studentName}</strong>,</p>
+    <p>Your payment of <strong>₹${amount}</strong> for the <strong>${internshipName}</strong> program was successful!</p>
     <div style="background-color: #f8fafc; padding: 16px; border-radius: 8px; margin: 24px 0; border: 1px solid #e2e8f0;">
       <h4 style="margin: 0 0 12px 0; color: #0f172a;">Transaction Details</h4>
-      <p style="margin: 4px 0;"><strong>Transaction ID:</strong> \${transactionId}</p>
+      <p style="margin: 4px 0;"><strong>Transaction ID:</strong> ${transactionId}</p>
       <p style="margin: 4px 0;"><strong>Status:</strong> Paid</p>
     </div>
     <p>Your internship dashboard is now unlocked. You can access your curriculum and begin immediately.</p>
     <div style="text-align: center; margin-top: 30px;">
-      <a href="\${APP_URL}/dashboard" style="background-color: \${BRAND_COLOR}; color: white; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">Start Learning</a>
+      <a href="${APP_URL}/dashboard" style="background-color: ${BRAND_COLOR}; color: white; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">Start Learning</a>
     </div>
-  \`;
+  `;
 
   return sendBrevoEmail({
     to: [{ email, name: studentName }],
-    subject: \`Payment Successful: Welcome to \${internshipName}\`,
+    subject: `Payment Successful: Welcome to ${internshipName}`,
     htmlContent: getBaseTemplate("Payment Successful", content)
   });
 }
