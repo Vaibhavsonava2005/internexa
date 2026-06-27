@@ -77,7 +77,7 @@ export default function MyInternshipsPage() {
   const filtered = applications.filter(app => {
     if (filter === "all") return true;
     if (filter === "pending" && app.status === "Submitted") return true;
-    if (filter === "accepted" && app.status === "Accepted") return true;
+    if (filter === "accepted" && (app.status === "Accepted" || app.status === "Offer Accepted")) return true;
     if (filter === "active" && (app.status === "Active" || app.status === "Enrolled")) return true;
     if (filter === "completed" && app.status === "Completed") return true;
     return false;
@@ -122,7 +122,7 @@ export default function MyInternshipsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filtered.map((app, index) => {
             const internship = app.internships;
-            const isAccepted = app.status === "Accepted";
+            const isAccepted = app.status === "Accepted" || app.status === "Offer Accepted";
             const isPending = app.status === "Submitted" || app.status === "Under Review";
             const isActive = app.status === "Active" || app.status === "Enrolled";
             const isCompleted = app.status === "Completed";

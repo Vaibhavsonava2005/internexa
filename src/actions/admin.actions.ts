@@ -85,12 +85,14 @@ export async function approveApplication(applicationId: string) {
 
     if (updateError) throw updateError;
 
-    // 4. Send Email
+    // 4. Send Email with PDF attached
     await sendOfferLetterEmail({
       studentName: application.full_name,
       email: application.email,
       internshipName: application.internships.title,
       offerLetterId,
+      applicationId: application.application_id || application.reference_number || application.id,
+      duration: application.internships.duration || "4 Weeks",
       pdfUrl: pdfResult.fileId
     });
 

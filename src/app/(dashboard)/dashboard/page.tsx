@@ -14,19 +14,14 @@ import { cn } from "@/lib/utils";
 import { getUserApplications } from "@/actions/application.actions";
 import { Loader2 } from "lucide-react";
 
-const STATS = [
-  { label: "Active Applications", value: "1", icon: Briefcase, trend: "View status below" },
-  { label: "Total XP Points", value: "2,450", icon: Zap, trend: "+350 this week" },
-  { label: "Current Streak", value: "7 Days", icon: Flame, trend: "Personal best: 14" },
-  { label: "Certificates", value: "0", icon: Award, trend: "Complete internship to earn" },
-];
+
 
 const TRACKING_STEPS = [
   "Submitted",
   "Under Review",
-  "Interview Scheduled",
-  "Approved",
-  "Offer Letter Generated",
+  "Accepted",
+  "Offer Accepted",
+  "Enrolled",
   "Internship Started",
   "Internship Completed",
   "Certificate Issued"
