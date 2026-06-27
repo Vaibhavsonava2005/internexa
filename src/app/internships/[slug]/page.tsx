@@ -10,6 +10,7 @@ import { Footer } from "@/components/marketing/Footer";
 import { Badge, Button } from "@/components/shared";
 import { getDifficultyColor, cn } from "@/lib/utils";
 import { createClient } from "@supabase/supabase-js";
+import { getUserApplications } from "@/actions/application.actions";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || "",
@@ -44,7 +45,6 @@ export default function InternshipDetailPage() {
       }
 
       try {
-        const { getUserApplications } = await import('@/actions/application.actions');
         const userAppsRes = await getUserApplications();
         if (userAppsRes.success && userAppsRes.data) {
           const applied = userAppsRes.data.some((app: any) => app.internship_id === data.id);

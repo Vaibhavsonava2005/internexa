@@ -10,6 +10,7 @@ import { FEATURED_INTERNSHIPS, CATEGORIES } from "@/lib/constants";
 import { createClient } from "@supabase/supabase-js";
 import { Badge, Button } from "@/components/shared";
 import { getDifficultyColor, cn } from "@/lib/utils";
+import { getUserApplications } from "@/actions/application.actions";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || "",
@@ -35,7 +36,6 @@ export default function InternshipsPage() {
       
       // 2. Fetch user applications if logged in
       try {
-        const { getUserApplications } = await import('@/actions/application.actions');
         const res = await getUserApplications();
         if (res.success && res.data) {
           setUserApps(res.data);
