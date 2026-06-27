@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { approveApplication, rejectApplication } from "@/actions/admin.actions";
+import { useState, useEffect } from "react";
+import { approveApplication, rejectApplication, getAdminData } from "@/actions/admin.actions";
 import { Button, Badge } from "@/components/shared";
 import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
@@ -10,6 +10,16 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
   const [activeTab, setActiveTab] = useState<"applications" | "users" | "transactions">("applications");
   const [data, setData] = useState(initialData);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const res = await getAdminData();
+      if (res.success && res.data) {
+        setData(res.data);
+      }
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleApprove = async (id: string) => {
     setLoadingAction(id);

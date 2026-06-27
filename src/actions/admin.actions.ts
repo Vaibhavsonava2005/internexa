@@ -92,8 +92,11 @@ export async function approveApplication(applicationId: string) {
 
     if (updateError) throw updateError;
 
+    // Give Supabase CDN 1 second to propagate the file so Brevo doesn't get a 404
+    await new Promise(r => setTimeout(r, 1000));
+
     // 4. Send Email with PDF attached
-    await sendOfferLetterEmail({
+    const emailRes = await sendOfferLetterEmail({
       studentName: application.full_name,
       email: application.email,
       internshipName: application.internships.title,
@@ -102,6 +105,12 @@ export async function approveApplication(applicationId: string) {
       duration: application.internships.duration || "4 Weeks",
       pdfUrl: pdfResult.fileId
     });
+
+    if (!emailRes.success) {
+      // Revert status if email failed (safety measure)
+      await supabaseAdmin.from('applications').update({ status: "Submitted", offer_letter_id: null }).eq('id', applicationId);
+      throw new Error(`Email failed: ${emailRes.error}`);
+    }
 
     // 5. Create Notification
     await supabaseAdmin.from('notifications').insert([{

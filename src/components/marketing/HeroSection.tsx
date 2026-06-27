@@ -35,7 +35,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-brand-900 dark:text-brand-50 tracking-tight leading-[1.1]"
+              className="text-3xl sm:text-4xl lg:text-6xl font-bold text-brand-900 dark:text-brand-50 tracking-tight leading-[1.1] break-words"
             >
               Bridge the gap between <br className="hidden sm:block" />
               <span className="text-accent-600 dark:text-accent-500">learning</span> and <span className="text-brand-400 dark:text-brand-600">leading.</span>

@@ -45,7 +45,7 @@ export function TopBar({ setIsMobileOpen }: TopBarProps) {
           <input
             type="text"
             placeholder="Search internships, tools, or help... (⌘K)"
-            className="w-full pl-9 pr-4 py-1.5 bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 rounded-lg text-sm focus:ring-2 focus:ring-accent-500 outline-none text-brand-900 dark:text-white shadow-sm transition-all placeholder:text-brand-400"
+            className="w-full pl-10 pr-4 py-1.5 bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 rounded-lg text-sm focus:ring-2 focus:ring-accent-500 outline-none text-brand-900 dark:text-white shadow-sm transition-all placeholder:text-brand-400"
           />
         </div>
 

@@ -35,17 +35,44 @@ export function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobile
       {/* Header */}
       <div className="flex items-center justify-between p-4 h-14 border-b border-brand-200 dark:border-brand-900 shrink-0">
         <Link href="/dashboard" className="flex items-center gap-2 overflow-hidden group" onClick={() => setIsMobileOpen(false)}>
-          <div className="w-6 h-6 rounded bg-brand-900 dark:bg-white flex items-center justify-center shrink-0 transition-transform group-hover:scale-105">
-            <span className="text-white dark:text-brand-900 font-bold text-xs leading-none">I</span>
+          <div className="relative w-7 h-7 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3">
+            <svg viewBox="0 0 100 100" className="w-full h-full fill-none">
+              <defs>
+                <linearGradient id="sidebar-logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#4f46e5" />
+                  <stop offset="50%" stopColor="#818cf8" />
+                  <stop offset="100%" stopColor="#38bdf8" />
+                </linearGradient>
+                <linearGradient id="sidebar-logo-gradient-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#818cf8" />
+                  <stop offset="100%" stopColor="#c084fc" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M50 5 L90 27.5 L90 72.5 L50 95 L10 72.5 L10 27.5 Z"
+                stroke="url(#sidebar-logo-gradient)"
+                strokeWidth="8"
+                className="dark:stroke-[url(#sidebar-logo-gradient-dark)] drop-shadow-md"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M50 5 L50 45 M10 27.5 L50 45 M90 27.5 L50 45 M10 72.5 L50 45 M90 72.5 L50 45 M50 95 L50 45"
+                stroke="url(#sidebar-logo-gradient)"
+                strokeWidth="4"
+                strokeLinecap="round"
+                className="dark:stroke-[url(#sidebar-logo-gradient-dark)] opacity-70"
+              />
+              <circle cx="50" cy="45" r="8" fill="url(#sidebar-logo-gradient)" className="dark:fill-[url(#sidebar-logo-gradient-dark)]" />
+            </svg>
           </div>
           {!isCollapsed && (
             <motion.span
               initial={{ opacity: 0, width: 0 }}
               animate={{ opacity: 1, width: "auto" }}
               exit={{ opacity: 0, width: 0 }}
-              className="font-bold text-lg text-brand-900 dark:text-white tracking-tight whitespace-nowrap"
+              className="font-extrabold text-lg text-brand-900 dark:text-white tracking-tight whitespace-nowrap"
             >
-              InterNexa
+              Inter<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-sky-400 dark:from-indigo-400 dark:to-purple-400">Nexa</span>
             </motion.span>
           )}
         </Link>

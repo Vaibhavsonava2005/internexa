@@ -36,12 +36,39 @@ export function Navbar() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="flex items-center gap-2 group">
-                <div className="w-8 h-8 rounded bg-brand-900 dark:bg-white flex items-center justify-center transition-transform group-hover:scale-105">
-                  <span className="text-white dark:text-brand-900 font-bold text-lg leading-none">I</span>
+              <Link href="/" className="flex items-center gap-2.5 group">
+                <div className="relative w-9 h-9 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3">
+                  <svg viewBox="0 0 100 100" className="w-full h-full fill-none">
+                    <defs>
+                      <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#4f46e5" />
+                        <stop offset="50%" stopColor="#818cf8" />
+                        <stop offset="100%" stopColor="#38bdf8" />
+                      </linearGradient>
+                      <linearGradient id="logo-gradient-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#818cf8" />
+                        <stop offset="100%" stopColor="#c084fc" />
+                      </linearGradient>
+                    </defs>
+                    <path
+                      d="M50 5 L90 27.5 L90 72.5 L50 95 L10 72.5 L10 27.5 Z"
+                      stroke="url(#logo-gradient)"
+                      strokeWidth="8"
+                      className="dark:stroke-[url(#logo-gradient-dark)] drop-shadow-md"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M50 5 L50 45 M10 27.5 L50 45 M90 27.5 L50 45 M10 72.5 L50 45 M90 72.5 L50 45 M50 95 L50 45"
+                      stroke="url(#logo-gradient)"
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                      className="dark:stroke-[url(#logo-gradient-dark)] opacity-70"
+                    />
+                    <circle cx="50" cy="45" r="8" fill="url(#logo-gradient)" className="dark:fill-[url(#logo-gradient-dark)]" />
+                  </svg>
                 </div>
-                <span className="font-bold text-xl text-brand-900 dark:text-white tracking-tight">
-                  Inter<span className="text-brand-500 dark:text-brand-400">Nexa</span>
+                <span className="font-extrabold text-2xl text-brand-900 dark:text-white tracking-tight">
+                  Inter<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-sky-400 dark:from-indigo-400 dark:to-purple-400">Nexa</span>
                 </span>
               </Link>
             </div>

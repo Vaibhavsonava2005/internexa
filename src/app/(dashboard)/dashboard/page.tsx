@@ -33,7 +33,8 @@ export default function DashboardHome() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function loadData() {
+    async function loadData(silent = false) {
+      if (!silent) setIsLoading(true);
       try {
         const res = await getUserApplications();
         if (res.success && res.data) {
@@ -42,10 +43,13 @@ export default function DashboardHome() {
       } catch (err) {
         console.error(err);
       } finally {
-        setIsLoading(false);
+        if (!silent) setIsLoading(false);
       }
     }
+    
     loadData();
+    const interval = setInterval(() => loadData(true), 10000);
+    return () => clearInterval(interval);
   }, []);
 
   return (

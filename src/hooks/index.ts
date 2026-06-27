@@ -39,40 +39,25 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 
 // ─── useTheme ───────────────────────────────────────────────
 export function useTheme() {
-  const [theme, setTheme] = useLocalStorage<"light" | "dark" | "system">(
-    "internexa-theme",
-    "dark"
-  );
+  const [theme, setTheme] = useState<"dark">("dark");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    const root = window.document.documentElement;
+    root.classList.remove("light");
+    root.classList.add("dark");
+    // Force localStorage to dark
+    try {
+      window.localStorage.setItem("internexa-theme", JSON.stringify("dark"));
+    } catch(e) {}
   }, []);
 
-  useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove("light", "dark");
-    
-    // Always fallback to dark if system, or force dark if the user specifically requested it globally
-    // We will still respect 'light' if they specifically toggle to it, but default is dark.
-    if (theme === "light") {
-      root.classList.add("light");
-    } else {
-      root.classList.add("dark");
-    }
-  }, [theme]);
-
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  }, [setTheme]);
+    // Disabled toggle as per user request to force dark mode globally
+  }, []);
 
-  const isDark =
-    theme === "dark" ||
-    (theme === "system" &&
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches);
-
-  return { theme, setTheme, toggleTheme, isDark, mounted };
+  return { theme: "dark", setTheme, toggleTheme, isDark: true, mounted };
 }
 
 // ─── useDebounce ────────────────────────────────────────────

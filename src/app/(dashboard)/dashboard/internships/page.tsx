@@ -9,12 +9,7 @@ import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import { createClient } from "@supabase/supabase-js";
 import { CheckoutModal } from "@/components/dashboard/CheckoutModal";
-
-// Client-side supabase instance
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
-);
+import { getUserApplications } from "@/actions/application.actions";
 
 export default function MyInternshipsPage() {
   const { user } = useUser();
@@ -36,37 +31,28 @@ export default function MyInternshipsPage() {
     amount: 0
   });
 
-  const fetchApplications = async () => {
+  const fetchApplications = async (silent = false) => {
     if (!user) return;
-    setLoading(true);
+    if (!silent) setLoading(true);
     
     try {
-      const { data, error } = await supabase
-        .from('applications')
-        .select(`
-          id,
-          status,
-          reference_number,
-          full_name,
-          email,
-          internships (
-            id, title, duration, category, thumbnail
-          )
-        `)
-        .eq('clerk_id', user.id)
-        .order('submission_date', { ascending: false });
-
-      if (error) throw error;
-      setApplications(data || []);
+      const res = await getUserApplications();
+      if (res.success && res.data) {
+        setApplications(res.data);
+      }
     } catch (err) {
       console.error("Failed to fetch applications:", err);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchApplications();
+    const interval = setInterval(() => {
+      fetchApplications(true);
+    }, 10000);
+    return () => clearInterval(interval);
   }, [user]);
 
   const handleCheckoutSuccess = () => {
