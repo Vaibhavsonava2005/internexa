@@ -159,18 +159,11 @@ export async function getAdminData() {
     };
   } catch (error: any) {
     console.error("Admin data fetch error:", error);
-    // Even if it completely fails, return fake data so it never crashes
+    // Return false so the UI knows there was an error fetching data
     return {
-      success: true,
-      data: {
-        applications: [
-          { id: "app-err-1", application_id: "APP-ERROR", reference_number: "INX-REF-ERR", full_name: "Demo Student", email: "demo@example.com", internships: { title: "Demo Program" }, status: "Submitted", created_at: new Date().toISOString() }
-        ],
-        users: [
-          { id: "usr-err-1", clerk_id: "user_err", email: "demo@example.com", full_name: "Demo Student", role: "student", created_at: new Date().toISOString() }
-        ],
-        transactions: []
-      }
+      success: false,
+      error: error.message || "Failed to fetch admin data",
+      data: null
     };
   }
 }
