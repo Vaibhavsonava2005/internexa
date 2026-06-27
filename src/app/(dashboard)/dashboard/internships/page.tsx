@@ -172,18 +172,13 @@ export default function MyInternshipsPage() {
                     )}
 
                     {isAccepted && (
-                      <button
-                        onClick={() => setCheckoutData({
-                          isOpen: true,
-                          appId: app.id,
-                          internshipName: internship?.title,
-                          amount: 999 // Fixed price for the demo, or fetch from DB
-                        })}
+                      <Link
+                        href={`/offer/${app.offer_letter_id}/onboarding`}
                         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-600/20"
                       >
-                        <CreditCard className="w-4 h-4" />
-                        Pay to Enroll
-                      </button>
+                        <CheckCircle className="w-4 h-4" />
+                        Start Onboarding
+                      </Link>
                     )}
 
                     {isPending && (

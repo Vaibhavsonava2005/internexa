@@ -27,6 +27,8 @@ export default function InternshipDetailPage() {
   const [internship, setInternship] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  const [hasApplied, setHasApplied] = useState(false);
+
   useEffect(() => {
     async function fetchInternship() {
       const { data, error } = await supabase
@@ -39,6 +41,17 @@ export default function InternshipDetailPage() {
         // Handle error or redirect
         router.push('/internships');
         return;
+      }
+
+      try {
+        const { getUserApplications } = await import('@/actions/application.actions');
+        const userAppsRes = await getUserApplications();
+        if (userAppsRes.success && userAppsRes.data) {
+          const applied = userAppsRes.data.some((app: any) => app.internship_id === data.id);
+          setHasApplied(applied);
+        }
+      } catch (e) {
+        // Not logged in or error, ignore
       }
       
       // Inject dummy details if DB fields are empty
@@ -134,9 +147,18 @@ export default function InternshipDetailPage() {
             {/* Sticky Enrollment Panel */}
             <div className="hidden lg:block lg:col-span-4 relative">
               <div className="sticky top-24 w-full bg-white dark:bg-brand-950 rounded-2xl shadow-lg border border-brand-200 dark:border-brand-800 p-6 overflow-hidden">
-                <Button size="lg" className="w-full mb-6" asChild>
-                  <Link href={`/apply/${internship.slug}`}>Apply Now</Link>
-                </Button>
+                {hasApplied ? (
+                  <Button size="lg" className="w-full mb-6 bg-emerald-600 hover:bg-emerald-700" asChild>
+                    <Link href="/dashboard/internships">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Already Applied - View Dashboard
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button size="lg" className="w-full mb-6" asChild>
+                    <Link href={`/apply/${internship.slug}`}>Apply Now</Link>
+                  </Button>
+                )}
 
                 <div className="space-y-4">
                   <h4 className="font-semibold text-brand-900 dark:text-white text-sm uppercase tracking-wider">This internship includes:</h4>

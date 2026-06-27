@@ -44,10 +44,18 @@ export default function CalendarPage() {
   const startDate = new Date(startDateStr);
   startDate.setHours(0, 0, 0, 0);
 
-  // Compute duration in weeks based on internship duration string (e.g., "4 Weeks")
-  const durationStr = application.internships?.duration || "4 Weeks";
-  const weeks = parseInt(durationStr.split(" ")[0]) || 4;
-  const totalDays = weeks * 7;
+  // Compute duration correctly based on string (e.g. "60 Days", "4 Weeks", "6 Months")
+  const durationStr = (application.internships?.duration || "4 Weeks").toLowerCase();
+  const num = parseInt(durationStr.match(/\d+/)?.[0] || "4");
+  let totalDays = num * 7; // Default to weeks
+
+  if (durationStr.includes("day")) {
+    totalDays = num;
+  } else if (durationStr.includes("month")) {
+    totalDays = num * 30; // Approximation
+  } else if (durationStr.includes("week")) {
+    totalDays = num * 7;
+  }
 
   const endDate = new Date(startDate);
   endDate.setDate(startDate.getDate() + totalDays - 1); // Inclusive end date

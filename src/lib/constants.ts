@@ -399,7 +399,6 @@ export const DASHBOARD_NAV = [
   { label: "Certificates", href: "/dashboard/certificates", icon: "Award" },
   { label: "Calendar", href: "/dashboard/calendar", icon: "Calendar" },
   { label: "Leaderboard", href: "/dashboard/leaderboard", icon: "Trophy" },
-  { label: "Achievements", href: "/dashboard/achievements", icon: "Medal" },
   { label: "AI Assistant", href: "/dashboard/ai-assistant", icon: "Bot" },
   { label: "Messages", href: "/dashboard/messages", icon: "MessageSquare" },
   { label: "Resume", href: "/dashboard/resume", icon: "FileUser" },

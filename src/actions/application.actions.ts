@@ -218,3 +218,44 @@ export async function getUserApplications() {
     return { success: false, error: error.message };
   }
 }
+
+export async function getLeaderboardStats() {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('applications')
+      .select('id, full_name, status, clerk_id');
+
+    if (error) throw error;
+
+    const userStats: Record<string, { name: string, xp: number, active: number, completed: number, clerk_id: string }> = {};
+
+    data?.forEach(app => {
+      const id = app.clerk_id || app.full_name;
+      if (!userStats[id]) {
+        userStats[id] = { name: app.full_name, xp: 0, active: 0, completed: 0, clerk_id: app.clerk_id };
+      }
+      
+      if (app.status === "Active" || app.status === "Enrolled") {
+        userStats[id].xp += 250;
+        userStats[id].active += 1;
+      }
+      if (app.status === "Completed") {
+        userStats[id].xp += 1000;
+        userStats[id].completed += 1;
+      }
+    });
+
+    const leaderboard = Object.values(userStats)
+      .filter(u => u.xp > 0)
+      .sort((a, b) => b.xp - a.xp)
+      .map((u, index) => ({
+        ...u,
+        rank: index + 1,
+        level: Math.floor(u.xp / 500) + 1
+      }));
+
+    return { success: true, data: leaderboard };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}

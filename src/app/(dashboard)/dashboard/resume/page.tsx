@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Download, FileText, CheckCircle2 } from "lucide-react";
 import { PageHeader } from "@/components/shared";
+import Link from "next/link";
 
 const TEMPLATES = [
   {
@@ -91,10 +92,14 @@ export default function ResumePage() {
                 ))}
               </div>
 
-              <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">
+              <Link 
+                href={`/dashboard/resume/preview/${tpl.id}`}
+                target="_blank"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+              >
                 <Download className="w-4 h-4" />
                 Download Template
-              </button>
+              </Link>
             </div>
           </motion.div>
         ))}

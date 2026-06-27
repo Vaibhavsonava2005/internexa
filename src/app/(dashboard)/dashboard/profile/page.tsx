@@ -3,9 +3,34 @@
 import { useUser } from "@clerk/nextjs";
 import { PageHeader, Avatar, Badge, ProgressBar } from "@/components/shared";
 import { MapPin, Mail, Calendar, Edit, Shield } from "lucide-react";
+import { useState, useEffect } from "react";
+import { getUserApplications } from "@/actions/application.actions";
 
 export default function ProfilePage() {
   const { user } = useUser();
+  const [xp, setXp] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [nextLevelXp, setNextLevelXp] = useState(500);
+
+  useEffect(() => {
+    async function loadData() {
+      const res = await getUserApplications();
+      if (res.success && res.data) {
+        let totalXp = 0;
+        res.data.forEach(app => {
+          if (app.status === "Active") totalXp += 250;
+          if (app.status === "Completed") totalXp += 1000;
+        });
+        setXp(totalXp);
+        
+        // Simple leveling system: Every 500 XP is a level
+        const currentLevel = Math.floor(totalXp / 500) + 1;
+        setLevel(currentLevel);
+        setNextLevelXp(currentLevel * 500);
+      }
+    }
+    loadData();
+  }, []);
 
   if (!user) return null;
 
@@ -68,11 +93,11 @@ export default function ProfilePage() {
             
             <div className="mb-8 p-6 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-slate-900 dark:text-white">Level 5 Scholar</span>
-                <span className="font-bold text-indigo-600 dark:text-indigo-400">2,450 XP</span>
+                <span className="font-bold text-slate-900 dark:text-white">Level {level} Scholar</span>
+                <span className="font-bold text-indigo-600 dark:text-indigo-400">{xp.toLocaleString()} XP</span>
               </div>
-              <ProgressBar value={85} />
-              <p className="text-xs text-slate-500 mt-2 text-right">550 XP to Level 6</p>
+              <ProgressBar value={Math.round((xp / nextLevelXp) * 100)} />
+              <p className="text-xs text-slate-500 mt-2 text-right">{nextLevelXp - xp} XP to Level {level + 1}</p>
             </div>
 
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Skills</h3>
@@ -85,7 +110,7 @@ export default function ProfilePage() {
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">About Me</h3>
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed bg-slate-50 dark:bg-slate-950 p-4 rounded-xl">
               I'm an aspiring software engineer passionate about building impactful web applications. 
-              Currently completing my B.Tech in Computer Science and exploring the world of full-stack development.
+              Currently exploring the world of full-stack development and completing internships.
             </p>
           </div>
         </div>
