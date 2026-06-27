@@ -4,7 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { generateJoiningLetter, generateNDA } from "@/lib/document-engine";
 import { sendBrevoEmail } from "@/lib/email"; // Re-using basic email function, we can add a specific template later
 
-export async function completeOnboarding(offerLetterId: string, idFileId: string, signatureText: string) {
+export async function completeOnboarding(offerLetterId: string, signatureText: string) {
   try {
     // 1. Fetch application details
     const { data: app, error: fetchError } = await supabaseAdmin
@@ -58,7 +58,6 @@ export async function completeOnboarding(offerLetterId: string, idFileId: string
         joining_letter_id: joiningId,
         joining_letter_file_id: joiningRes.fileId,
         nda_file_id: ndaRes.fileId,
-        id_proof_file_id: idFileId,
         digital_signature: signatureText
       })
       .eq('id', app.id);

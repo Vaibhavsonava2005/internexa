@@ -133,14 +133,14 @@ export default function OfferPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             {/* Logo */}
             <div className="mb-6">
-              <h2 className="text-3xl sm:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-violet-400">InterNexa</h2>
+              <h2 className="text-2xl sm:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-violet-400">InterNexa</h2>
               <p className="text-slate-400 text-sm mt-1">Bridge the Gap Between Learning and Leading</p>
             </div>
             
             {step === "success" ? (
               <div className="mb-6">
                 <div className="text-6xl mb-4">🎉</div>
-                <h1 className="text-3xl sm:text-5xl font-extrabold mb-4">
+                <h1 className="text-2xl sm:text-5xl font-extrabold mb-4 break-words">
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-green-300">Enrollment Confirmed!</span>
                 </h1>
                 <p className="text-slate-300 text-lg max-w-xl mx-auto">Welcome aboard, {offer?.studentName}! Your learning journey begins now.</p>
@@ -148,7 +148,7 @@ export default function OfferPage() {
             ) : step === "payment" ? (
               <div className="mb-6">
                 <div className="text-6xl mb-4">💳</div>
-                <h1 className="text-3xl sm:text-5xl font-extrabold mb-4">
+                <h1 className="text-2xl sm:text-5xl font-extrabold mb-4 break-words">
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-violet-300">Complete Your Enrollment</span>
                 </h1>
                 <p className="text-slate-300 text-lg max-w-xl mx-auto">One last step to unlock your internship, {offer?.studentName}!</p>
@@ -156,7 +156,7 @@ export default function OfferPage() {
             ) : (
               <div className="mb-6">
                 <div className="text-6xl mb-4">🎉</div>
-                <h1 className="text-3xl sm:text-5xl font-extrabold mb-4">
+                <h1 className="text-2xl sm:text-5xl font-extrabold mb-4 break-words">
                   Congratulations, <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-green-300">{offer?.studentName}!</span>
                 </h1>
                 <p className="text-slate-300 text-lg max-w-xl mx-auto">You have been officially selected for the <strong className="text-white">{offer?.internshipName}</strong> internship program.</p>
