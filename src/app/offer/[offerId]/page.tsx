@@ -301,9 +301,9 @@ export default function OfferPage() {
                     <div className="bg-slate-900 rounded-lg p-4 flex items-center justify-between border border-slate-700">
                       <div>
                         <p className="text-xs text-slate-500 mb-1">UPI ID</p>
-                        <p className="text-white font-mono font-bold text-lg">989885966@ybl</p>
+                        <p className="text-white font-mono font-bold text-lg">989885966</p>
                       </div>
-                      <a href="upi://pay?pa=989885966@ybl&pn=InterNexa&am=199&cu=INR&tn=InterNexa%20Internship%20Enrollment"
+                      <a href="upi://pay?pa=989885966&pn=InterNexa&am=199&cu=INR&tn=InterNexa%20Internship%20Enrollment"
                         className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-colors flex items-center gap-2">
                         Pay ₹199 <ExternalLink className="w-3.5 h-3.5" />
                       </a>
