@@ -1,0 +1,157 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  
+  /* Brand Colors - Monochromatic Premium Palette (Slate & Zinc inspired) */
+  --color-brand-50: #f8fafc;
+  --color-brand-100: #f1f5f9;
+  --color-brand-200: #e2e8f0;
+  --color-brand-300: #cbd5e1;
+  --color-brand-400: #94a3b8;
+  --color-brand-500: #64748b;
+  --color-brand-600: #475569;
+  --color-brand-700: #334155;
+  --color-brand-800: #1e293b;
+  --color-brand-900: #0f172a;
+  --color-brand-950: #020617;
+
+  /* Accent Color (Deep Blue/Indigo for Interactive Elements) */
+  --color-accent-50: #eef2ff;
+  --color-accent-500: #6366f1;
+  --color-accent-600: #4f46e5;
+  
+  /* Strict 8px grid spacing extended values */
+  --spacing-0: 0px;
+  --spacing-1: 8px;
+  --spacing-2: 16px;
+  --spacing-3: 24px;
+  --spacing-4: 32px;
+  --spacing-5: 40px;
+  --spacing-6: 48px;
+  --spacing-8: 64px;
+  --spacing-10: 80px;
+  --spacing-12: 96px;
+  --spacing-16: 128px;
+  --spacing-20: 160px;
+  --spacing-24: 192px;
+  
+  /* Refined border radius */
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Premium shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  
+  /* Glows */
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+  --shadow-glow-active: 0 0 30px rgba(99, 102, 241, 0.3);
+
+  /* Animation Keyframes */
+  --animate-fade-in: fade-in 0.3s ease-out forwards;
+  --animate-slide-up: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-marquee: marquee 40s linear infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes accordion-down {
+  from { height: 0; opacity: 0; }
+  to { height: var(--radix-accordion-content-height); opacity: 1; }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); opacity: 1; }
+  to { height: 0; opacity: 0; }
+}
+
+/* Base Styles */
+@layer base {
+  * {
+    @apply border-brand-200 dark:border-brand-800;
+  }
+  body {
+    @apply bg-white text-brand-900 dark:bg-[#0a0a0a] dark:text-brand-50 antialiased selection:bg-accent-500/30 selection:text-accent-600 dark:selection:text-accent-50;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-brand-200 dark:bg-brand-800 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-brand-300 dark:bg-brand-700;
+}
+
+/* Glass Utilities */
+@layer utilities {
+  .glass {
+    @apply bg-white/70 dark:bg-brand-950/70 backdrop-blur-md border border-white/20 dark:border-white/10;
+  }
+  .glass-card {
+    @apply bg-white/50 dark:bg-brand-900/50 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-lg;
+  }
+  /* Remove autofill styles */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:active{
+      -webkit-box-shadow: 0 0 0 30px white inset !important;
+  }
+  .dark input:-webkit-autofill,
+  .dark input:-webkit-autofill:hover, 
+  .dark input:-webkit-autofill:focus, 
+  .dark input:-webkit-autofill:active{
+      -webkit-box-shadow: 0 0 0 30px #020617 inset !important;
+      -webkit-text-fill-color: white !important;
+  }
+}
+
+/* Hide Clerk Development UI */
+.clerk-badge,
+.cl-devMode,
+.cl-internal-b3alnn,
+.cl-internal-1dauvpw {
+  display: none !important;
+}
+
+/* Hide Clerk Development Mode UI */
+.clerk-badge, 
+.cl-devMode, 
+.cl-internal-b3alnn, 
+.cl-internal-1dauvpw {
+  display: none !important;
+}

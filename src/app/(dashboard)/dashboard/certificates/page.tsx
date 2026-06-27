@@ -1,0 +1,94 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { Download, Share2, ShieldCheck, Award } from "lucide-react";
+import { PageHeader, Badge } from "@/components/shared";
+
+const CERTIFICATES = [
+  {
+    id: "CERT-2026-X9Y8Z7",
+    title: "Data Science Fundamentals",
+    date: "August 15, 2026",
+    grade: "A+",
+    skills: ["Python", "Pandas", "Machine Learning"],
+  }
+];
+
+export default function CertificatesPage() {
+  return (
+    <div className="space-y-8">
+      <PageHeader 
+        title="My Certificates" 
+        description="View, download, and share your verified certificates."
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {CERTIFICATES.map((cert, index) => (
+          <motion.div
+            key={cert.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="group relative bg-white dark:bg-slate-900 rounded-3xl p-1 border border-slate-200 dark:border-slate-800 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300"
+          >
+            {/* Certificate Preview Card */}
+            <div className="relative h-48 rounded-[22px] overflow-hidden bg-slate-950 mb-4 p-6 flex flex-col items-center justify-center text-center border-4 border-slate-100 dark:border-slate-800">
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20 mix-blend-overlay" />
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/80 to-slate-900/90" />
+              
+              <Award className="w-10 h-10 text-amber-400 mb-2 relative z-10" />
+              <h4 className="text-white font-bold font-heading leading-tight relative z-10">
+                {cert.title}
+              </h4>
+              <p className="text-indigo-200 text-xs mt-2 relative z-10">
+                Issued to Student • {cert.date}
+              </p>
+            </div>
+
+            <div className="px-5 pb-5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-slate-500 font-mono">
+                  {cert.id}
+                </span>
+                <Badge variant="success" className="bg-emerald-100 text-emerald-700">
+                  Grade: {cert.grade}
+                </Badge>
+              </div>
+
+              <div className="flex flex-wrap gap-2 mb-6">
+                {cert.skills.map(skill => (
+                  <span key={skill} className="px-2 py-1 text-xs font-medium text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-md">
+                    {skill}
+                  </span>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <button className="flex items-center justify-center gap-2 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors text-sm">
+                  <Download className="w-4 h-4" />
+                  PDF
+                </button>
+                <button className="flex items-center justify-center gap-2 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-sm">
+                  <Share2 className="w-4 h-4" />
+                  Share
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {CERTIFICATES.length === 0 && (
+        <div className="py-20 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl">
+          <div className="w-20 h-20 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-4">
+            <ShieldCheck className="w-8 h-8 text-slate-400" />
+          </div>
+          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No certificates yet</h3>
+          <p className="text-slate-500 max-w-md mx-auto">
+            Complete your first internship program to earn an industry-recognized certificate.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
