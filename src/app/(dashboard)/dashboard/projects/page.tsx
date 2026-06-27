@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FolderGit2, Link as LinkIcon, Github, Send, Loader2, CheckCircle2 } from "lucide-react";
+import { FolderGit2, Link as LinkIcon, GitBranch, Send, Loader2, CheckCircle2 } from "lucide-react";
 import { PageHeader } from "@/components/shared";
 import { getUserApplications } from "@/actions/application.actions";
 import { submitProject } from "@/actions/projects.actions";
@@ -171,7 +171,7 @@ export default function ProjectsPage() {
 
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                <Github className="w-4 h-4" /> GitHub Repository URL *
+                <GitBranch className="w-4 h-4" /> GitHub Repository URL *
               </label>
               <input 
                 type="url" 
