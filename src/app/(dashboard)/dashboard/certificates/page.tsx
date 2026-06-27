@@ -4,17 +4,30 @@ import { motion } from "framer-motion";
 import { Download, Share2, ShieldCheck, Award } from "lucide-react";
 import { PageHeader, Badge } from "@/components/shared";
 
-const CERTIFICATES = [
-  {
-    id: "CERT-2026-X9Y8Z7",
-    title: "Data Science Fundamentals",
-    date: "August 15, 2026",
-    grade: "A+",
-    skills: ["Python", "Pandas", "Machine Learning"],
-  }
-];
+import { useEffect, useState } from "react";
+import { getUserApplications } from "@/actions/application.actions";
 
 export default function CertificatesPage() {
+  const [certificates, setCertificates] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadCerts() {
+      try {
+        const res = await getUserApplications();
+        if (res.success && res.data) {
+          const completed = res.data.filter(app => app.status === "Completed" && app.certificate_id);
+          setCertificates(completed);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadCerts();
+  }, []);
+
   return (
     <div className="space-y-8">
       <PageHeader 
@@ -22,8 +35,17 @@ export default function CertificatesPage() {
         description="View, download, and share your verified certificates."
       />
 
+      {isLoading ? (
+        <div className="flex justify-center p-12"><div className="animate-spin w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full" /></div>
+      ) : certificates.length === 0 ? (
+        <div className="text-center p-12 bg-slate-900 rounded-3xl border border-slate-800">
+          <Award className="w-12 h-12 text-slate-500 mx-auto mb-4 opacity-50" />
+          <h3 className="text-xl font-bold text-white mb-2">No Certificates Yet</h3>
+          <p className="text-slate-400">Complete an internship to earn your verified certificate.</p>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {CERTIFICATES.map((cert, index) => (
+        {certificates.map((cert, index) => (
           <motion.div
             key={cert.id}
             initial={{ opacity: 0, y: 20 }}
@@ -38,29 +60,21 @@ export default function CertificatesPage() {
               
               <Award className="w-10 h-10 text-amber-400 mb-2 relative z-10" />
               <h4 className="text-white font-bold font-heading leading-tight relative z-10">
-                {cert.title}
+                {cert.internships?.title || "InterNexa Program"}
               </h4>
               <p className="text-indigo-200 text-xs mt-2 relative z-10">
-                Issued to Student • {cert.date}
+                Issued to {cert.full_name || "Student"}
               </p>
             </div>
 
             <div className="px-5 pb-5">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-medium text-slate-500 font-mono">
-                  {cert.id}
+                  {cert.certificate_id}
                 </span>
                 <Badge variant="success" className="bg-emerald-100 text-emerald-700">
-                  Grade: {cert.grade}
+                  Grade: A+
                 </Badge>
-              </div>
-
-              <div className="flex flex-wrap gap-2 mb-6">
-                {cert.skills.map(skill => (
-                  <span key={skill} className="px-2 py-1 text-xs font-medium text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-md">
-                    {skill}
-                  </span>
-                ))}
               </div>
 
               <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
@@ -77,17 +91,6 @@ export default function CertificatesPage() {
           </motion.div>
         ))}
       </div>
-
-      {CERTIFICATES.length === 0 && (
-        <div className="py-20 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl">
-          <div className="w-20 h-20 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-4">
-            <ShieldCheck className="w-8 h-8 text-slate-400" />
-          </div>
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No certificates yet</h3>
-          <p className="text-slate-500 max-w-md mx-auto">
-            Complete your first internship program to earn an industry-recognized certificate.
-          </p>
-        </div>
       )}
     </div>
   );

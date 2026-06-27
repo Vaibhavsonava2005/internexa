@@ -42,9 +42,9 @@ export async function generateAndUploadOfferLetter(data: OfferLetterData): Promi
 
     const bodyText = `We are thrilled to offer you the position of Intern in the ${data.internshipName} program at InterNexa. Your skills and background impress us, and we believe you will be a great addition to our team.
 
-This internship is for a duration of ${data.duration}. ${data.stipend ? `You will receive a stipend of ${data.stipend}.` : "This is an unpaid, learning-focused internship program."}
+This internship is for a duration of ${data.duration}. ${data.stipend ? `You will receive a stipend of ${data.stipend}.` : "A performance-based stipend of up to ₹15,000 is to be given at the end of the internship."}
 
-Please find the detailed curriculum and terms on your student dashboard. To accept this offer, please log in to your InterNexa account and complete the payment/onboarding process within 72 hours.
+Please find the detailed curriculum and terms on your student dashboard. To accept this offer, please log in to your InterNexa account and complete the onboarding process within 72 hours.
 
 We look forward to welcoming you aboard and wish you a successful learning journey.`;
 

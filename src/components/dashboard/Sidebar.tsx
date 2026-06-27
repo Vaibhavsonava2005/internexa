@@ -128,34 +128,6 @@ export function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobile
         })}
       </div>
 
-      {/* Footer / User Profile */}
-      <div className="p-3 border-t border-brand-200 dark:border-brand-900 shrink-0">
-        <div className={cn("flex items-center p-2 rounded-lg hover:bg-brand-100 dark:hover:bg-brand-900 transition-colors cursor-pointer", isCollapsed ? "justify-center" : "gap-3")}>
-          <Avatar src={user?.imageUrl} name={user?.fullName || "User"} size="sm" />
-          
-          {!isCollapsed && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-brand-900 dark:text-white truncate leading-none mb-1">
-                {user?.fullName || "Student"}
-              </p>
-              <p className="text-xs text-brand-500 truncate leading-none">
-                {user?.primaryEmailAddress?.emailAddress || "student@internexa.com"}
-              </p>
-            </div>
-          )}
-        </div>
-
-        <button
-          onClick={handleLogout}
-          className={cn(
-            "w-full flex items-center gap-3 mt-2 px-3 py-2 rounded-lg text-brand-600 dark:text-brand-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors group text-sm",
-            isCollapsed && "justify-center"
-          )}
-        >
-          <LogOut className="w-4 h-4 shrink-0" />
-          {!isCollapsed && <span>Log out</span>}
-        </button>
-      </div>
     </div>
   );
 

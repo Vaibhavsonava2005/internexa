@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import { approveApplication, rejectApplication, getAdminData } from "@/actions/admin.actions";
 import { Button, Badge } from "@/components/shared";
-import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock, FolderGit2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
 export function AdminDashboardClient({ initialData }: { initialData: any }) {
-  const [activeTab, setActiveTab] = useState<"applications" | "users" | "transactions">("applications");
+  const [activeTab, setActiveTab] = useState<"applications" | "users" | "transactions" | "submissions">("applications");
   const [data, setData] = useState(initialData);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
 
@@ -67,6 +67,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
       <div className="flex space-x-1 bg-brand-100 dark:bg-brand-900/50 p-1 rounded-xl mb-8 w-max">
         {[
           { id: "applications", label: "Applications", icon: FileText },
+          { id: "submissions", label: "Projects", icon: FolderGit2 },
           { id: "users", label: "Users", icon: Users },
           { id: "transactions", label: "Payments", icon: CreditCard },
         ].map((tab) => {
@@ -230,6 +231,53 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
         )}
 
       </div>
+
+        {/* Submissions */}
+        {activeTab === "submissions" && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="bg-brand-50 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400">
+                <tr>
+                  <th className="px-6 py-4 font-medium">Student Name</th>
+                  <th className="px-6 py-4 font-medium">Domain & Project</th>
+                  <th className="px-6 py-4 font-medium">Links</th>
+                  <th className="px-6 py-4 font-medium">Date</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-brand-100 dark:divide-brand-800">
+                {(data.submissions || []).map((sub: any) => (
+                  <tr key={sub.id} className="hover:bg-brand-50/50 dark:hover:bg-brand-900/20 transition-colors">
+                    <td className="px-6 py-4 font-medium text-brand-900 dark:text-white">{sub.student_name}</td>
+                    <td className="px-6 py-4">
+                      <div className="font-medium text-brand-900 dark:text-white">{sub.project_title}</div>
+                      <div className="text-xs text-brand-500 mt-1">{sub.domain}</div>
+                    </td>
+                    <td className="px-6 py-4 space-y-1">
+                      {sub.github_link && (
+                        <a href={sub.github_link} target="_blank" rel="noopener noreferrer" className="block text-indigo-500 hover:underline text-xs">
+                          GitHub
+                        </a>
+                      )}
+                      {sub.deployment_link && (
+                        <a href={sub.deployment_link} target="_blank" rel="noopener noreferrer" className="block text-emerald-500 hover:underline text-xs">
+                          Live Demo
+                        </a>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">{sub.submitted_at ? new Date(sub.submitted_at).toLocaleDateString() : "N/A"}</td>
+                  </tr>
+                ))}
+                {(!data.submissions || data.submissions.length === 0) && (
+                  <tr>
+                    <td colSpan={4} className="px-6 py-12 text-center text-brand-500">
+                      No projects submitted yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
     </div>
   );
 }

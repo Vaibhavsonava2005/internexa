@@ -58,16 +58,17 @@ export default function DashboardHome() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-brand-900 dark:text-white tracking-tight mb-2">
-            Welcome back, {user?.firstName || "Student"}
+            {(() => {
+              const hour = new Date().getHours();
+              const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+              const name = applications[0]?.full_name || user?.firstName || "Student";
+              return `${greeting}, ${name}!`;
+            })()}
           </h1>
           <p className="text-brand-500 dark:text-brand-400 text-sm">
             Track your applications and learning journey.
           </p>
         </div>
-        <Button className="shrink-0 group" size="sm">
-          <Sparkles className="w-4 h-4 mr-2 text-accent-100" />
-          Claim Daily Reward
-        </Button>
       </div>
 
       {/* Metrics Row */}

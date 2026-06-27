@@ -49,6 +49,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { AntiInspect } from "@/components/security/AntiInspect";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -58,6 +60,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning className="dark">
         <body className={`${inter.variable} font-sans antialiased`}>
+          <AntiInspect />
           {children}
         </body>
       </html>

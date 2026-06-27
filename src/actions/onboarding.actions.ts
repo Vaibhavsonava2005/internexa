@@ -57,8 +57,7 @@ export async function completeOnboarding(offerLetterId: string, signatureText: s
         status: "Active",
         joining_letter_id: joiningId,
         joining_letter_file_id: joiningRes.fileId,
-        nda_file_id: ndaRes.fileId,
-        digital_signature: signatureText
+        nda_file_id: ndaRes.fileId
       })
       .eq('id', app.id);
 

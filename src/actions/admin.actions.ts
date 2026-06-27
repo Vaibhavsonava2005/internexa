@@ -34,11 +34,22 @@ export async function logAudit(admin_id: string, action: string, target_user_id?
   }
 }
 
+import { cookies } from "next/headers";
+
+async function verifyAdmin() {
+  const cookieStore = await cookies();
+  const adminSession = cookieStore.get("admin_session");
+  if (adminSession?.value !== "true") {
+    throw new Error("Unauthorized: Admin access required");
+  }
+}
+
 export async function approveApplication(applicationId: string) {
   const admin = await currentUser();
   if (!admin) return { success: false, error: "Not authenticated" };
 
   try {
+    await verifyAdmin();
     // 1. Fetch application details
     const { data: application, error: fetchError } = await supabaseAdmin
       .from('applications')
@@ -79,6 +90,10 @@ export async function approveApplication(applicationId: string) {
       throw new Error(pdfResult.error || "PDF Generation failed");
     }
 
+    // Calculate start date (3 days from now)
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() + 3);
+
     // 3. Update Application Status
     const { error: updateError } = await supabaseAdmin
       .from('applications')
@@ -86,7 +101,8 @@ export async function approveApplication(applicationId: string) {
         status: "Accepted",
         offer_letter_id: offerLetterId,
         offer_letter_file_id: pdfResult.fileId,
-        offer_expires_at: offerExpiresAt.toISOString()
+        offer_expires_at: offerExpiresAt.toISOString(),
+        start_date: startDate.toISOString().split('T')[0]
       })
       .eq('id', applicationId);
 
@@ -138,6 +154,7 @@ export async function rejectApplication(applicationId: string) {
   if (!admin) return { success: false, error: "Not authenticated" };
 
   try {
+    await verifyAdmin();
     const { error: updateError } = await supabaseAdmin
       .from('applications')
       .update({ status: "Rejected" })
@@ -155,29 +172,30 @@ export async function rejectApplication(applicationId: string) {
 
 export async function getAdminData() {
   try {
-    const [appsRes, usersRes, txRes] = await Promise.all([
+    await verifyAdmin();
+    const [appsRes, usersRes, txRes, projectsRes] = await Promise.all([
       supabaseAdmin.from('applications').select('*, internships(title)'),
       supabaseAdmin.from('users').select('*'),
-      supabaseAdmin.from('transactions').select('*')
+      supabaseAdmin.from('transactions').select('*'),
+      supabaseAdmin.from('project_submissions').select('*').order('submitted_at', { ascending: false })
     ]);
 
     const applications = appsRes.data || [];
     const users = usersRes.data || [];
     const transactions = txRes.data || [];
-
-
+    const submissions = projectsRes.data || [];
 
     return {
       success: true,
       data: {
         applications,
         users,
-        transactions
+        transactions,
+        submissions
       }
     };
   } catch (error: any) {
     console.error("Admin data fetch error:", error);
-    // Return false so the UI knows there was an error fetching data
     return {
       success: false,
       error: error.message || "Failed to fetch admin data",
@@ -185,8 +203,6 @@ export async function getAdminData() {
     };
   }
 }
-
-import { cookies } from "next/headers";
 
 export async function loginAdmin(password: string) {
   if (password === "0202") {

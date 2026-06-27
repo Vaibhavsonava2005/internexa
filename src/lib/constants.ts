@@ -361,7 +361,6 @@ export const FAQ_DATA = [
   { question: "Do I need prior experience?", answer: "Not at all! We offer internships at Beginner, Intermediate, and Advanced levels. Our beginner programs start from zero and guide you step-by-step with structured curriculum and mentor support." },
   { question: "How does the AI-powered learning work?", answer: "Our AI assistant helps you solve doubts instantly, analyzes your resume, conducts mock interviews, generates personalized learning roadmaps, and provides code reviews. It's like having a personal tutor available 24/7." },
   { question: "What about certificates?", answer: "Upon successful completion, you receive a premium digital certificate with a unique ID and QR verification code. Certificates can be downloaded as PDF, shared to LinkedIn, and added to your resume." },
-  { question: "Can I get a refund?", answer: "Yes! We offer a 7-day money-back guarantee. If you're not satisfied with the internship within the first 7 days, we'll refund your full amount — no questions asked." },
   { question: "How are mentors selected?", answer: "Our mentors are industry professionals from top companies like Google, Microsoft, Amazon, and more. Each mentor goes through a rigorous selection process and has 5+ years of industry experience." },
   { question: "Is there placement support?", answer: "Absolutely! We provide resume building, mock interviews, LinkedIn optimization, and direct referrals to our 500+ hiring partners. Our placement rate is 94%." },
 ];
