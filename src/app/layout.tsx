@@ -50,6 +50,7 @@ export const metadata: Metadata = {
 };
 
 import { AntiInspect } from "@/components/security/AntiInspect";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export default function RootLayout({
   children,
@@ -60,8 +61,10 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning className="dark">
         <body className={`${inter.variable} font-sans antialiased`}>
-          <AntiInspect />
-          {children}
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
+            <AntiInspect />
+            {children}
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

@@ -88,6 +88,14 @@ export function Navbar() {
 
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center gap-4">
+              <button
+                onClick={toggleTheme}
+                className="p-2 text-brand-500 hover:text-brand-900 dark:text-brand-400 dark:hover:text-white transition-colors rounded-full hover:bg-brand-100 dark:hover:bg-brand-800"
+                aria-label="Toggle Theme"
+              >
+                {mounted ? (isDark ? <Sun size={18} /> : <Moon size={18} />) : <Sun size={18} className="opacity-0" />}
+              </button>
+
               {isSignedIn ? (
                 <div className="flex items-center gap-4">
                   <Button variant="outline" asChild className="hidden sm:flex border-brand-200 dark:border-brand-800 text-brand-700 dark:text-brand-300 hover:bg-brand-50 dark:hover:bg-brand-900">
@@ -157,12 +165,21 @@ export function Navbar() {
                     InterNexa
                   </span>
                 </div>
-                <button
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 text-brand-500 hover:text-brand-900 dark:text-brand-400 dark:hover:text-white rounded-full hover:bg-brand-100 dark:hover:bg-brand-800"
-                >
-                  <X size={20} />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={toggleTheme}
+                    className="p-2 text-brand-500 hover:text-brand-900 dark:text-brand-400 dark:hover:text-white rounded-full hover:bg-brand-100 dark:hover:bg-brand-800"
+                    aria-label="Toggle Theme"
+                  >
+                    {mounted ? (isDark ? <Sun size={20} /> : <Moon size={20} />) : <Sun size={20} className="opacity-0" />}
+                  </button>
+                  <button
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="p-2 text-brand-500 hover:text-brand-900 dark:text-brand-400 dark:hover:text-white rounded-full hover:bg-brand-100 dark:hover:bg-brand-800"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
               </div>
 
               <div className="flex flex-col gap-2">

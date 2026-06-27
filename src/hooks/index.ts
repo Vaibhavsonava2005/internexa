@@ -37,30 +37,30 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   return [storedValue, setValue] as const;
 }
 
+import { useTheme as useNextTheme } from "next-themes";
+
 // ─── useTheme ───────────────────────────────────────────────
 export function useTheme() {
-  const [theme, setThemeState] = useState<"dark">("dark");
+  const { theme, setTheme, systemTheme } = useNextTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const root = window.document.documentElement;
-    root.classList.add("dark");
-    root.classList.remove("light");
-    try {
-      window.localStorage.setItem("internexa-theme", JSON.stringify("dark"));
-    } catch(e) {}
   }, []);
 
-  const setTheme = useCallback((newTheme: "dark") => {
-    // Disabled as per user request to force dark mode globally
-  }, []);
-
+  const currentTheme = theme === "system" ? systemTheme : theme;
+  
   const toggleTheme = useCallback(() => {
-    // Disabled toggle as per user request to force dark mode globally
-  }, []);
+    setTheme(currentTheme === "dark" ? "light" : "dark");
+  }, [currentTheme, setTheme]);
 
-  return { theme: "dark", setTheme, toggleTheme, isDark: true, mounted };
+  return { 
+    theme: currentTheme || "dark", 
+    setTheme, 
+    toggleTheme, 
+    isDark: currentTheme === "dark" || !mounted, 
+    mounted 
+  };
 }
 
 // ─── useDebounce ────────────────────────────────────────────

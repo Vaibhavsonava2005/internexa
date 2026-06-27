@@ -136,23 +136,6 @@ export function HeroSection() {
                 </div>
               </div>
 
-              {/* Floating Element over UI */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 1.2 }}
-                className="absolute -right-6 -bottom-6 w-48 p-4 bg-white dark:bg-brand-800 border border-brand-200 dark:border-brand-700 rounded-xl shadow-xl"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                    <CheckCircle className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold dark:text-white">Review Passed</div>
-                    <div className="text-xs text-brand-500">Mentor approved</div>
-                  </div>
-                </div>
-              </motion.div>
             </motion.div>
           </div>
         </div>
