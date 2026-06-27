@@ -17,8 +17,8 @@ export async function completeOnboarding(offerLetterId: string, signatureText: s
       return { success: false, error: "Application not found" };
     }
 
-    if (app.status !== "Enrolled") {
-      return { success: false, error: "Payment not completed or already onboarded" };
+    if (app.status !== "Accepted" && app.status !== "Offer Accepted") {
+      return { success: false, error: "Invalid application status for onboarding" };
     }
 
     // 2. Generate unique IDs for the documents
@@ -60,13 +60,36 @@ export async function completeOnboarding(offerLetterId: string, signatureText: s
 
     if (updateError) throw updateError;
 
-    // 5. Send Email with Joining Letter (we use raw for now, can be upgraded to brevo template)
+    // 5. Send Email with Joining Letter
     try {
       const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/documents/${joiningRes.fileId}`;
+      const emailHtml = `
+        <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+          <div style="background-color: #4f46e5; padding: 20px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 24px;">Welcome to InterNexa!</h1>
+          </div>
+          <div style="padding: 30px;">
+            <p style="font-size: 16px;">Dear <strong>${app.full_name}</strong>,</p>
+            <p style="font-size: 16px; line-height: 1.5;">Congratulations! Your onboarding for the <strong>${app.internships.title}</strong> internship is officially complete. We are thrilled to have you join our cohort.</p>
+            <p style="font-size: 16px; line-height: 1.5;">Your payment has been successfully processed and your Official Joining Letter has been generated.</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${publicUrl}" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;">Download Joining Letter</a>
+            </div>
+            
+            <p style="font-size: 16px; line-height: 1.5;">You can now log in to your student dashboard to access your curriculum and begin your journey.</p>
+            <p style="font-size: 16px; margin-top: 30px;">Best regards,<br><strong>The InterNexa Team</strong></p>
+          </div>
+          <div style="background-color: #f8fafc; padding: 15px; text-align: center; font-size: 12px; color: #64748b;">
+            &copy; ${new Date().getFullYear()} InterNexa EdTech. All rights reserved.
+          </div>
+        </div>
+      `;
+      
       await sendBrevoEmail({
         to: [{ email: app.email, name: app.full_name }],
-        subject: "Your InterNexa Joining Letter 🚀",
-        htmlContent: `Hi ${app.full_name},<br><br>Welcome to InterNexa! Your onboarding is complete.<br><br>Please find your Joining Letter here: <a href="${publicUrl}">${publicUrl}</a><br><br>Log in to your dashboard to start your journey.<br><br>Best,<br>InterNexa Team`
+        subject: "🎉 Congratulations! Your InterNexa Joining Letter is Ready",
+        htmlContent: emailHtml
       });
     } catch (e) {
       console.error("Failed to send joining letter email", e);

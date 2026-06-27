@@ -114,14 +114,9 @@ export function FeaturedInternships() {
 
                 <div className="flex items-center justify-between pt-5 border-t border-brand-100 dark:border-brand-800">
                   <div className="flex flex-col">
-                    <span className="text-lg font-bold text-brand-900 dark:text-white leading-none">
-                      {formatCurrency(internship.price || 0, internship.currency)}
+                    <span className="text-sm font-medium text-brand-500 dark:text-brand-400">
+                      Performance-based Stipend Available
                     </span>
-                    {internship.originalPrice && (
-                      <span className="text-xs text-brand-400 line-through mt-1">
-                        {formatCurrency(internship.originalPrice, internship.currency)}
-                      </span>
-                    )}
                   </div>
                   <Button variant="secondary" asChild>
                     <Link href={`/internships/${internship.slug}`}>

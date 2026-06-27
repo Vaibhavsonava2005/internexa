@@ -39,25 +39,40 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 
 // ─── useTheme ───────────────────────────────────────────────
 export function useTheme() {
-  const [theme, setTheme] = useState<"dark">("dark");
+  const [theme, setThemeState] = useState<"light" | "dark">("dark");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const root = window.document.documentElement;
-    root.classList.remove("light");
-    root.classList.add("dark");
-    // Force localStorage to dark
+    let savedTheme = "dark";
     try {
-      window.localStorage.setItem("internexa-theme", JSON.stringify("dark"));
+      const item = window.localStorage.getItem("internexa-theme");
+      if (item) savedTheme = JSON.parse(item);
+    } catch(e) {}
+    
+    setTheme(savedTheme as "light" | "dark");
+  }, []);
+
+  const setTheme = useCallback((newTheme: "light" | "dark") => {
+    setThemeState(newTheme);
+    const root = window.document.documentElement;
+    if (newTheme === "dark") {
+      root.classList.add("dark");
+      root.classList.remove("light");
+    } else {
+      root.classList.add("light");
+      root.classList.remove("dark");
+    }
+    try {
+      window.localStorage.setItem("internexa-theme", JSON.stringify(newTheme));
     } catch(e) {}
   }, []);
 
   const toggleTheme = useCallback(() => {
-    // Disabled toggle as per user request to force dark mode globally
-  }, []);
+    setTheme(theme === "dark" ? "light" : "dark");
+  }, [theme, setTheme]);
 
-  return { theme: "dark", setTheme, toggleTheme, isDark: true, mounted };
+  return { theme, setTheme, toggleTheme, isDark: theme === "dark", mounted };
 }
 
 // ─── useDebounce ────────────────────────────────────────────
