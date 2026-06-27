@@ -13,8 +13,8 @@ import { createClient } from "@supabase/supabase-js";
 import { getUserApplications } from "@/actions/application.actions";
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
+  process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co",
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder"
 );
 
 const TABS = ["Overview", "Curriculum", "Projects", "Mentor", "Reviews"];

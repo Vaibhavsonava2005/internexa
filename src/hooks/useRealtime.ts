@@ -5,8 +5,8 @@ import { createClient } from "@supabase/supabase-js";
 import { useAuth } from "@clerk/nextjs";
 
 // We use an empty key or public key for frontend listening if row level security is properly configured
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""; 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder"; 
 const getSupabase = () => {
   if (!supabaseUrl || !supabaseKey) return null;
   return createClient(supabaseUrl, supabaseKey);

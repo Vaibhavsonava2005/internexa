@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, Filter, Clock, BookOpen, Star, LayoutGrid, List, ChevronRight } from "lucide-react";
+import { Search, Filter, Clock, BookOpen, Star, LayoutGrid, List, ChevronRight, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { Navbar } from "@/components/marketing/Navbar";
 import { Footer } from "@/components/marketing/Footer";
@@ -13,8 +13,8 @@ import { getDifficultyColor, cn } from "@/lib/utils";
 import { getUserApplications } from "@/actions/application.actions";
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
+  process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co",
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder"
 );
 
 export default function InternshipsPage() {
