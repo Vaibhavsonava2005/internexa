@@ -295,13 +295,30 @@ export async function sendOfferLetterEmail({
   // Build PDF attachment
   let attachment: any[] = [];
   if (pdfUrl) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    if (supabaseUrl) {
-      const publicUrl = `${supabaseUrl}/storage/v1/object/public/offer-letters/${pdfUrl}`;
-      attachment.push({
-        url: publicUrl,
-        name: `InterNexa_Offer_Letter_${offerLetterId}.pdf`
-      });
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+        process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+        { auth: { autoRefreshToken: false, persistSession: false } }
+      );
+      
+      const { data, error } = await supabaseAdmin.storage.from('offer-letters').download(pdfUrl);
+      
+      if (!error && data) {
+        const arrayBuffer = await data.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const base64Content = buffer.toString('base64');
+        
+        attachment.push({
+          content: base64Content,
+          name: `InterNexa_Offer_Letter_${offerLetterId}.pdf`
+        });
+      } else {
+        console.error("Failed to download PDF for email attachment", error);
+      }
+    } catch (err) {
+      console.error("Error attaching PDF to email", err);
     }
   }
 
