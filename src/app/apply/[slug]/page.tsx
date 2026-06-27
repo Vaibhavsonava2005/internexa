@@ -135,107 +135,19 @@ export default function ApplyPage() {
               </div>
             </section>
 
-            {/* Education */}
+            {/* Education & Skills */}
             <section className="space-y-4">
-              <h3 className="text-lg font-bold text-brand-900 dark:text-white border-b border-brand-100 dark:border-brand-900 pb-2">Education Details</h3>
+              <h3 className="text-lg font-bold text-brand-900 dark:text-white border-b border-brand-100 dark:border-brand-900 pb-2">Education & Skills</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">College Name</label>
                   <input {...register("collegeName")} className="w-full px-4 py-2 rounded-lg bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500" />
                   {errors.collegeName && <p className="text-red-500 text-xs mt-1">{errors.collegeName.message}</p>}
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">University</label>
-                  <input {...register("university")} className="w-full px-4 py-2 rounded-lg bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500" />
-                  {errors.university && <p className="text-red-500 text-xs mt-1">{errors.university.message}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Current Semester</label>
-                  <input {...register("currentSemester")} className="w-full px-4 py-2 rounded-lg bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500" />
-                  {errors.currentSemester && <p className="text-red-500 text-xs mt-1">{errors.currentSemester.message}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Degree</label>
-                  <input {...register("degree")} className="w-full px-4 py-2 rounded-lg bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500" />
-                  {errors.degree && <p className="text-red-500 text-xs mt-1">{errors.degree.message}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Branch/Specialization</label>
-                  <input {...register("branch")} className="w-full px-4 py-2 rounded-lg bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500" />
-                  {errors.branch && <p className="text-red-500 text-xs mt-1">{errors.branch.message}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Expected Graduation Year</label>
-                  <input {...register("expectedGraduationYear")} className="w-full px-4 py-2 rounded-lg bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500" />
-                  {errors.expectedGraduationYear && <p className="text-red-500 text-xs mt-1">{errors.expectedGraduationYear.message}</p>}
-                </div>
-              </div>
-            </section>
-
-            {/* Profile & Skills */}
-            <section className="space-y-4">
-              <h3 className="text-lg font-bold text-brand-900 dark:text-white border-b border-brand-100 dark:border-brand-900 pb-2">Profile & Skills</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Current Skills (comma separated)</label>
                   <textarea {...register("currentSkills")} rows={2} className="w-full px-4 py-2 rounded-lg bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500" />
                   {errors.currentSkills && <p className="text-red-500 text-xs mt-1">{errors.currentSkills.message}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">GitHub Profile (Optional)</label>
-                  <input {...register("githubProfile")} className="w-full px-4 py-2 rounded-lg bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500" />
-                  {errors.githubProfile && <p className="text-red-500 text-xs mt-1">{errors.githubProfile.message}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">LinkedIn Profile (Optional)</label>
-                  <input {...register("linkedinProfile")} className="w-full px-4 py-2 rounded-lg bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500" />
-                  {errors.linkedinProfile && <p className="text-red-500 text-xs mt-1">{errors.linkedinProfile.message}</p>}
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Portfolio Website (Optional)</label>
-                  <input {...register("portfolio")} className="w-full px-4 py-2 rounded-lg bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500" />
-                  {errors.portfolio && <p className="text-red-500 text-xs mt-1">{errors.portfolio.message}</p>}
-                </div>
-              </div>
-            </section>
-
-            {/* Internship Preferences */}
-            <section className="space-y-4">
-              <h3 className="text-lg font-bold text-brand-900 dark:text-white border-b border-brand-100 dark:border-brand-900 pb-2">Internship Preferences</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Preferred Domain</label>
-                  <input {...register("preferredDomain")} className="w-full px-4 py-2 rounded-lg bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500" />
-                  {errors.preferredDomain && <p className="text-red-500 text-xs mt-1">{errors.preferredDomain.message}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Preferred Start Date</label>
-                  <input type="date" {...register("preferredStartDate")} className="w-full px-4 py-2 rounded-lg bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500" />
-                  {errors.preferredStartDate && <p className="text-red-500 text-xs mt-1">{errors.preferredStartDate.message}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Available Hours Per Week</label>
-                  <input {...register("availableHours")} className="w-full px-4 py-2 rounded-lg bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500" />
-                  {errors.availableHours && <p className="text-red-500 text-xs mt-1">{errors.availableHours.message}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Preferred Duration</label>
-                  <input {...register("preferredDuration")} placeholder="e.g., 3 months" className="w-full px-4 py-2 rounded-lg bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500" />
-                  {errors.preferredDuration && <p className="text-red-500 text-xs mt-1">{errors.preferredDuration.message}</p>}
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Why do you want to join this internship?</label>
-                  <textarea {...register("whyJoin")} rows={3} className="w-full px-4 py-2 rounded-lg bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500" />
-                  {errors.whyJoin && <p className="text-red-500 text-xs mt-1">{errors.whyJoin.message}</p>}
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Career Goals</label>
-                  <textarea {...register("careerGoals")} rows={3} className="w-full px-4 py-2 rounded-lg bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500" />
-                  {errors.careerGoals && <p className="text-red-500 text-xs mt-1">{errors.careerGoals.message}</p>}
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Previous Experience (Optional)</label>
-                  <textarea {...register("previousExperience")} rows={3} className="w-full px-4 py-2 rounded-lg bg-brand-50 dark:bg-[#0a0a0a] border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500" />
                 </div>
               </div>
             </section>
