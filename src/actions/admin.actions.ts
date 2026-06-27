@@ -61,6 +61,7 @@ export async function approveApplication(applicationId: string) {
     
     const pdfResult = await generateAndUploadOfferLetter({
       offerId: offerLetterId,
+      applicationId: application.application_id || application.reference_number || application.id,
       studentName: application.full_name,
       internshipName: application.internships.title,
       date: new Date().toLocaleDateString(),

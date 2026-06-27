@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 
 interface OfferLetterData {
   offerId: string;
+  applicationId?: string;
   studentName: string;
   internshipName: string;
   date: string;
@@ -31,8 +32,11 @@ export async function generateAndUploadOfferLetter(data: OfferLetterData): Promi
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
     
-    doc.text(`Date: ${data.date}`, 150, 30);
-    doc.text(`Offer ID: ${data.offerId}`, 150, 38);
+    doc.text(`Date: ${data.date}`, 145, 30);
+    doc.text(`Offer ID: ${data.offerId}`, 145, 38);
+    if (data.applicationId) {
+      doc.text(`App No: ${data.applicationId}`, 145, 46);
+    }
 
     doc.text(`Dear ${data.studentName},`, 20, 70);
 

@@ -170,7 +170,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
               <tbody className="divide-y divide-brand-100 dark:divide-brand-800">
                 {data.users.map((u: any) => (
                   <tr key={u.id} className="hover:bg-brand-50/50 dark:hover:bg-brand-900/20 transition-colors">
-                    <td className="px-6 py-4 font-mono text-xs">{u.clerk_id.substring(0, 16)}...</td>
+                    <td className="px-6 py-4 font-mono text-xs">{u.clerk_id?.substring(0, 16) || "N/A"}...</td>
                     <td className="px-6 py-4 font-medium text-brand-900 dark:text-white">{u.email}</td>
                     <td className="px-6 py-4">{u.full_name}</td>
                     <td className="px-6 py-4"><Badge variant="secondary">{u.role}</Badge></td>

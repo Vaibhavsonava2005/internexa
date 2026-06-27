@@ -15,7 +15,7 @@ const getBaseTemplate = (title: string, content: string) => `
     </div>
     
     <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eaeaea; text-align: center;">
-      <p style="color: #64748b; font-size: 14px; margin-bottom: 5px;">Need help? Contact us at <a href="mailto:support@internexa.in" style="color: ${BRAND_COLOR}; text-decoration: none;">support@internexa.in</a></p>
+      <p style="color: #64748b; font-size: 14px; margin-bottom: 5px;">Need help? Contact us at <a href="mailto:info.internexa@gmail.com" style="color: ${BRAND_COLOR}; text-decoration: none;">info.internexa@gmail.com</a></p>
       <p style="color: #94a3b8; font-size: 12px; margin: 0;">&copy; ${new Date().getFullYear()} InterNexa. All rights reserved.</p>
     </div>
   </div>
@@ -30,7 +30,7 @@ async function sendBrevoEmail({ to, subject, htmlContent, attachment }: { to: { 
 
   try {
     const payload: any = {
-      sender: { name: "InterNexa", email: "support@internexa.in" },
+      sender: { name: "InterNexa", email: "info.internexa@gmail.com" },
       to,
       subject,
       htmlContent,
