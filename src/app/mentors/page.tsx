@@ -85,37 +85,37 @@ export default function MentorsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] flex flex-col">
       <Navbar />
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
+          <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl">
             Learn from Industry Leaders
           </h1>
-          <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="mt-4 text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Connect with experienced professionals from top tech companies. Get personalized guidance, resume reviews, and interview preparation.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {mentors.map((mentor) => (
-            <div key={mentor.id} className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col">
+            <div key={mentor.id} className="bg-white dark:bg-brand-950 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-brand-800 overflow-hidden flex flex-col">
               <div className="p-6">
                 <div className="flex items-start gap-4">
-                  <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-gray-100 shrink-0">
+                  <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-gray-100 dark:border-brand-800 shrink-0">
                     <img src={mentor.imageUrl} alt={mentor.name} className="w-full h-full object-cover" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">{mentor.name}</h3>
-                    <p className="text-gray-600 font-medium">{mentor.role}</p>
-                    <div className="flex items-center gap-1 mt-1 text-sm text-gray-500">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">{mentor.name}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 font-medium">{mentor.role}</p>
+                    <div className="flex items-center gap-1 mt-1 text-sm text-gray-500 dark:text-gray-500">
                       <Building2 className="w-4 h-4" />
                       <span>{mentor.company}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-6 flex flex-wrap gap-4 text-sm text-gray-600">
+                <div className="mt-6 flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
                   <div className="flex items-center gap-1">
                     <MapPin className="w-4 h-4 text-gray-400" />
                     <span>{mentor.location}</span>
@@ -126,18 +126,18 @@ export default function MentorsPage() {
                   </div>
                   <div className="flex items-center gap-1">
                     <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                    <span className="font-medium text-gray-900">{mentor.rating}</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{mentor.rating}</span>
                     <span>({mentor.reviews})</span>
                   </div>
                 </div>
 
-                <p className="mt-6 text-gray-600 text-sm leading-relaxed line-clamp-3">
+                <p className="mt-6 text-gray-600 dark:text-gray-400 text-sm leading-relaxed line-clamp-3">
                   {mentor.bio}
                 </p>
 
                 <div className="mt-6 flex flex-wrap gap-2">
                   {mentor.skills.map((skill, index) => (
-                    <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
+                    <span key={index} className="px-3 py-1 bg-gray-100 dark:bg-brand-900 text-gray-700 dark:text-gray-300 text-xs font-medium rounded-full">
                       {skill}
                     </span>
                   ))}
@@ -145,7 +145,7 @@ export default function MentorsPage() {
               </div>
               
               <div className="mt-auto p-6 pt-0">
-                <button className="w-full py-3 bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold rounded-xl transition-colors">
+                <button className="w-full py-3 bg-white dark:bg-brand-950 border-2 border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 font-semibold rounded-xl transition-colors">
                   View Profile & Book
                 </button>
               </div>

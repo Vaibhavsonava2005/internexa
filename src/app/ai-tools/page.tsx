@@ -64,30 +64,30 @@ export default function AIToolsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0a] flex flex-col">
       <Navbar />
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-700 font-medium text-sm mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium text-sm mb-4">
             <BrainCircuit className="w-4 h-4" />
             <span>Next-Generation Career Tools</span>
           </div>
-          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
+          <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl">
             Supercharge Your Career with AI
           </h1>
-          <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="mt-4 text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Leverage our advanced artificial intelligence tools to optimize your resume, ace your interviews, and chart a clear path to success.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {tools.map((tool) => (
-            <div key={tool.id} className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col">
-              <div className={`${tool.color} w-20 h-20 rounded-2xl flex items-center justify-center mb-6`}>
+            <div key={tool.id} className="bg-white dark:bg-brand-950 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-brand-800 flex flex-col">
+              <div className={`${tool.color} dark:bg-brand-900 w-20 h-20 rounded-2xl flex items-center justify-center mb-6`}>
                 {tool.icon}
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">{tool.title}</h3>
-              <p className="text-gray-600 mb-8 flex-grow leading-relaxed">{tool.description}</p>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{tool.title}</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-8 flex-grow leading-relaxed">{tool.description}</p>
               
               <Link 
                 href={`/ai-tools/${tool.id}`}

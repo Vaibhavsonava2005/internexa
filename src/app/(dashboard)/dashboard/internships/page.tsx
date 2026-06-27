@@ -200,9 +200,15 @@ export default function MyInternshipsPage() {
             <Clock className="w-8 h-8 text-slate-400" />
           </div>
           <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No {filter !== "all" ? filter : ""} internships found</h3>
-          <p className="text-slate-500 max-w-md mx-auto">
+          <p className="text-slate-500 max-w-md mx-auto mb-6">
             You don't have any {filter !== "all" ? filter : ""} internships at the moment. Browse our catalog to start learning.
           </p>
+          <Link 
+            href="/internships"
+            className="inline-flex items-center justify-center px-6 py-3 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors"
+          >
+            Find Internship
+          </Link>
         </div>
       )}
 

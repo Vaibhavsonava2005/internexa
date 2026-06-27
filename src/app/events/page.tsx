@@ -67,28 +67,28 @@ export default function EventsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0a] flex flex-col">
       <Navbar />
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
+          <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl">
             Upcoming Events & Workshops
           </h1>
-          <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="mt-4 text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Join our live sessions, hackathons, and webinars to upskill, network, and advance your career alongside a global community.
           </p>
         </div>
 
         <div className="flex flex-col gap-6">
           {events.map((event) => (
-            <div key={event.id} className="bg-white rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow border border-gray-100 flex flex-col md:flex-row gap-8 items-start md:items-center">
+            <div key={event.id} className="bg-white dark:bg-brand-950 rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow border border-gray-100 dark:border-brand-800 flex flex-col md:flex-row gap-8 items-start md:items-center">
               
               {/* Event Date Block */}
               <div className="shrink-0 text-center w-32 hidden md:block">
-                <div className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-1">
+                <div className="text-sm font-bold text-gray-500 dark:text-brand-500 uppercase tracking-wider mb-1">
                   {event.date.split(" ")[0]}
                 </div>
-                <div className="text-3xl font-extrabold text-gray-900">
+                <div className="text-3xl font-extrabold text-gray-900 dark:text-white">
                   {event.date.split(" ")[1].replace(",", "")}
                 </div>
               </div>
@@ -99,21 +99,21 @@ export default function EventsPage() {
                   <span className={`px-3 py-1 rounded-full text-xs font-bold ${event.imageColor} ${event.textColor}`}>
                     {event.type}
                   </span>
-                  <div className="flex items-center text-sm text-gray-500 gap-1">
+                  <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 gap-1">
                     {event.format === "Online" ? <Video className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}
                     <span>{event.format}</span>
                   </div>
                 </div>
                 
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                   {event.title}
                 </h2>
                 
-                <p className="text-gray-600 mb-4 max-w-3xl">
+                <p className="text-gray-600 dark:text-gray-400 mb-4 max-w-3xl">
                   {event.description}
                 </p>
 
-                <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500">
+                <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 dark:text-gray-400">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     <span>{event.date} • {event.time}</span>
@@ -127,7 +127,7 @@ export default function EventsPage() {
 
               {/* Action Button */}
               <div className="shrink-0 w-full md:w-auto mt-4 md:mt-0">
-                <button className="w-full md:w-auto px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors">
+                <button className="w-full md:w-auto px-6 py-3 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-brand-100 text-white dark:text-brand-900 font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors">
                   <Ticket className="w-4 h-4" />
                   Register Now
                 </button>

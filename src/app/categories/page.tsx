@@ -72,33 +72,33 @@ export default function CategoriesPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] flex flex-col">
       <Navbar />
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
+          <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl">
             Explore Learning Domains
           </h1>
-          <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="mt-4 text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Discover a wide range of categories tailored for your career growth. Choose your path and start learning today.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {categories.map((category) => (
-            <div key={category.id} className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full">
-              <div className="bg-gray-50 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
+            <div key={category.id} className="bg-white dark:bg-brand-950 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-brand-800 flex flex-col h-full">
+              <div className="bg-gray-50 dark:bg-brand-900 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
                 {category.icon}
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">{category.title}</h3>
-              <p className="text-gray-600 mb-6 flex-grow">{category.description}</p>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{category.title}</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6 flex-grow">{category.description}</p>
               
-              <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
-                <div className="text-sm text-gray-500">
-                  <span className="font-semibold text-gray-900">{category.courses}</span> Courses
+              <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-brand-800">
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  <span className="font-semibold text-gray-900 dark:text-white">{category.courses}</span> Courses
                 </div>
-                <div className="text-sm text-gray-500">
-                  <span className="font-semibold text-gray-900">{category.internships}</span> Internships
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  <span className="font-semibold text-gray-900 dark:text-white">{category.internships}</span> Internships
                 </div>
               </div>
               

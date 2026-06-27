@@ -68,21 +68,21 @@ export default function BlogPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] flex flex-col">
       <Navbar />
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div className="max-w-2xl">
-            <h1 className="text-4xl font-extrabold text-gray-900">
+            <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white">
               Insights & Career Advice
             </h1>
-            <p className="mt-4 text-xl text-gray-600">
+            <p className="mt-4 text-xl text-gray-600 dark:text-gray-400">
               Expert articles, tutorials, and guides to help you master new skills and accelerate your tech career.
             </p>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {["All", "System Design", "DSA", "AI / ML", "Interview Preparation", "Resume", "Python"].map((cat) => (
-              <button key={cat} className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${cat === "All" ? "bg-gray-900 text-white" : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"}`}>
+              <button key={cat} className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${cat === "All" ? "bg-gray-900 dark:bg-white text-white dark:text-brand-900" : "bg-white dark:bg-brand-950 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-brand-900 border border-gray-200 dark:border-brand-800"}`}>
                 {cat}
               </button>
             ))}
@@ -91,18 +91,18 @@ export default function BlogPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map((post) => (
-            <article key={post.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col">
+            <article key={post.id} className="bg-white dark:bg-brand-950 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-brand-800 flex flex-col">
               <div className="aspect-[2/1] w-full relative overflow-hidden">
                 <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
                 <div className="absolute top-4 left-4">
-                  <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-bold rounded-full shadow-sm">
+                  <span className="px-3 py-1 bg-white/90 dark:bg-brand-900/90 backdrop-blur-sm text-gray-900 dark:text-white text-xs font-bold rounded-full shadow-sm">
                     {post.category}
                   </span>
                 </div>
               </div>
               
               <div className="p-6 flex flex-col flex-grow">
-                <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
+                <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-3">
                   <div className="flex items-center gap-1">
                     <User className="w-3 h-3" />
                     <span>{post.author}</span>
@@ -113,17 +113,17 @@ export default function BlogPage() {
                   </div>
                 </div>
                 
-                <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
                   {post.title}
                 </h3>
                 
-                <p className="text-gray-600 text-sm mb-6 line-clamp-3 flex-grow">
+                <p className="text-gray-600 dark:text-gray-400 text-sm mb-6 line-clamp-3 flex-grow">
                   {post.excerpt}
                 </p>
                 
-                <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-                  <span className="text-xs text-gray-500">{post.date}</span>
-                  <Link href={`/blog/${post.id}`} className="inline-flex items-center text-blue-600 font-semibold text-sm hover:text-blue-700">
+                <div className="mt-auto pt-4 border-t border-gray-100 dark:border-brand-800 flex items-center justify-between">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{post.date}</span>
+                  <Link href={`/blog/${post.id}`} className="inline-flex items-center text-blue-600 dark:text-blue-400 font-semibold text-sm hover:text-blue-700 dark:hover:text-blue-300">
                     Read More <ChevronRight className="w-4 h-4 ml-1" />
                   </Link>
                 </div>
