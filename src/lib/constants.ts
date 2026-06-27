@@ -394,6 +394,7 @@ export const DASHBOARD_NAV = [
   { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
   { label: "My Internships", href: "/dashboard/internships", icon: "GraduationCap" },
   { label: "My Courses", href: "/dashboard/courses", icon: "BookOpen" },
+  { label: "Tasks & Attendance", href: "/dashboard/tasks", icon: "CheckSquare" },
   { label: "Assignments", href: "/dashboard/assignments", icon: "FileText" },
   { label: "Projects", href: "/dashboard/projects", icon: "FolderKanban" },
   { label: "Certificates", href: "/dashboard/certificates", icon: "Award" },

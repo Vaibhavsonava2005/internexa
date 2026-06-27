@@ -55,7 +55,14 @@ export async function approveApplication(applicationId: string) {
     }
 
     // 2. Generate PDF Offer Letter
-    const offerLetterId = `OFL-${application.internships.title.substring(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const { count: offerCount } = await supabaseAdmin
+      .from('applications')
+      .select('id', { count: 'exact', head: true })
+      .not('offer_letter_id', 'is', null);
+      
+    const seq = (offerCount || 0) + 1;
+    const offerLetterId = `OFF-${new Date().getFullYear()}-${String(seq).padStart(6, '0')}`;
+    
     const offerExpiresAt = new Date();
     offerExpiresAt.setHours(offerExpiresAt.getHours() + 72);
     

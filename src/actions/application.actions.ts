@@ -12,10 +12,15 @@ function generateReferenceNumber() {
   return `INX-REF-${random}`;
 }
 
-function generateApplicationId() {
+async function generateApplicationId() {
   const year = new Date().getFullYear();
-  const random = Math.floor(100000 + Math.random() * 900000);
-  return `APP-${year}-${random}`;
+  // Get count of applications for sequential ID
+  const { count, error } = await supabaseAdmin
+    .from('applications')
+    .select('*', { count: 'exact', head: true });
+    
+  const seq = (count || 0) + 1;
+  return `APP-${year}-${String(seq).padStart(6, '0')}`;
 }
 
 export async function submitApplication(formData: FormData) {
@@ -93,7 +98,7 @@ export async function submitApplication(formData: FormData) {
 
     // 6. Create Application Record
     const referenceNumber = generateReferenceNumber();
-    const applicationId = generateApplicationId();
+    const applicationId = await generateApplicationId();
     const submissionTime = new Date().toISOString();
 
     const { data: newApp, error: insertError } = await supabaseAdmin

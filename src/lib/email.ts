@@ -3,7 +3,7 @@ const BRAND_COLOR = "#4f46e5";
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 
 // -- Brevo Send Helper
-async function sendBrevoEmail({ to, subject, htmlContent, attachment }: { to: { email: string, name: string }[], subject: string, htmlContent: string, attachment?: any[] }) {
+export async function sendBrevoEmail({ to, subject, htmlContent, attachment }: { to: { email: string, name: string }[], subject: string, htmlContent: string, attachment?: any[] }) {
   if (!BREVO_API_KEY) {
     console.warn("BREVO_API_KEY is missing, returning mock success.");
     return { success: true, mock: true };

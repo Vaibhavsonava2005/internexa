@@ -351,9 +351,9 @@ export default function OfferPage() {
               </div>
               <h2 className="text-3xl font-extrabold text-white mb-3">You're All Set! 🚀</h2>
               <p className="text-slate-300 text-lg max-w-md mx-auto mb-8">Your enrollment for <strong className="text-indigo-400">{offer?.internshipName}</strong> is confirmed. Head to your dashboard to start learning.</p>
-              <Link href="/dashboard/internships"
+              <Link href={`/offer/${offerId}/onboarding`}
                 className="inline-flex items-center gap-3 bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-indigo-500/25">
-                <Rocket className="w-5 h-5" /> Go to My Dashboard <ArrowRight className="w-5 h-5" />
+                <Rocket className="w-5 h-5" /> Start Onboarding <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
           </motion.div>
