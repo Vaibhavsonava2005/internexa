@@ -54,10 +54,7 @@ export async function completeOnboarding(offerLetterId: string, signatureText: s
     const { error: updateError } = await supabaseAdmin
       .from('applications')
       .update({
-        status: "Active",
-        joining_letter_id: joiningId,
-        joining_letter_file_id: joiningRes.fileId,
-        nda_file_id: ndaRes.fileId
+        status: "Active"
       })
       .eq('id', app.id);
 
