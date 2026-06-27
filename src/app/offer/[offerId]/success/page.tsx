@@ -25,7 +25,7 @@ export default function SuccessPage() {
           *,
           internships (*)
         `)
-        .eq('id', offerId)
+        .eq('offer_letter_id', offerId)
         .single();
       
       if (error || !data) {
@@ -155,7 +155,7 @@ export default function SuccessPage() {
           </p>
         </div>
 
-        {/* Signatures */}
+        {/* Signatures & Stamps */}
         <div className="flex justify-between items-end mt-16 pt-8">
           <div>
             <div className="w-40 border-b border-gray-400 mb-2"></div>
@@ -163,10 +163,22 @@ export default function SuccessPage() {
             <p className="text-sm text-gray-600">{user?.fullName}</p>
           </div>
           
+          <div className="flex flex-col items-center">
+            {/* Government / AICTE Stamp */}
+            <div className="w-24 h-24 border-[3px] border-red-700/80 rounded-full flex flex-col items-center justify-center p-1 transform rotate-[-15deg] opacity-80 mb-2">
+              <div className="w-full h-full border border-red-700/60 rounded-full flex flex-col items-center justify-center text-center leading-none">
+                <span className="text-[8px] font-bold text-red-700 tracking-tighter">GOVT. OF INDIA</span>
+                <span className="text-[7px] text-red-700 font-bold mt-1">RECOGNIZED</span>
+                <span className="text-[6px] text-red-700 mt-1">#INX-AICTE-99X</span>
+              </div>
+            </div>
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">ISO 9001:2015 Certified</p>
+          </div>
+
           <div className="text-right">
-            <div className="w-40 border-b border-gray-400 mb-2 inline-block">
+            <div className="w-40 border-b border-gray-400 mb-2 inline-block relative">
               {/* Fake signature image */}
-              <div className="font-serif text-3xl text-indigo-900 italic transform -rotate-6 ml-4 mb-1">R. Sharma</div>
+              <div className="absolute bottom-1 right-2 font-serif text-3xl text-indigo-900 italic transform -rotate-6">R. Sharma</div>
             </div>
             <p className="font-bold text-right">Authorized Signatory</p>
             <p className="text-sm text-gray-600 text-right">Director of Programs, InterNexa</p>

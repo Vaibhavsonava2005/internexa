@@ -309,17 +309,26 @@ export default function OfferPage() {
                   </div>
 
                   {/* Verification */}
-                  {paymentRef === "RAZORPAY_LINK_CLICKED" && (
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                      <button onClick={handlePaymentSubmit} disabled={submittingPayment}
+                  {paymentRef === "RAZORPAY_LINK_CLICKED" || paymentRef.startsWith("pay_") || paymentRef.length > 0 ? (
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 bg-slate-900 border border-slate-700 rounded-xl p-5">
+                      <label className="block text-sm font-semibold text-slate-300 mb-2">Enter your Razorpay Payment ID to Verify</label>
+                      <input
+                        type="text"
+                        value={paymentRef === "RAZORPAY_LINK_CLICKED" ? "" : paymentRef}
+                        onChange={(e) => setPaymentRef(e.target.value)}
+                        placeholder="e.g., pay_Oq7J8nB9V3w1p4"
+                        className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent font-mono text-sm mb-3"
+                      />
+                      <p className="text-slate-500 text-xs mb-4">You can find this ID starting with "pay_" in your Razorpay receipt email.</p>
+                      
+                      <button onClick={handlePaymentSubmit} disabled={submittingPayment || !paymentRef.startsWith("pay_") || paymentRef.length < 14}
                         className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 disabled:opacity-50">
-                        {submittingPayment ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
-                        {submittingPayment ? "Verifying Payment..." : "I have completed the payment"}
+                        {submittingPayment ? <Loader2 className="w-5 h-5 animate-spin" /> : <Shield className="w-5 h-5" />}
+                        {submittingPayment ? "Verifying Payment Server..." : "Verify Secure Payment"}
                       </button>
-                      <p className="text-xs text-slate-500 text-center mt-3">Click this after successful payment on Razorpay to finalize enrollment.</p>
                     </div>
-                  )}
-
+                  ) : null}
+                  
                   {error && <p className="text-red-400 text-sm text-center">{error}</p>}
                 </div>
               </div>
