@@ -58,12 +58,11 @@ export default function OfferPage() {
   };
 
   const handlePaymentSubmit = async () => {
-    if (!paymentRef.trim()) {
-      setError("Please enter your UPI transaction reference number");
-      return;
-    }
     setSubmittingPayment(true);
     setError("");
+    
+    // Simulated Verification Delay
+    await new Promise((r) => setTimeout(r, 2000));
     const res = await markPaymentComplete(offerId, paymentRef);
     if (res.success) {
       setStep("success");
@@ -290,50 +289,36 @@ export default function OfferPage() {
                   </div>
                 </div>
 
-                {/* UPI Payment */}
+                {/* Razorpay Payment */}
                 <div className="space-y-6">
-                  <div className="bg-gradient-to-r from-indigo-500/5 to-violet-500/5 rounded-xl p-6 border border-indigo-500/20">
-                    <p className="text-white font-bold mb-3 flex items-center gap-2">
-                      <span className="text-xl">📱</span> Pay via UPI
+                  <div className="bg-gradient-to-r from-indigo-500/5 to-violet-500/5 rounded-xl p-6 border border-indigo-500/20 text-center">
+                    <p className="text-white font-bold mb-3 flex items-center justify-center gap-2">
+                      <Shield className="w-5 h-5 text-emerald-400" /> Secure Payment via Razorpay
                     </p>
-                    <p className="text-slate-400 text-sm mb-4">Send exactly <strong className="text-emerald-400">₹199</strong> to the UPI ID below:</p>
+                    <p className="text-slate-400 text-sm mb-6">Click the button below to complete your enrollment fee of <strong className="text-emerald-400">₹199</strong> securely.</p>
                     
-                    <div className="bg-slate-900 rounded-lg p-4 flex items-center justify-between border border-slate-700">
-                      <div>
-                        <p className="text-xs text-slate-500 mb-1">UPI ID</p>
-                        <p className="text-white font-mono font-bold text-lg">989885966</p>
-                      </div>
-                      <a href="upi://pay?pa=989885966&pn=InterNexa&am=199&cu=INR&tn=InterNexa%20Internship%20Enrollment"
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-colors flex items-center gap-2">
-                        Pay ₹199 <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    </div>
-                    
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {["Google Pay", "PhonePe", "Paytm", "BHIM", "Amazon Pay", "Any UPI App"].map(app => (
-                        <span key={app} className="text-xs bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700">{app}</span>
-                      ))}
-                    </div>
+                    <a
+                      href="https://rzp.io/rzp/lkeeUyjf"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setPaymentRef("RAZORPAY_LINK_CLICKED")}
+                      className="w-full sm:w-2/3 mx-auto bg-[#3399cc] hover:bg-[#2b88b7] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-500/20 mb-4"
+                    >
+                      Pay ₹199 via Razorpay <ExternalLink className="w-4 h-4" />
+                    </a>
                   </div>
 
-                  {/* Transaction Reference */}
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-300 mb-2">Enter UPI Transaction Reference / UTR Number</label>
-                    <input
-                      type="text"
-                      value={paymentRef}
-                      onChange={(e) => setPaymentRef(e.target.value)}
-                      placeholder="e.g., 425619283746"
-                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-lg"
-                    />
-                    <p className="text-slate-500 text-xs mt-2">You'll find this in your UPI app's transaction history after payment.</p>
-                  </div>
-
-                  <button onClick={handlePaymentSubmit} disabled={submittingPayment}
-                    className="w-full py-4 bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white font-bold text-lg rounded-xl transition-all shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-3 disabled:opacity-50">
-                    {submittingPayment ? <Loader2 className="w-5 h-5 animate-spin" /> : <Shield className="w-5 h-5" />}
-                    {submittingPayment ? "Verifying Payment..." : "Confirm Payment & Enroll"}
-                  </button>
+                  {/* Verification */}
+                  {paymentRef === "RAZORPAY_LINK_CLICKED" && (
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                      <button onClick={handlePaymentSubmit} disabled={submittingPayment}
+                        className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 disabled:opacity-50">
+                        {submittingPayment ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
+                        {submittingPayment ? "Verifying Payment..." : "I have completed the payment"}
+                      </button>
+                      <p className="text-xs text-slate-500 text-center mt-3">Click this after successful payment on Razorpay to finalize enrollment.</p>
+                    </div>
+                  )}
 
                   {error && <p className="text-red-400 text-sm text-center">{error}</p>}
                 </div>

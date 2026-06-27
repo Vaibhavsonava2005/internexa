@@ -22,17 +22,31 @@ export default function InternshipsPage() {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [internships, setInternships] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userApps, setUserApps] = useState<any[]>([]);
 
   useEffect(() => {
-    async function fetchInternships() {
+    async function load() {
+      // 1. Fetch internships
       const { data } = await supabase
         .from('internships')
         .select('*')
         .eq('is_active', true);
       setInternships(data || []);
+      
+      // 2. Fetch user applications if logged in
+      try {
+        const { getUserApplications } = await import('@/actions/application.actions');
+        const res = await getUserApplications();
+        if (res.success && res.data) {
+          setUserApps(res.data);
+        }
+      } catch (e) {
+        // Not logged in or error
+      }
+      
       setLoading(false);
     }
-    fetchInternships();
+    load();
   }, []);
 
   const filteredInternships = internships.filter(i => 
@@ -205,11 +219,19 @@ export default function InternshipsPage() {
                       
                       {/* Mobile CTA shown only in grid mode */}
                       <div className={cn("flex items-center justify-end pt-5 border-t border-brand-100 dark:border-brand-800", viewMode === "list" && "sm:hidden")}>
-                        <Button variant="secondary" asChild>
-                          <Link href={`/apply/${internship.slug}`}>
-                            Apply Now
-                          </Link>
-                        </Button>
+                        {userApps.some(app => app.internship_id === internship.id) ? (
+                          <Button variant="secondary" className="bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600/20 hover:text-emerald-600" asChild>
+                            <Link href="/dashboard/internships">
+                              <CheckCircle className="w-4 h-4 mr-2" /> Applied
+                            </Link>
+                          </Button>
+                        ) : (
+                          <Button variant="secondary" asChild>
+                            <Link href={`/apply/${internship.slug}`}>
+                              Apply Now
+                            </Link>
+                          </Button>
+                        )}
                       </div>
                     </div>
                     
@@ -228,11 +250,19 @@ export default function InternshipsPage() {
                                />
                              </div>
                            </div>
-                           <Button className="w-full" asChild>
-                             <Link href={`/apply/${internship.slug}`}>
-                               Apply Now
-                             </Link>
-                           </Button>
+                           {userApps.some(app => app.internship_id === internship.id) ? (
+                             <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" asChild>
+                               <Link href="/dashboard/internships">
+                                 <CheckCircle className="w-4 h-4 mr-2" /> Applied
+                               </Link>
+                             </Button>
+                           ) : (
+                             <Button className="w-full" asChild>
+                               <Link href={`/apply/${internship.slug}`}>
+                                 Apply Now
+                               </Link>
+                             </Button>
+                           )}
                          </div>
                       </div>
                     )}
