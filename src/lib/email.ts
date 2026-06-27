@@ -1,12 +1,22 @@
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://internexa.vercel.app';
 const BRAND_COLOR = "#4f46e5";
-const BREVO_API_KEY = process.env.BREVO_API_KEY;
+
+function getBrevoKey(): string {
+  const key = process.env.BREVO_API_KEY;
+  if (!key) {
+    console.error("❌ BREVO_API_KEY is NOT set in environment variables!");
+    return "";
+  }
+  return key.replace(/[\s\r\n]+/g, ''); // Strip all whitespace/newlines
+}
 
 // -- Brevo Send Helper
 export async function sendBrevoEmail({ to, subject, htmlContent, attachment }: { to: { email: string, name: string }[], subject: string, htmlContent: string, attachment?: any[] }) {
-  if (!BREVO_API_KEY) {
-    console.warn("BREVO_API_KEY is missing, returning mock success.");
-    return { success: true, mock: true };
+  const apiKey = getBrevoKey();
+  
+  if (!apiKey) {
+    console.error("⚠️ BREVO_API_KEY missing — email NOT sent. Subject:", subject, "To:", to.map(t => t.email).join(', '));
+    return { success: false, error: "BREVO_API_KEY not configured" };
   }
 
   try {
@@ -21,26 +31,31 @@ export async function sendBrevoEmail({ to, subject, htmlContent, attachment }: {
       payload.attachment = attachment;
     }
 
+    console.log("📧 Sending email via Brevo — To:", to.map(t => t.email).join(', '), "Subject:", subject);
+
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
         "accept": "application/json",
-        "api-key": BREVO_API_KEY.replace(/\s+/g, ''),
+        "api-key": apiKey,
         "content-type": "application/json"
       },
       body: JSON.stringify(payload)
     });
 
+    const responseText = await response.text();
+    console.log("📧 Brevo API Response:", response.status, responseText);
+
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Brevo API Error:", errorData);
-      return { success: false, error: errorData };
+      console.error("❌ Brevo API Error:", response.status, responseText);
+      return { success: false, error: responseText };
     }
 
+    console.log("✅ Email sent successfully to:", to.map(t => t.email).join(', '));
     return { success: true };
-  } catch (error) {
-    console.error("Brevo Network/Fetch Error:", error);
-    return { success: false };
+  } catch (error: any) {
+    console.error("❌ Brevo Network/Fetch Error:", error.message || error);
+    return { success: false, error: error.message };
   }
 }
 
