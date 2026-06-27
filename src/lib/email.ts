@@ -297,7 +297,7 @@ export async function sendOfferLetterEmail({
   if (pdfUrl) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     if (supabaseUrl) {
-      const publicUrl = `${supabaseUrl}/storage/v1/object/public/offer-letters/${pdfUrl}`;
+      const publicUrl = `${supabaseUrl}/storage/v1/object/public/documents/${pdfUrl}`;
       attachment.push({
         url: publicUrl,
         name: `InterNexa_Offer_Letter_${offerLetterId}.pdf`
