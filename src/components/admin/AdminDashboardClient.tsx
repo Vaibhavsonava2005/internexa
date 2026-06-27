@@ -7,7 +7,7 @@ import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock } from "lucide
 import { formatCurrency } from "@/lib/utils";
 
 export function AdminDashboardClient({ initialData }: { initialData: any }) {
-  const [activeTab, setActiveTab] = useState<"applications" | "users" | "payments">("applications");
+  const [activeTab, setActiveTab] = useState<"applications" | "users" | "transactions">("applications");
   const [data, setData] = useState(initialData);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
 
@@ -58,7 +58,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
         {[
           { id: "applications", label: "Applications", icon: FileText },
           { id: "users", label: "Users", icon: Users },
-          { id: "payments", label: "Payments", icon: CreditCard },
+          { id: "transactions", label: "Payments", icon: CreditCard },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -183,7 +183,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
         )}
 
         {/* Payments */}
-        {activeTab === "payments" && (
+        {activeTab === "transactions" && (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm whitespace-nowrap">
               <thead className="bg-brand-50 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400">
