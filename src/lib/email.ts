@@ -1,16 +1,6 @@
-import { Resend } from "resend";
-
-const getResendClient = () => {
-  try {
-    const apiKey = (process.env.RESEND_API_KEY || "re_mock_key").replace(/\s+/g, '');
-    return new Resend(apiKey);
-  } catch (e) {
-    console.error("Failed to initialize Resend:", e);
-    return null;
-  }
-};
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://internexa.vercel.app';
 const BRAND_COLOR = "#4f46e5";
+const BREVO_API_KEY = process.env.BREVO_API_KEY;
 
 // -- Shared Base Template
 const getBaseTemplate = (title: string, content: string) => `
@@ -31,6 +21,48 @@ const getBaseTemplate = (title: string, content: string) => `
   </div>
 `;
 
+// -- Brevo Send Helper
+async function sendBrevoEmail({ to, subject, htmlContent, attachment }: { to: { email: string, name: string }[], subject: string, htmlContent: string, attachment?: any[] }) {
+  if (!BREVO_API_KEY) {
+    console.warn("BREVO_API_KEY is missing, returning mock success.");
+    return { success: true, mock: true };
+  }
+
+  try {
+    const payload: any = {
+      sender: { name: "InterNexa", email: "support@internexa.in" },
+      to,
+      subject,
+      htmlContent,
+    };
+
+    if (attachment && attachment.length > 0) {
+      payload.attachment = attachment;
+    }
+
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "accept": "application/json",
+        "api-key": BREVO_API_KEY.replace(/\s+/g, ''),
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Brevo API Error:", errorData);
+      return { success: false, error: errorData };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Brevo Network/Fetch Error:", error);
+    return { success: false };
+  }
+}
+
 // -- 1. Application Submitted
 interface ApplicationEmailProps {
   studentName: string;
@@ -43,8 +75,6 @@ interface ApplicationEmailProps {
 export async function sendApplicationReceivedEmail({
   studentName, email, internshipName, referenceNumber, applicationId
 }: ApplicationEmailProps) {
-  if (!process.env.RESEND_API_KEY) return { success: true, mock: true };
-
   const content = `
     <p>Dear <strong>${studentName}</strong>,</p>
     <p>Your application for the <strong>${internshipName}</strong> program has been successfully received.</p>
@@ -60,21 +90,11 @@ export async function sendApplicationReceivedEmail({
     </div>
   `;
 
-  try {
-    const resend = getResendClient();
-    if (resend) {
-      await resend.emails.send({
-        from: "InterNexa <support@internexa.in>",
-        to: email,
-        subject: `Application Received: ${internshipName} - ${referenceNumber}`,
-        html: getBaseTemplate("Application Received", content),
-      });
-    }
-    return { success: true };
-  } catch (error) {
-    console.error("Email Error:", error);
-    return { success: false };
-  }
+  return sendBrevoEmail({
+    to: [{ email, name: studentName }],
+    subject: `Application Received: ${internshipName} - ${referenceNumber}`,
+    htmlContent: getBaseTemplate("Application Received", content)
+  });
 }
 
 // -- 2. Offer Letter Generated
@@ -83,14 +103,12 @@ interface OfferEmailProps {
   email: string;
   internshipName: string;
   offerLetterId: string;
-  pdfUrl?: string; // We can attach a URL to download
+  pdfUrl?: string;
 }
 
 export async function sendOfferLetterEmail({
   studentName, email, internshipName, offerLetterId, pdfUrl
 }: OfferEmailProps) {
-  if (!process.env.RESEND_API_KEY) return { success: true, mock: true };
-
   const content = `
     <p>Dear <strong>${studentName}</strong>,</p>
     <p>Congratulations! We are thrilled to offer you a position in the <strong>${internshipName}</strong> program.</p>
@@ -105,27 +123,24 @@ export async function sendOfferLetterEmail({
     </div>
   `;
 
-  try {
-    const resend = getResendClient();
-    if (resend) {
-      await resend.emails.send({
-        from: "InterNexa <support@internexa.in>",
-        to: email,
-        subject: `🎉 Congratulations! Offer Letter for ${internshipName}`,
-        html: getBaseTemplate("Offer Letter Issued", content),
-        attachments: [
-          {
-            filename: `Offer_Letter_${internshipName.replace(/\s+/g, '_')}.pdf`,
-            path: pdfUrl,
-          }
-        ]
+  let attachment = [];
+  if (pdfUrl) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (supabaseUrl) {
+      const publicUrl = \`\${supabaseUrl}/storage/v1/object/public/offer-letters/\${pdfUrl}\`;
+      attachment.push({
+        url: publicUrl,
+        name: \`Offer_Letter_\${internshipName.replace(/\\s+/g, '_')}.pdf\`
       });
     }
-    return { success: true };
-  } catch (error) {
-    console.error("Email Error:", error);
-    return { success: false };
   }
+
+  return sendBrevoEmail({
+    to: [{ email, name: studentName }],
+    subject: \`🎉 Congratulations! Offer Letter for \${internshipName}\`,
+    htmlContent: getBaseTemplate("Offer Letter Issued", content),
+    attachment
+  });
 }
 
 // -- 3. Payment Successful
@@ -140,32 +155,23 @@ interface PaymentEmailProps {
 export async function sendPaymentSuccessEmail({
   studentName, email, internshipName, transactionId, amount
 }: PaymentEmailProps) {
-  if (!process.env.RESEND_API_KEY) return { success: true, mock: true };
-
-  const content = `
-    <p>Dear <strong>${studentName}</strong>,</p>
-    <p>Your payment of <strong>₹${amount}</strong> for the <strong>${internshipName}</strong> program was successful!</p>
+  const content = \`
+    <p>Dear <strong>\${studentName}</strong>,</p>
+    <p>Your payment of <strong>₹\${amount}</strong> for the <strong>\${internshipName}</strong> program was successful!</p>
     <div style="background-color: #f8fafc; padding: 16px; border-radius: 8px; margin: 24px 0; border: 1px solid #e2e8f0;">
       <h4 style="margin: 0 0 12px 0; color: #0f172a;">Transaction Details</h4>
-      <p style="margin: 4px 0;"><strong>Transaction ID:</strong> ${transactionId}</p>
+      <p style="margin: 4px 0;"><strong>Transaction ID:</strong> \${transactionId}</p>
       <p style="margin: 4px 0;"><strong>Status:</strong> Paid</p>
     </div>
     <p>Your internship dashboard is now unlocked. You can access your curriculum and begin immediately.</p>
     <div style="text-align: center; margin-top: 30px;">
-      <a href="${APP_URL}/dashboard" style="background-color: ${BRAND_COLOR}; color: white; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">Start Learning</a>
+      <a href="\${APP_URL}/dashboard" style="background-color: \${BRAND_COLOR}; color: white; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">Start Learning</a>
     </div>
-  `;
+  \`;
 
-  try {
-    await resend.emails.send({
-      from: "InterNexa <support@internexa.in>",
-      to: email,
-      subject: `Payment Successful: Welcome to ${internshipName}`,
-      html: getBaseTemplate("Payment Successful", content),
-    });
-    return { success: true };
-  } catch (error) {
-    console.error("Email Error:", error);
-    return { success: false };
-  }
+  return sendBrevoEmail({
+    to: [{ email, name: studentName }],
+    subject: \`Payment Successful: Welcome to \${internshipName}\`,
+    htmlContent: getBaseTemplate("Payment Successful", content)
+  });
 }
