@@ -225,16 +225,23 @@ export default function OnboardingPage() {
                 </div>
               </div>
 
-              <a
-                href={`upi://pay?pa=internexa@slc&pn=InterNexa&am=${offer?.price || 199}&cu=INR`}
-                onClick={() => {
-                  setPaymentClicked(true);
-                  setShowManualForm(true);
-                }}
-                className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 mb-4 text-lg"
-              >
-                <CreditCard className="w-6 h-6" /> Pay Now via UPI <ExternalLink className="w-4 h-4" />
-              </a>
+              <div className="flex flex-col sm:flex-row gap-4 mb-4">
+                <a
+                  href="upi://pay?pa=internexa@slc&pn=Internexa%20labs&am=199&tn="
+                  onClick={() => {
+                    setPaymentClicked(true);
+                    setShowManualForm(true);
+                  }}
+                  className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 text-lg"
+                >
+                  <CreditCard className="w-6 h-6" /> Pay Now via UPI <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
+              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center mb-4">
+                <p className="text-sm text-slate-400 mb-2">Or scan QR to pay securely</p>
+                <img src="/qr-199.png" alt="Scan to pay 199" className="w-32 h-32 mx-auto rounded-lg border-2 border-emerald-500/30 mb-2" />
+                <p className="text-xs text-slate-500 mt-2">Amount: ₹199</p>
+              </div>
 
               {paymentClicked && (
                 <div className="space-y-4">

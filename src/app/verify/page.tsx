@@ -7,8 +7,9 @@ import { verifyDocumentAction } from "@/actions/verification.actions";
 
 export default function VerificationPortal() {
   const [docId, setDocId] = useState("");
+  const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "valid" | "invalid">("idle");
-  const [docData, setDocData] = useState<{ docType: string; studentName: string; internshipName: string } | null>(null);
+  const [docData, setDocData] = useState<{ docType: string; studentName: string; internshipName: string; email: string } | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
 
   const handleVerify = async (e: React.FormEvent) => {
@@ -17,7 +18,15 @@ export default function VerificationPortal() {
 
     setStatus("loading");
     
-    const res = await verifyDocumentAction(docId);
+    // Extract ID if a full URL is pasted
+    let cleanId = docId.trim();
+    if (cleanId.includes("?id=")) {
+      cleanId = cleanId.split("?id=")[1].split("&")[0];
+    } else if (cleanId.includes("/")) {
+      cleanId = cleanId.split("/").pop() || cleanId;
+    }
+
+    const res = await verifyDocumentAction(cleanId, email.trim());
     
     if (res.success && res.data) {
       setDocData(res.data);
@@ -65,6 +74,22 @@ export default function VerificationPortal() {
                   onChange={(e) => setDocId(e.target.value)}
                   placeholder="e.g. CERT-2026-123456"
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 uppercase font-mono tracking-wider"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Registered Email ID
+              </label>
+              <div className="relative">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Student's registered email"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 px-4 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                 />
               </div>
             </div>

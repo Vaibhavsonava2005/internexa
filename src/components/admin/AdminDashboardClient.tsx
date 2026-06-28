@@ -432,11 +432,11 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
               </div>
             </div>
 
-            {/* Fast-Track Certification Payments (199) */}
+            {/* Fast-Track Certification Payments (99) */}
             <div>
               <h3 className="text-xl font-bold text-brand-900 dark:text-white mb-4 flex items-center gap-2">
                 <Award className="w-5 h-5 text-indigo-500" />
-                Fast-Track Certification Payments (₹199)
+                Fast-Track Certification Payments (₹99)
               </h3>
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm whitespace-nowrap border-t-2 border-indigo-500/20">

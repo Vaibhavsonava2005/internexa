@@ -18,7 +18,7 @@ export async function submitManualPayment(formData: FormData) {
       return { success: false, error: "Reference Number, Email, and UPI ID are required" };
     }
 
-    let fileName = null;
+    let fileName = "optional";
 
     if (screenshot && typeof screenshot === "object" && screenshot.name) {
       // 1. Upload screenshot to Supabase Storage
@@ -92,7 +92,7 @@ export async function submitFastTrackPayment(formData: FormData) {
       return { success: false, error: "Reference Number, Email, and UPI ID are required" };
     }
 
-    let fileName = null;
+    let fileName = "optional";
 
     if (screenshot && typeof screenshot === "object" && screenshot.name) {
       const fileExt = screenshot.name.split('.').pop();

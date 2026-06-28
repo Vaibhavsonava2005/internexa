@@ -92,7 +92,7 @@ export default function CertificatesPage() {
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">Fast-Track Your Certificate</h3>
                 <p className="text-indigo-200 text-sm max-w-xl">
-                  Don't want to wait for the internship timeline to finish? You can instantly generate your Official Certificate, Letter of Recommendation, and Experience Letter right now for just ₹199.
+                  Don't want to wait for the internship timeline to finish? You can instantly generate your Official Certificate, Letter of Recommendation, and Experience Letter right now for just ₹99.
                 </p>
               </div>
             </div>
@@ -227,9 +227,15 @@ export default function CertificatesPage() {
                   </div>
                 )}
                 
-                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center mb-6">
-                  <p className="text-sm text-slate-400 mb-2">Pay securely using UPI</p>
-                  <p className="text-xl font-bold text-indigo-400 font-mono tracking-wider">internexa@ybl</p>
+                <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 text-center mb-6">
+                  <a
+                    href="upi://pay?pa=internexa@slc&pn=Internexa%20labs&am=99&tn="
+                    className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 mb-4"
+                  >
+                    Pay Now via UPI
+                  </a>
+                  <p className="text-sm text-slate-400 mb-2">Or scan QR to pay securely</p>
+                  <img src="/qr-99.png" alt="Scan to pay 99" className="w-32 h-32 mx-auto rounded-lg border-2 border-indigo-500/30 mb-2" />
                   <p className="text-xs text-slate-500 mt-2">Amount: ₹99</p>
                 </div>
 

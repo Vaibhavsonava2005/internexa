@@ -2,7 +2,7 @@
 
 import { supabaseAdmin } from "@/lib/supabase";
 
-export async function verifyDocumentAction(docId: string) {
+export async function verifyDocumentAction(docId: string, email: string) {
   try {
     const upperId = docId.toUpperCase().trim();
     
@@ -41,12 +41,17 @@ export async function verifyDocumentAction(docId: string) {
       return { success: false, error: "Document not found in registry. Please check the ID and try again." };
     }
 
+    if (application.email.toLowerCase().trim() !== email.toLowerCase().trim()) {
+      return { success: false, error: "The provided email does not match the registered student's email for this document." };
+    }
+
     return { 
       success: true, 
       data: {
         docType: type,
         studentName: application.full_name,
-        internshipName: application.internships?.title || "Internship Program"
+        internshipName: application.internships?.title || "Internship Program",
+        email: application.email
       }
     };
   } catch (error: any) {
