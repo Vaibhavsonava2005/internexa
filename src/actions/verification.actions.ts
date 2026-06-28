@@ -7,8 +7,8 @@ export async function verifyDocumentAction(docId: string, email: string) {
     const upperId = docId.toUpperCase().trim();
     
     // Check what type of document this is based on prefix
-    if (!upperId.startsWith("CERT-") && !upperId.startsWith("OFF-") && !upperId.startsWith("JOIN-") && !upperId.startsWith("NDA-") && !upperId.startsWith("OFL-") && !upperId.startsWith("JNL-")) {
-      return { success: false, error: "Invalid document format. ID must start with CERT-, OFF-, JOIN-, or NDA-." };
+    if (!upperId.startsWith("CERT-") && !upperId.startsWith("OFF-") && !upperId.startsWith("JOIN-") && !upperId.startsWith("NDA-") && !upperId.startsWith("OFL-") && !upperId.startsWith("JNL-") && !upperId.startsWith("APP-") && !upperId.startsWith("EXP-") && !upperId.startsWith("LOR-") && !upperId.startsWith("REF-")) {
+      return { success: false, error: "Invalid document format. Please enter a valid Document ID (e.g. CERT-xxx, JOIN-xxx, EXP-xxx)." };
     }
 
     let type = "Official Document";
@@ -16,20 +16,31 @@ export async function verifyDocumentAction(docId: string, email: string) {
     else if (upperId.startsWith("OFF-") || upperId.startsWith("OFL-")) type = "Offer Letter";
     else if (upperId.startsWith("JOIN-") || upperId.startsWith("JNL-")) type = "Joining Letter";
     else if (upperId.startsWith("NDA-")) type = "Non-Disclosure Agreement";
+    else if (upperId.startsWith("EXP-")) type = "Experience Letter";
+    else if (upperId.startsWith("LOR-")) type = "Letter of Recommendation";
+    else if (upperId.startsWith("APP-") || upperId.startsWith("REF-")) type = "Application Reference";
 
     let application = null;
 
     // We use "Deep Logic" to find the application across all possible ID mappings.
     // 1. It might be derived from application_id (e.g. CERT-2026-000010 -> APP-2026-000010)
-    const potentialAppId = upperId.replace(/^(CERT-|JOIN-|OFF-|NDA-|OFL-|JNL-)/, 'APP-');
+    const potentialAppId = upperId.replace(/^(CERT-|JOIN-|OFF-|NDA-|OFL-|JNL-|EXP-|LOR-|REF-)/, 'APP-');
     
-    // 2. It might be derived from the first 8 chars of the UUID
-    const potentialIdPrefix = upperId.replace(/^(CERT-|JOIN-|OFF-|NDA-|OFL-|JNL-)/, '').toLowerCase();
+    // 2. It might be derived from the full UUID
+    const potentialId = upperId.replace(/^(CERT-|JOIN-|OFF-|NDA-|OFL-|JNL-|APP-|EXP-|LOR-|REF-)/, '').toLowerCase();
+    
+    // Safely check if it's a valid UUID to prevent Postgres casting errors
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(potentialId);
+    
+    let orQuery = `application_id.eq.${potentialAppId},offer_letter_id.eq.${upperId},certificate_id.eq.${upperId},reference_number.eq.${upperId}`;
+    if (isUuid) {
+      orQuery += `,id.eq.${potentialId}`;
+    }
 
     const { data, error } = await supabaseAdmin
       .from('applications')
       .select('*, internships(title)')
-      .or(`application_id.eq.${potentialAppId},offer_letter_id.eq.${upperId},certificate_id.eq.${upperId},reference_number.eq.${upperId},id.ilike.${potentialIdPrefix}%`)
+      .or(orQuery)
       .limit(1)
       .single();
 

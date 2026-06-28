@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Search, ShieldCheck, BadgeCheck, XCircle, Loader2 } from "lucide-react";
 import { verifyDocumentAction } from "@/actions/verification.actions";
@@ -11,6 +11,16 @@ export default function VerificationPortal() {
   const [status, setStatus] = useState<"idle" | "loading" | "valid" | "invalid">("idle");
   const [docData, setDocData] = useState<{ docType: string; studentName: string; internshipName: string; email: string } | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const idParam = urlParams.get("id");
+      if (idParam) {
+        setDocId(idParam);
+      }
+    }
+  }, []);
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
