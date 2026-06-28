@@ -11,7 +11,7 @@ export async function getOfferDetails(offerLetterId: string) {
     
     const { data, error } = await supabaseAdmin
       .from('applications')
-      .select('*, internships(title, duration, category, price)')
+      .select('*, internships(title, duration, category)')
       .eq('offer_letter_id', cleanId)
       .single();
 
@@ -71,7 +71,7 @@ export async function markPaymentComplete(offerLetterId: string, transactionRef:
       .from('applications')
       .update({ status: "Enrolled" })
       .eq('offer_letter_id', offerLetterId)
-      .select('*, internships(title, price)')
+      .select('*, internships(title)')
       .single();
 
     if (error) throw error;

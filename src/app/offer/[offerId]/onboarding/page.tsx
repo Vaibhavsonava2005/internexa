@@ -82,8 +82,12 @@ export default function OnboardingPage() {
     setError("");
 
     try {
+      if (!offer?.id) {
+        throw new Error("Application session lost. Please refresh the page.");
+      }
+      
       const formData = new FormData();
-      formData.append("applicationId", offer?.id);
+      formData.append("applicationId", offer.id);
       formData.append("referenceNumber", referenceNumber);
       formData.append("emailId", emailId);
       formData.append("upiId", upiId);
