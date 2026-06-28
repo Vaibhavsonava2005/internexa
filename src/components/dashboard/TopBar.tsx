@@ -21,15 +21,15 @@ export function TopBar({ setIsMobileOpen }: TopBarProps) {
   const currentNav = DASHBOARD_NAV.find(item => pathname.startsWith(item.href)) || { label: "Dashboard" };
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between h-14 px-4 sm:px-6 lg:px-8 bg-white/80 dark:bg-brand-950/80 backdrop-blur-md border-b border-brand-200 dark:border-brand-900">
+    <header className="sticky top-0 z-30 flex items-center justify-between h-[60px] md:h-16 px-4 sm:px-6 lg:px-8 bg-white/90 dark:bg-brand-950/90 backdrop-blur-xl border-b border-brand-200 dark:border-brand-900 pt-safe shadow-sm md:shadow-none transition-all">
       
       <div className="flex items-center gap-4">
-        {/* Mobile menu toggle */}
+        {/* Mobile menu toggle (Drawer) */}
         <button
           onClick={() => setIsMobileOpen(true)}
-          className="md:hidden p-2 -ml-2 text-brand-500 hover:text-brand-900 dark:text-brand-400 dark:hover:text-white rounded-lg hover:bg-brand-100 dark:hover:bg-brand-800 transition-colors"
+          className="md:hidden p-2 -ml-2 text-brand-600 hover:text-brand-900 dark:text-brand-400 dark:hover:text-white rounded-xl hover:bg-brand-100 dark:hover:bg-brand-800 transition-colors"
         >
-          <Menu className="w-5 h-5" />
+          <Menu className="w-6 h-6" />
         </button>
 
         {/* Page Title */}

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { TopBar } from "@/components/dashboard/TopBar";
+import { MobileBottomNav } from "@/components/dashboard/MobileBottomNav";
 import { cn } from "@/lib/utils";
 import { usePathname, useRouter } from "next/navigation";
 import { getUserApplications } from "@/actions/application.actions";
@@ -115,13 +116,15 @@ export default function DashboardLayout({
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col md:flex-row">
-      <Sidebar
-        isCollapsed={isSidebarCollapsed}
-        setIsCollapsed={setIsSidebarCollapsed}
-        isMobileOpen={isMobileSidebarOpen}
-        setIsMobileOpen={setIsMobileSidebarOpen}
-      />
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col md:flex-row pb-16 md:pb-0">
+      <div className="hidden md:block">
+        <Sidebar
+          isCollapsed={isSidebarCollapsed}
+          setIsCollapsed={setIsSidebarCollapsed}
+          isMobileOpen={isMobileSidebarOpen}
+          setIsMobileOpen={setIsMobileSidebarOpen}
+        />
+      </div>
       
       <div 
         className={cn(
@@ -131,14 +134,15 @@ export default function DashboardLayout({
       >
         <TopBar setIsMobileOpen={setIsMobileSidebarOpen} />
         
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto relative">
-          <div className="max-w-7xl mx-auto h-full relative">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto relative w-full overflow-x-hidden">
+          <div className="w-full max-w-7xl mx-auto h-full relative">
             <PremiumLockOverlay>
               {children}
             </PremiumLockOverlay>
           </div>
         </main>
       </div>
+      <MobileBottomNav />
     </div>
   );
 }
