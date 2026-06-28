@@ -490,7 +490,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                   <tr key={app.id} className="hover:bg-brand-50/50 dark:hover:bg-brand-900/20 transition-colors">
                     <td className="px-6 py-4 font-medium text-brand-900 dark:text-white">{app.full_name}</td>
                     <td className="px-6 py-4">{app.internships?.title || "Unknown"}</td>
-                    <td className="px-6 py-4 font-mono text-xs">{app.certificate_id || "-"}</td>
+                    <td className="px-6 py-4 font-mono text-xs">{app.status === "Completed" ? `CERT-${app.id.substring(0,8).toUpperCase()}` : "-"}</td>
                     <td className="px-6 py-4">
                       {app.status === "Completed" ? (
                         <Badge variant="success" className="bg-emerald-500 text-white border-0">Generated</Badge>
@@ -499,9 +499,9 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                       )}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      {app.status === "Completed" && app.certificate_file_id ? (
+                      {app.status === "Completed" ? (
                         <a 
-                          href={`${process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"}/storage/v1/object/public/documents/${app.certificate_file_id}`}
+                          href={`${process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"}/storage/v1/object/public/documents/certificates/${app.id}.pdf`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center justify-center h-9 px-4 rounded-md text-sm font-medium bg-brand-100 text-brand-700 hover:bg-brand-200 transition-colors"
@@ -520,7 +520,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                               setData((prev: any) => ({
                                 ...prev,
                                 applications: prev.applications.map((a: any) => 
-                                  a.id === app.id ? { ...a, status: "Completed", certificate_id: res.certificateId, certificate_file_id: res.fileId } : a
+                                  a.id === app.id ? { ...a, status: "Completed" } : a
                                 )
                               }));
                             } else {

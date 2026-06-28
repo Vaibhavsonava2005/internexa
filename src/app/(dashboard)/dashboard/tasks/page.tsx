@@ -83,8 +83,8 @@ export default function TasksPage() {
           <p className="text-slate-400 mt-1">{application.internships?.title}</p>
         </div>
         
-        {application.status === "Completed" && application.certificate_file_id && (
-          <a href={`${process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"}/storage/v1/object/public/documents/${application.certificate_file_id}`} 
+        {application.status === "Completed" && (
+          <a href={`${process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"}/storage/v1/object/public/documents/certificates/${application.id}.pdf`} 
              target="_blank" rel="noopener noreferrer"
              className="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 px-4 py-2 rounded-lg font-bold flex items-center gap-2 border border-emerald-500/30 transition-colors">
             <Download className="w-4 h-4" /> Download Certificate

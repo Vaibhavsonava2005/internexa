@@ -17,7 +17,7 @@ export async function generateCertificateAction(applicationId: string) {
     }
 
     if (app.status === "Completed") {
-      return { success: true, certificateId: app.certificate_id, fileId: app.certificate_file_id };
+      return { success: true, certificateId: `CERT-${app.id.substring(0,8).toUpperCase()}`, fileId: `certificates/${app.id}.pdf` };
     }
 
     // 2. Generate unique Certificate ID
@@ -29,6 +29,7 @@ export async function generateCertificateAction(applicationId: string) {
     // 3. Generate Certificate Document
     const certRes = await generateCertificate({
       documentId: certificateId,
+      applicationId: app.id,
       studentName: app.full_name,
       internshipName: app.internships.title,
       duration: app.internships.duration,
@@ -40,13 +41,11 @@ export async function generateCertificateAction(applicationId: string) {
       return { success: false, error: "Failed to generate official certificate" };
     }
 
-    // 4. Update Database
+    // 4. Update Database (Only status, schema does not have certificate_file_id)
     const { error: updateError } = await supabaseAdmin
       .from('applications')
       .update({
-        status: "Completed",
-        certificate_id: certificateId,
-        certificate_file_id: certRes.fileId
+        status: "Completed"
       })
       .eq('id', app.id);
 

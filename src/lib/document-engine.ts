@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 
 interface BaseDocumentData {
   documentId: string;
+  applicationId: string;
   studentName: string;
   internshipName: string;
   date: string;
@@ -20,9 +21,7 @@ interface CertificateData extends BaseDocumentData {
   duration?: string;
 }
 
-async function uploadPdfToSupabase(pdfBuffer: Buffer, folder: string): Promise<string> {
-  const fileId = `${folder}/${uuidv4()}.pdf`;
-  
+async function uploadPdfToSupabase(pdfBuffer: Buffer, fileId: string): Promise<string> {
   // Ensure bucket exists or silently fail/continue if it does
   try {
     await supabaseAdmin.storage.createBucket('documents', { public: true });
@@ -115,7 +114,8 @@ Please log in to your Student Dashboard to access your initial tasks and connect
     await generateQRAndAdd(doc, verificationUrl);
 
     const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
-    const fileId = await uploadPdfToSupabase(pdfBuffer, 'joining-letters');
+    const fileId = `joining-letters/${data.applicationId}.pdf`;
+    await uploadPdfToSupabase(pdfBuffer, fileId);
 
     return { success: true, fileId };
   } catch (error: any) {
@@ -157,7 +157,8 @@ By accepting the offer and proceeding with the internship, the Intern digitally 
     await generateQRAndAdd(doc, verificationUrl);
 
     const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
-    const fileId = await uploadPdfToSupabase(pdfBuffer, 'ndas');
+    const fileId = `ndas/${data.applicationId}.pdf`;
+    await uploadPdfToSupabase(pdfBuffer, fileId);
 
     return { success: true, fileId };
   } catch (error: any) {
@@ -320,7 +321,8 @@ I have no doubt that ${data.studentName} will be a tremendous asset to any organ
     doc.text("InterNexa Mentorship Board", 20, 226);
 
     const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
-    const fileId = await uploadPdfToSupabase(pdfBuffer, 'certificates');
+    const fileId = `certificates/${data.applicationId}.pdf`;
+    await uploadPdfToSupabase(pdfBuffer, fileId);
 
     return { success: true, fileId };
   } catch (error: any) {

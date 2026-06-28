@@ -155,9 +155,9 @@ export default function MyInternshipsPage() {
                             <PlayCircle className="w-5 h-5" />
                             Go to Course
                           </Link>
-                          {(app.joiningLetterFileId || app.joining_letter_file_id) && (
+                          {app.status !== "Rejected" && (
                             <a
-                              href={`${process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"}/storage/v1/object/public/documents/${app.joiningLetterFileId || app.joining_letter_file_id}`}
+                              href={`${process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"}/storage/v1/object/public/documents/joining-letters/${app.id}.pdf`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="w-full flex items-center justify-center gap-2 h-14 rounded-2xl border-2 border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-900/10 text-emerald-700 dark:text-emerald-400 font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors shadow-sm"

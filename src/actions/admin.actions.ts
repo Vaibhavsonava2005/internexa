@@ -319,7 +319,6 @@ export async function approveManualPayment(paymentId: string) {
       .from('applications')
       .update({
         status: "Enrolled",
-        ...(pdfFileId ? { joining_letter_file_id: pdfFileId } : {}),
         start_date: startDate.toISOString().split('T')[0]
       })
       .eq('id', application.id);
