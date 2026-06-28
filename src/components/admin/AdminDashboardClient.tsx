@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { approveApplication, rejectApplication, getAdminData, approveRewardClaim, approveManualPayment, rejectManualPayment } from "@/actions/admin.actions";
+import { generateCertificateAction } from "@/actions/certificate.actions";
 import { Button, Badge } from "@/components/shared";
-import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock, FolderGit2, Shield, Gift } from "lucide-react";
+import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock, FolderGit2, Shield, Gift, Award, Download } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
 export function AdminDashboardClient({ initialData }: { initialData: any }) {
-  const [activeTab, setActiveTab] = useState<"applications" | "users" | "transactions" | "submissions" | "manualPayments" | "rewardClaims">("applications");
+  const [activeTab, setActiveTab] = useState<"applications" | "users" | "transactions" | "submissions" | "manualPayments" | "rewardClaims" | "certificates">("applications");
   const [data, setData] = useState(initialData);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
 
@@ -71,6 +72,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
           { id: "users", label: "Users", icon: Users },
           { id: "transactions", label: "Auto Payments", icon: CreditCard },
           { id: "manualPayments", label: "Manual Verifications", icon: Shield },
+          { id: "certificates", label: "Certificates", icon: Award },
           { id: "rewardClaims", label: "Reward Claims", icon: Gift },
         ].map((tab) => {
           const Icon = tab.icon;
@@ -88,7 +90,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
               <Icon className="w-4 h-4" />
               {tab.label}
               <Badge variant={isActive ? "default" : "secondary"} className="ml-2 rounded-full px-2 py-0.5 text-xs">
-                {data[tab.id]?.length || 0}
+              {tab.id === "certificates" ? data.applications.filter((a: any) => a.status === "Active" || a.status === "Completed").length : (data[tab.id]?.length || 0)}
               </Badge>
             </button>
           );

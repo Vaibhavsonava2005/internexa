@@ -133,7 +133,7 @@ export default function DashboardHome() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-4 sm:px-0">
         
         {/* Main Column */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-3 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-brand-900 dark:text-white tracking-tight">
               Application Status
@@ -162,7 +162,7 @@ export default function DashboardHome() {
                 const progressPercent = Math.max(5, Math.min(100, Math.round(((currentStepIndex + 1) / TRACKING_STEPS.length) * 100)));
 
                 return (
-                  <div key={app.id || Math.random()} className="bg-white dark:bg-brand-950 border border-brand-200 dark:border-brand-800 rounded-3xl overflow-hidden shadow-sm transition-all">
+                  <div key={app.id || app.application_id} className="bg-white dark:bg-brand-950 border border-brand-200 dark:border-brand-800 rounded-3xl overflow-hidden shadow-sm transition-all">
                     {/* Header Toggle */}
                     <div 
                       onClick={() => setExpandedApp(isExpanded ? null : app.id)}
@@ -275,36 +275,6 @@ export default function DashboardHome() {
               })}
             </div>
           )}
-        </div>
-
-        {/* Right Sidebar */}
-        <div className="space-y-6">
-          <div className="bg-white dark:bg-brand-950 rounded-3xl border border-brand-200 dark:border-brand-800 shadow-sm p-6">
-            <h2 className="text-xl font-bold text-brand-900 dark:text-white tracking-tight mb-6">
-              Quick Actions
-            </h2>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { label: "Browse Apps", icon: Search, href: "/internships", color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-900/20" },
-                { label: "AI Tools", icon: Zap, href: "/dashboard/ai-assistant", color: "text-violet-500", bg: "bg-violet-50 dark:bg-violet-900/20" },
-                { label: "Resume", icon: FileText, href: "/dashboard/profile", color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-900/20" },
-                { label: "Help", icon: MessageSquare, href: "/dashboard/messages", color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-900/20" },
-              ].map((action) => (
-                <Link
-                  key={action.label}
-                  href={action.href}
-                  className="flex flex-col items-center justify-center p-5 rounded-2xl bg-white dark:bg-brand-900 border border-brand-100 dark:border-brand-800 shadow-sm hover:shadow-md transition-all group"
-                >
-                  <div className={cn("w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-transform group-hover:scale-110", action.bg)}>
-                    <action.icon className={cn("w-6 h-6", action.color)} />
-                  </div>
-                  <span className="text-sm font-bold text-brand-900 dark:text-white">
-                    {action.label}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>

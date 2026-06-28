@@ -31,7 +31,7 @@ function PremiumLockOverlay({ children }: { children: React.ReactNode }) {
         const res = await getUserApplications();
         if (res.success && res.data) {
           // If they have any active or completed application, they have paid/enrolled
-          const hasAccess = res.data.some(app => app.status === "Active" || app.status === "Completed");
+          const hasAccess = res.data.some(app => app.status === "Active" || app.status === "Completed" || app.status === "Enrolled");
           setIsLocked(!hasAccess);
         } else {
           setIsLocked(true);

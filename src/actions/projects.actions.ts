@@ -63,6 +63,24 @@ export async function submitProject(data: {
   }
 }
 
+export async function getUserProjects() {
+  const user = await currentUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("project_submissions")
+      .select("*")
+      .eq("clerk_id", user.id)
+      .order("submitted_at", { ascending: false });
+
+    if (error) throw error;
+    return { success: true, data };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
 import { cookies } from "next/headers";
 
 async function verifyAdmin() {
