@@ -47,6 +47,19 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "InterNexa",
+  },
+  manifest: "/manifest.webmanifest",
+};
+
+export const viewport: import("next").Viewport = {
+  themeColor: "#4f46e5",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 import { AntiInspect } from "@/components/security/AntiInspect";
