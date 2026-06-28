@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { approveApplication, rejectApplication, getAdminData, approveRewardClaim, approveManualPayment, rejectManualPayment } from "@/actions/admin.actions";
 import { generateCertificateAction } from "@/actions/certificate.actions";
 import { Button, Badge } from "@/components/shared";
-import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock, FolderGit2, Shield, Gift, Award, Download } from "lucide-react";
+import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock, FolderGit2, Shield, Gift, Award, Download, RefreshCw } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
 export function AdminDashboardClient({ initialData }: { initialData: any }) {
@@ -12,13 +12,15 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
   const [data, setData] = useState(initialData);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
 
+  const fetchAdminData = async () => {
+    const res = await getAdminData();
+    if (res.success && res.data) {
+      setData(res.data);
+    }
+  };
+
   useEffect(() => {
-    const interval = setInterval(async () => {
-      const res = await getAdminData();
-      if (res.success && res.data) {
-        setData(res.data);
-      }
-    }, 10000);
+    const interval = setInterval(fetchAdminData, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -62,6 +64,19 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
           <h1 className="text-3xl font-bold text-brand-900 dark:text-white">Admin Dashboard</h1>
           <p className="text-brand-500">Manage all platform data and applications.</p>
         </div>
+        <Button 
+          variant="outline" 
+          onClick={async () => {
+            setLoadingAction("refresh");
+            await fetchAdminData();
+            setLoadingAction(null);
+          }}
+          disabled={loadingAction === "refresh"}
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className={`w-4 h-4 ${loadingAction === "refresh" ? "animate-spin" : ""}`} />
+          Refresh Data
+        </Button>
       </div>
 
       {/* Tabs */}
@@ -114,7 +129,11 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-brand-100 dark:divide-brand-800">
-                {data.applications.map((app: any) => (
+                {[...data.applications].sort((a: any, b: any) => {
+                  if (a.status === "Submitted" && b.status !== "Submitted") return -1;
+                  if (a.status !== "Submitted" && b.status === "Submitted") return 1;
+                  return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+                }).map((app: any) => (
                   <tr key={app.id} className="hover:bg-brand-50/50 dark:hover:bg-brand-900/20 transition-colors">
                     <td className="px-6 py-4 font-mono text-xs">{app.application_id || app.reference_number}</td>
                     <td className="px-6 py-4 font-medium text-brand-900 dark:text-white">{app.full_name}</td>
@@ -300,7 +319,11 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-brand-100 dark:divide-brand-800">
-                {(data.manualPayments || []).map((payment: any) => (
+                {[...(data.manualPayments || [])].sort((a: any, b: any) => {
+                  if (a.status === "Pending" && b.status !== "Pending") return -1;
+                  if (a.status !== "Pending" && b.status === "Pending") return 1;
+                  return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+                }).map((payment: any) => (
                   <tr key={payment.id} className="hover:bg-brand-50/50 dark:hover:bg-brand-900/20 transition-colors">
                     <td className="px-6 py-4">
                       <div className="font-medium text-brand-900 dark:text-white">{payment.applications?.full_name || "Unknown"}</div>
@@ -314,7 +337,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                     <td className="px-6 py-4">
                       {payment.screenshot_file_id ? (
                         <a 
-                          href={`/api/downloads/${payment.screenshot_file_id}`} 
+                          href={`${process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"}/storage/v1/object/public/documents/${payment.screenshot_file_id}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="text-indigo-500 hover:underline text-xs flex items-center gap-1"

@@ -41,9 +41,10 @@ export async function submitApplication(formData: FormData) {
     const internshipSlug = formData.get("internshipSlug") as string;
     const resumeFile = formData.get("resume") as File;
     
-    if (!resumeFile) {
-      return { success: false, error: "Resume is required" };
-    }
+    // Resume is optional
+    // if (!resumeFile) {
+    //   return { success: false, error: "Resume is required" };
+    // }
 
     const validatedData = applicationSchema.parse(rawData);
 
