@@ -61,7 +61,7 @@ export function FloatingReferButton() {
     }
   };
 
-  if (!isLoaded) return null;
+  if (!isLoaded || !isSignedIn) return null;
 
   return (
     <>
