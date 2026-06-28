@@ -59,7 +59,8 @@ export const metadata: Metadata = {
 
 export const viewport: import("next").Viewport = {
   themeColor: "#4f46e5",
-  width: 1280,
+  // Next.js automatically adds initial-scale=1 which breaks desktop view on mobile
+  // We handle viewport manually in the <head> below
 };
 
 import { AntiInspect } from "@/components/security/AntiInspect";
@@ -73,6 +74,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning className="dark">
+        <head>
+          <meta name="viewport" content="width=1280" />
+        </head>
         <body className={`${inter.variable} font-sans antialiased`}>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
             <AntiInspect />
