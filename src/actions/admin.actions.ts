@@ -73,7 +73,7 @@ export async function approveApplication(applicationId: string) {
       .not('offer_letter_id', 'is', null);
       
     const seq = (offerCount || 0) + 1;
-    const offerLetterId = `OFF-${new Date().getFullYear()}-${String(seq).padStart(6, '0')}`;
+    const offerLetterId = application.application_id ? application.application_id.replace("APP-", "OFF-") : `OFF-${new Date().getFullYear()}-${String(seq).padStart(6, '0')}`;
     
     const offerExpiresAt = new Date();
     offerExpiresAt.setHours(offerExpiresAt.getHours() + 72);
@@ -291,7 +291,7 @@ export async function approveManualPayment(paymentId: string) {
     const application = payment.applications;
 
     // 2. Generate PDF Joining Letter
-    const offerLetterId = `JOIN-${new Date().getFullYear()}-${String(Math.floor(1000 + Math.random() * 9000))}`;
+    const offerLetterId = application.application_id ? application.application_id.replace("APP-", "JOIN-") : `JOIN-${new Date().getFullYear()}-${String(Math.floor(1000 + Math.random() * 9000))}`;
     
     let pdfFileId = null;
     try {

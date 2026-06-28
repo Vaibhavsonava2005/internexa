@@ -18,13 +18,14 @@ export async function generateCertificateAction(applicationId: string) {
     }
 
     if (app.status === "Completed") {
-      return { success: true, certificateId: `CERT-${app.id.substring(0,8).toUpperCase()}`, fileId: `certificates/${app.id}.pdf` };
+      const existingId = app.application_id ? app.application_id.replace("APP-", "CERT-") : `CERT-${app.id.substring(0,8).toUpperCase()}`;
+      return { success: true, certificateId: existingId, fileId: `certificates/${app.id}.pdf` };
     }
 
-    // 2. Generate unique Certificate ID
+    // 2. Generate unique Certificate ID (Deterministic based on application_id)
     const currentYear = new Date().getFullYear();
     const seq = Math.floor(100000 + Math.random() * 900000);
-    const certificateId = `CERT-${currentYear}-${seq}`;
+    const certificateId = app.application_id ? app.application_id.replace("APP-", "CERT-") : `CERT-${currentYear}-${seq}`;
     const dateStr = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
     // 3. Generate Certificate Document
