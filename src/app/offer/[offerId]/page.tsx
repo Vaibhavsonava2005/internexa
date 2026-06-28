@@ -27,6 +27,7 @@ export default function OfferPage() {
 
   useEffect(() => {
     async function load() {
+      if (!offerId) return;
       const res = await getOfferDetails(offerId);
       if (res.success && res.data) {
         setOffer(res.data);

@@ -4,13 +4,19 @@ import { supabaseAdmin } from "@/lib/supabase";
 
 export async function getOfferDetails(offerLetterId: string) {
   try {
+    if (!offerLetterId) return { success: false, error: "No offer ID provided" };
+    const cleanId = decodeURIComponent(offerLetterId).trim();
+    
+    console.log("Fetching offer details for ID:", cleanId);
+    
     const { data, error } = await supabaseAdmin
       .from('applications')
       .select('*, internships(title, duration, category, price)')
-      .eq('offer_letter_id', offerLetterId)
+      .eq('offer_letter_id', cleanId)
       .single();
 
     if (error || !data) {
+      console.error("Offer fetch error:", error, "Data:", data);
       return { success: false, error: "Offer not found" };
     }
 

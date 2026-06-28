@@ -1,4 +1,10 @@
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://internexa.vercel.app';
+const getBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return 'https://internexa.vercel.app';
+};
+const APP_URL = getBaseUrl();
 const BRAND_COLOR = "#4f46e5";
 
 function getBrevoKey(): string {
