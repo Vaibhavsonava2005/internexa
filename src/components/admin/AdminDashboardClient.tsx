@@ -541,8 +541,6 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
             </table>
           </div>
         )}
-
       </div>
-    </div>
   );
 }

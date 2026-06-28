@@ -346,7 +346,7 @@ export async function approveManualPayment(paymentId: string) {
         letterId: offerLetterId,
         applicationId: application.application_id || application.reference_number || application.id,
         duration: application.internships.duration || "4 Weeks",
-        pdfUrl: pdfFileId
+        pdfUrl: pdfFileId || undefined
       });
     } catch (emailErr) {
       console.error("Failed to send joining email in manual approval", emailErr);
