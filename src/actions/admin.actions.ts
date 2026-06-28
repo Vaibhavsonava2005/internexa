@@ -174,7 +174,7 @@ export async function rejectApplication(applicationId: string) {
 export async function getAdminData() {
   try {
     await verifyAdmin();
-    const [appsRes, usersRes, txRes, projectsRes, paymentsRes] = await Promise.all([
+    const [appsRes, usersRes, txRes, projectsRes, paymentsRes, rewardClaimsRes] = await Promise.all([
       supabaseAdmin.from('applications').select('*, internships(title)'),
       supabaseAdmin.from('users').select('*'),
       supabaseAdmin.from('transactions').select('*'),
