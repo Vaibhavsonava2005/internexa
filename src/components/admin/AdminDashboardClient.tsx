@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { approveApplication, rejectApplication, getAdminData } from "@/actions/admin.actions";
+import { approveApplication, rejectApplication, getAdminData, approveRewardClaim } from "@/actions/admin.actions";
 import { Button, Badge } from "@/components/shared";
-import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock, FolderGit2, Shield } from "lucide-react";
+import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock, FolderGit2, Shield, Gift } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
 export function AdminDashboardClient({ initialData }: { initialData: any }) {
@@ -71,6 +71,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
           { id: "users", label: "Users", icon: Users },
           { id: "transactions", label: "Auto Payments", icon: CreditCard },
           { id: "manualPayments", label: "Manual Verifications", icon: Shield },
+          { id: "rewardClaims", label: "Reward Claims", icon: Gift },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -177,6 +178,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                   <th className="px-6 py-4 font-medium">Full Name</th>
                   <th className="px-6 py-4 font-medium">Role</th>
                   <th className="px-6 py-4 font-medium">Joined</th>
+                  <th className="px-6 py-4 font-medium">Successful Referrals</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-brand-100 dark:divide-brand-800">
@@ -187,6 +189,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                     <td className="px-6 py-4">{u.full_name}</td>
                     <td className="px-6 py-4"><Badge variant="secondary">{u.role}</Badge></td>
                     <td className="px-6 py-4">{u.created_at ? new Date(u.created_at).toLocaleDateString() : "N/A"}</td>
+                    <td className="px-6 py-4 font-medium text-emerald-600 dark:text-emerald-400">{u.successful_referrals || 0}</td>
                   </tr>
                 ))}
               </tbody>
@@ -272,6 +275,79 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                   <tr>
                     <td colSpan={4} className="px-6 py-12 text-center text-brand-500">
                       No projects submitted yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Reward Claims */}
+        {activeTab === "rewardClaims" && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="bg-brand-50 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400">
+                <tr>
+                  <th className="px-6 py-4 font-medium">Date</th>
+                  <th className="px-6 py-4 font-medium">User</th>
+                  <th className="px-6 py-4 font-medium">UPI ID</th>
+                  <th className="px-6 py-4 font-medium">Amount</th>
+                  <th className="px-6 py-4 font-medium">Status</th>
+                  <th className="px-6 py-4 font-medium text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-brand-100 dark:divide-brand-800">
+                {(data.rewardClaims || []).map((claim: any) => (
+                  <tr key={claim.id} className="hover:bg-brand-50/50 dark:hover:bg-brand-900/20 transition-colors">
+                    <td className="px-6 py-4">{new Date(claim.created_at).toLocaleDateString()}</td>
+                    <td className="px-6 py-4">
+                      <div className="font-medium text-brand-900 dark:text-white">{claim.users?.name || "Unknown"}</div>
+                      <div className="text-xs text-brand-500">{claim.users?.email}</div>
+                    </td>
+                    <td className="px-6 py-4 font-mono text-xs">{claim.upi_id}</td>
+                    <td className="px-6 py-4 font-medium text-emerald-600 dark:text-emerald-400">₹{claim.amount}</td>
+                    <td className="px-6 py-4">
+                      <Badge variant={claim.status === "Approved" ? "success" : "warning"}>
+                        {claim.status}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-4 text-right space-x-2">
+                      {claim.status === "Pending" ? (
+                        <Button 
+                          size="sm"
+                          onClick={async () => {
+                            if (!confirm("Are you sure you have manually sent ₹100 to this UPI ID?")) return;
+                            setLoadingAction(claim.id);
+                            const res = await approveRewardClaim(claim.id);
+                            if (res.success) {
+                              setData((prev: any) => ({
+                                ...prev,
+                                rewardClaims: prev.rewardClaims.map((c: any) => 
+                                  c.id === claim.id ? { ...c, status: "Approved" } : c
+                                )
+                              }));
+                            } else {
+                              alert(res.error || "Failed to approve");
+                            }
+                            setLoadingAction(null);
+                          }}
+                          disabled={loadingAction === claim.id}
+                        >
+                          {loadingAction === claim.id ? "Approving..." : "Mark as Paid"}
+                        </Button>
+                      ) : (
+                        <span className="text-emerald-500 text-xs flex justify-end items-center gap-1">
+                          <CheckCircle className="w-3 h-3" /> Paid
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {(!data.rewardClaims || data.rewardClaims.length === 0) && (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center text-brand-500">
+                      No reward claims found.
                     </td>
                   </tr>
                 )}

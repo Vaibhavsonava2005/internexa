@@ -136,6 +136,33 @@ export interface StudentProfile {
   certificates: Certificate[];
   achievements: Achievement[];
   createdAt: string;
+  referralCode?: string;
+  referredBy?: string;
+}
+
+export interface Referral {
+  id: string;
+  referrerId: string;
+  referredId: string;
+  status: "Pending" | "Successful";
+  createdAt: string;
+  referredUser?: {
+    name: string;
+    avatar: string;
+  };
+}
+
+export interface RewardClaim {
+  id: string;
+  clerkId: string;
+  upiId: string;
+  amount: number;
+  status: "Pending" | "Approved" | "Rejected";
+  createdAt: string;
+  user?: {
+    name: string;
+    email: string;
+  };
 }
 
 export interface Enrollment {

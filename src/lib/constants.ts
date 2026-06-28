@@ -392,6 +392,7 @@ export const NAV_ITEMS = [
 export const DASHBOARD_NAV = [
   { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
   { label: "My Internships", href: "/dashboard/internships", icon: "GraduationCap" },
+  { label: "Refer & Earn", href: "/dashboard/refer-and-earn", icon: "Gift" },
   { label: "My Courses", href: "/dashboard/courses", icon: "BookOpen" },
   { label: "Tasks & Attendance", href: "/dashboard/tasks", icon: "CheckSquare" },
   { label: "Assignments", href: "/dashboard/assignments", icon: "FileText" },

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { ReferralTracker, FloatingReferButton } from "@/components/shared";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -74,6 +76,10 @@ export default function RootLayout({
         <body className={`${inter.variable} font-sans antialiased`}>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
             <AntiInspect />
+            <Suspense fallback={null}>
+              <ReferralTracker />
+            </Suspense>
+            <FloatingReferButton />
             {children}
           </ThemeProvider>
         </body>

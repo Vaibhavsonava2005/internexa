@@ -2,6 +2,7 @@
 
 import { supabaseAdmin } from "@/lib/supabase";
 import { currentUser } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
 
 // ─── Get or Create User Profile ─────────────────────────────
 export async function getOrCreateUserProfile() {
@@ -61,6 +62,30 @@ export async function getOrCreateUserProfile() {
       return { success: true, data: existing };
     }
 
+    // Generate a unique 6 character referral code
+    const referralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+    
+    // Check for referred_by cookie
+    const cookieStore = await cookies();
+    const referredByCookie = cookieStore.get("internexa_ref")?.value;
+    
+    let referredBy = null;
+    let referrerClerkId = null;
+    
+    // Verify the referral code belongs to a valid user
+    if (referredByCookie) {
+      const { data: referrer } = await supabaseAdmin
+        .from('users')
+        .select('clerk_id, referral_code')
+        .eq('referral_code', referredByCookie)
+        .single();
+        
+      if (referrer) {
+        referredBy = referrer.referral_code;
+        referrerClerkId = referrer.clerk_id;
+      }
+    }
+
     // Create new user
     const { data: newUser, error: insertError } = await supabaseAdmin
       .from('users')
@@ -79,12 +104,26 @@ export async function getOrCreateUserProfile() {
           skills: [],
           interests: [],
           last_active: new Date().toISOString(),
+          referral_code: referralCode,
+          referred_by: referredBy,
         }
       ])
       .select()
       .single();
 
     if (insertError) throw insertError;
+    
+    // If successfully referred, create a pending referral entry
+    if (referrerClerkId) {
+      await supabaseAdmin.from('referrals').insert([
+        {
+          referrer_id: referrerClerkId,
+          referred_id: user.id,
+          status: 'Pending',
+        }
+      ]);
+    }
+    
     return { success: true, data: newUser };
   } catch (error: any) {
     console.error("Error getting/creating user:", error);

@@ -179,7 +179,8 @@ export async function getAdminData() {
       supabaseAdmin.from('users').select('*'),
       supabaseAdmin.from('transactions').select('*'),
       supabaseAdmin.from('project_submissions').select('*').order('submitted_at', { ascending: false }),
-      supabaseAdmin.from('manual_payments').select('*, applications(full_name, internships(title))').order('created_at', { ascending: false })
+      supabaseAdmin.from('manual_payments').select('*, applications(full_name, internships(title))').order('created_at', { ascending: false }),
+      supabaseAdmin.from('reward_claims').select('*, users(name, email)').order('created_at', { ascending: false })
     ]);
 
     const applications = appsRes.data || [];
@@ -187,6 +188,19 @@ export async function getAdminData() {
     const transactions = txRes.data || [];
     const submissions = projectsRes.data || [];
     const manualPayments = paymentsRes.data || [];
+    const rewardClaims = rewardClaimsRes.data || [];
+
+    // Attach successful referral counts to users
+    if (users.length > 0) {
+      const { data: referrals } = await supabaseAdmin.from('referrals').select('referrer_id, status').eq('status', 'Successful');
+      const refCountMap: Record<string, number> = {};
+      referrals?.forEach(r => {
+        refCountMap[r.referrer_id] = (refCountMap[r.referrer_id] || 0) + 1;
+      });
+      users.forEach(u => {
+        u.successful_referrals = refCountMap[u.clerk_id] || 0;
+      });
+    }
 
     return {
       success: true,
@@ -195,7 +209,8 @@ export async function getAdminData() {
         users,
         transactions,
         submissions,
-        manualPayments
+        manualPayments,
+        rewardClaims
       }
     };
   } catch (error: any) {
@@ -205,6 +220,40 @@ export async function getAdminData() {
       error: error.message || "Failed to fetch admin data",
       data: null
     };
+  }
+}
+
+export async function approveRewardClaim(claimId: string) {
+  try {
+    await verifyAdmin();
+    
+    const { data: claim, error: fetchError } = await supabaseAdmin
+      .from('reward_claims')
+      .select('*')
+      .eq('id', claimId)
+      .single();
+      
+    if (fetchError || !claim) return { success: false, error: "Claim not found" };
+    
+    const { error: updateError } = await supabaseAdmin
+      .from('reward_claims')
+      .update({ status: 'Approved' })
+      .eq('id', claimId);
+      
+    if (updateError) throw updateError;
+    
+    // Notify user
+    await supabaseAdmin.from('notifications').insert([{
+      clerk_id: claim.clerk_id,
+      title: "Reward Paid! 🎉",
+      message: "Your ₹100 reward has been approved and sent to your UPI ID.",
+      type: "success",
+      link: "/dashboard/refer-and-earn"
+    }]);
+    
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
   }
 }
 
@@ -276,6 +325,13 @@ export async function approveManualPayment(paymentId: string) {
       .from('manual_payments')
       .update({ status: "Approved" })
       .eq('id', paymentId);
+
+    // 4b. Update Referral Status to Successful (if exists)
+    await supabaseAdmin
+      .from('referrals')
+      .update({ status: "Successful" })
+      .eq('referred_id', application.clerk_id)
+      .eq('status', 'Pending');
 
     // 5. Send Joining Letter Email
     await sendJoiningLetterEmail({
