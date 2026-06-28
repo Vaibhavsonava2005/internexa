@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { approveApplication, rejectApplication, getAdminData } from "@/actions/admin.actions";
 import { Button, Badge } from "@/components/shared";
-import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock, FolderGit2 } from "lucide-react";
+import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock, FolderGit2, Shield } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
 export function AdminDashboardClient({ initialData }: { initialData: any }) {
@@ -64,12 +64,13 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-1 bg-brand-100 dark:bg-brand-900/50 p-1 rounded-xl mb-8 w-max">
+      <div className="flex space-x-1 bg-brand-100 dark:bg-brand-900/50 p-1 rounded-xl mb-8 w-max flex-wrap">
         {[
           { id: "applications", label: "Applications", icon: FileText },
           { id: "submissions", label: "Projects", icon: FolderGit2 },
           { id: "users", label: "Users", icon: Users },
-          { id: "transactions", label: "Payments", icon: CreditCard },
+          { id: "transactions", label: "Auto Payments", icon: CreditCard },
+          { id: "manualPayments", label: "Manual Verifications", icon: Shield },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -86,7 +87,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
               <Icon className="w-4 h-4" />
               {tab.label}
               <Badge variant={isActive ? "default" : "secondary"} className="ml-2 rounded-full px-2 py-0.5 text-xs">
-                {data[tab.id].length}
+                {data[tab.id]?.length || 0}
               </Badge>
             </button>
           );
@@ -281,3 +282,4 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
     </div>
   );
 }
+

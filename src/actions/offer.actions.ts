@@ -6,7 +6,7 @@ export async function getOfferDetails(offerLetterId: string) {
   try {
     const { data, error } = await supabaseAdmin
       .from('applications')
-      .select('*, internships(title, duration, category)')
+      .select('*, internships(title, duration, category, price)')
       .eq('offer_letter_id', offerLetterId)
       .single();
 
@@ -26,6 +26,7 @@ export async function getOfferDetails(offerLetterId: string) {
         internshipName: data.internships?.title || "Internship Program",
         duration: data.internships?.duration || "4 Weeks",
         category: data.internships?.category || "Technology",
+        price: data.internships?.price || 199,
         offerExpiresAt: data.offer_expires_at,
         offerLetterFileId: data.offer_letter_file_id,
         createdAt: data.created_at
@@ -64,16 +65,18 @@ export async function markPaymentComplete(offerLetterId: string, transactionRef:
       .from('applications')
       .update({ status: "Enrolled" })
       .eq('offer_letter_id', offerLetterId)
-      .select('*, internships(title)')
+      .select('*, internships(title, price)')
       .single();
 
     if (error) throw error;
+
+    const amount = data.internships?.price || 199;
 
     // Record the transaction
     await supabaseAdmin.from('transactions').insert([{
       clerk_id: data.clerk_id,
       application_id: data.id,
-      amount: 199,
+      amount: amount,
       currency: "INR",
       status: "Success",
       payment_method: "UPI",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle2, Clock, Shield, Award, Users, Briefcase, Star,
@@ -15,6 +15,7 @@ type Step = "loading" | "offer" | "accepted" | "payment" | "success";
 
 export default function OfferPage() {
   const params = useParams();
+  const router = useRouter();
   const offerId = params.offerId as string;
 
   const [step, setStep] = useState<Step>("loading");
@@ -50,11 +51,11 @@ export default function OfferPage() {
     setAccepting(true);
     const res = await acceptOffer(offerId);
     if (res.success) {
-      setStep("payment");
+      router.push(`/offer/${offerId}/onboarding`);
     } else {
       setError(res.error || "Failed to accept offer");
+      setAccepting(false);
     }
-    setAccepting(false);
   };
 
   const handlePaymentSubmit = async () => {
@@ -250,87 +251,6 @@ export default function OfferPage() {
                   </button>
                 )}
                 {error && <p className="text-red-400 text-sm text-center mt-3">{error}</p>}
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Payment Step */}
-        {step === "payment" && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl border border-slate-700/50 overflow-hidden">
-              <div className="bg-gradient-to-r from-indigo-500/10 to-violet-500/10 px-6 sm:px-8 py-5 border-b border-slate-700/50">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-indigo-400" />
-                  Complete Your Enrollment
-                </h3>
-              </div>
-              <div className="px-6 sm:px-8 py-8">
-                {/* Price Reveal */}
-                <div className="text-center mb-8">
-                  <p className="text-slate-400 text-sm mb-2">Enrollment Fee</p>
-                  <div className="flex items-center justify-center gap-3">
-                    <span className="text-slate-500 line-through text-xl">₹999</span>
-                    <span className="text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-green-300">₹199</span>
-                  </div>
-                  <p className="text-emerald-400 text-sm font-semibold mt-2">🎉 80% OFF — Limited Time Offer!</p>
-                </div>
-
-                {/* What's Included */}
-                <div className="bg-slate-800/50 rounded-xl p-5 mb-8 border border-slate-700/50">
-                  <p className="text-white font-bold text-sm mb-3">What's included:</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {["Professional Certificate", "Letter of Recommendation", "Industry Mentor", "Real-World Projects", "Career Support", "Lifetime Access"].map(item => (
-                      <div key={item} className="flex items-center gap-2 text-sm text-slate-300">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Razorpay Payment */}
-                <div className="space-y-6">
-                  <div className="bg-gradient-to-r from-indigo-500/5 to-violet-500/5 rounded-xl p-6 border border-indigo-500/20 text-center">
-                    <p className="text-white font-bold mb-3 flex items-center justify-center gap-2">
-                      <Shield className="w-5 h-5 text-emerald-400" /> Secure Payment via Razorpay
-                    </p>
-                    <p className="text-slate-400 text-sm mb-6">Click the button below to complete your enrollment fee of <strong className="text-emerald-400">₹199</strong> securely.</p>
-                    
-                    <a
-                      href="https://rzp.io/rzp/lkeeUyjf"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => setPaymentRef("RAZORPAY_LINK_CLICKED")}
-                      className="w-full sm:w-2/3 mx-auto bg-[#3399cc] hover:bg-[#2b88b7] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-500/20 mb-4"
-                    >
-                      Pay ₹199 via Razorpay <ExternalLink className="w-4 h-4" />
-                    </a>
-                  </div>
-
-                  {/* Verification */}
-                  {paymentRef === "RAZORPAY_LINK_CLICKED" || paymentRef.startsWith("pay_") || paymentRef.length > 0 ? (
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 bg-slate-900 border border-slate-700 rounded-xl p-5">
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">Enter your Razorpay Payment ID to Verify</label>
-                      <input
-                        type="text"
-                        value={paymentRef === "RAZORPAY_LINK_CLICKED" ? "" : paymentRef}
-                        onChange={(e) => setPaymentRef(e.target.value)}
-                        placeholder="e.g., pay_Oq7J8nB9V3w1p4"
-                        className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent font-mono text-sm mb-3"
-                      />
-                      <p className="text-slate-500 text-xs mb-4">You can find this ID starting with "pay_" in your Razorpay receipt email.</p>
-                      
-                      <button onClick={handlePaymentSubmit} disabled={submittingPayment || !paymentRef.startsWith("pay_") || paymentRef.length < 14}
-                        className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 disabled:opacity-50">
-                        {submittingPayment ? <Loader2 className="w-5 h-5 animate-spin" /> : <Shield className="w-5 h-5" />}
-                        {submittingPayment ? "Verifying Payment Server..." : "Verify Secure Payment"}
-                      </button>
-                    </div>
-                  ) : null}
-                  
-                  {error && <p className="text-red-400 text-sm text-center">{error}</p>}
-                </div>
               </div>
             </div>
           </motion.div>

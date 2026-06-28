@@ -216,3 +216,18 @@ CREATE POLICY "Users can view their own activity logs" ON activity_logs FOR SELE
 
 DROP POLICY IF EXISTS "Users can insert their own activity logs" ON activity_logs;
 CREATE POLICY "Users can insert their own activity logs" ON activity_logs FOR INSERT WITH CHECK (clerk_id = current_setting('request.jwt.claims')::json->>'sub');
+
+ - -   7 .   M a n u a l   P a y m e n t s   T a b l e 
+ C R E A T E   T A B L E   I F   N O T   E X I S T S   m a n u a l _ p a y m e n t s   ( 
+     i d   U U I D   D E F A U L T   g e n _ r a n d o m _ u u i d ( )   P R I M A R Y   K E Y , 
+     a p p l i c a t i o n _ i d   U U I D   R E F E R E N C E S   a p p l i c a t i o n s ( i d )   O N   D E L E T E   C A S C A D E , 
+     c l e r k _ i d   T E X T   N O T   N U L L   R E F E R E N C E S   u s e r s ( c l e r k _ i d )   O N   D E L E T E   C A S C A D E , 
+     r e f e r e n c e _ n u m b e r   T E X T   N O T   N U L L , 
+     e m a i l _ i d   T E X T   N O T   N U L L , 
+     u p i _ i d   T E X T   N O T   N U L L , 
+     s c r e e n s h o t _ f i l e _ i d   T E X T   N O T   N U L L , 
+     s t a t u s   T E X T   D E F A U L T   ' P e n d i n g ' , 
+     c r e a t e d _ a t   T I M E S T A M P   W I T H   T I M E   Z O N E   D E F A U L T   t i m e z o n e ( ' u t c ' : : t e x t ,   n o w ( ) )   N O T   N U L L 
+ ) ; 
+  
+ 

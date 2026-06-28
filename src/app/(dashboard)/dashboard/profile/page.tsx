@@ -4,7 +4,7 @@ import { useUser } from "@clerk/nextjs";
 import { PageHeader, Avatar, Badge, ProgressBar } from "@/components/shared";
 import { MapPin, Mail, Calendar, Edit, Shield } from "lucide-react";
 import { useState, useEffect } from "react";
-import { getUserApplications } from "@/actions/application.actions";
+import { getOrCreateUserProfile } from "@/actions/user.actions";
 
 export default function ProfilePage() {
   const { user } = useUser();
@@ -14,19 +14,11 @@ export default function ProfilePage() {
 
   useEffect(() => {
     async function loadData() {
-      const res = await getUserApplications();
+      const res = await getOrCreateUserProfile();
       if (res.success && res.data) {
-        let totalXp = 0;
-        res.data.forEach(app => {
-          if (app.status === "Active") totalXp += 250;
-          if (app.status === "Completed") totalXp += 1000;
-        });
-        setXp(totalXp);
-        
-        // Simple leveling system: Every 500 XP is a level
-        const currentLevel = Math.floor(totalXp / 500) + 1;
-        setLevel(currentLevel);
-        setNextLevelXp(currentLevel * 500);
+        setXp(res.data.xp || 0);
+        setLevel(res.data.level || 1);
+        setNextLevelXp((res.data.level || 1) * 1000);
       }
     }
     loadData();

@@ -210,7 +210,8 @@ export async function getUserApplications() {
       internship: app.internships,
       // Map postgres snake_case to camelCase where frontend expects it
       referenceNumber: app.reference_number,
-      offerLetterFileId: app.offer_letter_file_id
+      offerLetterFileId: app.offer_letter_file_id,
+      joiningLetterFileId: app.joining_letter_file_id
     }));
 
     return { success: true, data: appsWithInternships };

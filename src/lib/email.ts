@@ -396,3 +396,152 @@ export async function sendPaymentSuccessEmail({
     htmlContent
   });
 }
+
+export async function sendPaymentRejectedEmail({
+  email,
+  name,
+  internshipName,
+}: {
+  email: string;
+  name: string;
+  internshipName: string;
+}) {
+  const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background-color:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;padding:40px 20px;">
+<tr><td align="center">
+<table width="100%" max-width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,0.05);max-width:600px;margin:0 auto;">
+  
+  <tr><td style="padding:40px;text-align:center;background:linear-gradient(135deg,#ef4444,#dc2626);">
+    <h1 style="color:#ffffff;font-size:28px;margin:0 0 12px;font-weight:800;letter-spacing:-0.5px;">Payment Verification Failed</h1>
+  </td></tr>
+
+  <tr><td style="padding:40px 40px 20px;">
+    <p style="color:#334155;font-size:16px;line-height:24px;margin:0 0 20px;">Hi <strong style="color:#0f172a;">${name}</strong>,</p>
+    <p style="color:#475569;font-size:16px;line-height:26px;margin:0 0 24px;">
+      We reviewed your submitted payment screenshot for the <strong>${internshipName}</strong> internship, but unfortunately we could not verify the transaction.
+    </p>
+
+    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:24px;margin-bottom:32px;">
+      <h3 style="color:#b91c1c;margin:0 0 12px;font-size:16px;">What you can do:</h3>
+      <ul style="color:#7f1d1d;margin:0;padding-left:20px;line-height:24px;">
+        <li>Ensure you paid the correct amount (?199).</li>
+        <li>Make sure the screenshot clearly shows the UPI Reference ID or Transaction ID.</li>
+        <li>Try submitting the payment again using the onboarding link.</li>
+      </ul>
+    </div>
+
+    <div style="text-align:center;margin:36px 0 0;">
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://internexa.vercel.app'}/dashboard/internships" style="display:inline-block;background:#ef4444;color:#ffffff;padding:16px 48px;text-decoration:none;border-radius:12px;font-weight:800;font-size:16px;box-shadow:0 6px 20px rgba(239,68,68,0.4);">Go to Dashboard</a>
+    </div>
+  </td></tr>
+  
+  <tr><td style="padding:28px 40px;background-color:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;">
+    <p style="color:#4f46e5;font-size:18px;font-weight:800;margin:0 0 4px;">InterNexa</p>
+    <p style="color:#64748b;font-size:13px;margin:0 0 4px;">Need help? Contact <a href="mailto:info.internexa@gmail.com" style="color:#4f46e5;text-decoration:none;font-weight:600;">info.internexa@gmail.com</a></p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+
+  return sendBrevoEmail({
+    to: [{ email, name }],
+    subject: "Action Required: Payment Verification Failed - InterNexa",
+    htmlContent,
+  });
+}
+
+export async function sendJoiningLetterEmail({
+  studentName,
+  email,
+  internshipName,
+  letterId,
+  applicationId,
+  duration,
+  pdfUrl,
+}: {
+  studentName: string;
+  email: string;
+  internshipName: string;
+  letterId: string;
+  applicationId: string;
+  duration: string;
+  pdfUrl?: string;
+}) {
+  const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background-color:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;padding:40px 20px;">
+<tr><td align="center">
+<table width="100%" max-width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,0.05);max-width:600px;margin:0 auto;">
+  
+  <tr><td style="padding:40px;text-align:center;background:linear-gradient(135deg,#10b981,#059669);">
+    <h1 style="color:#ffffff;font-size:28px;margin:0 0 12px;font-weight:800;letter-spacing:-0.5px;">Welcome to InterNexa!</h1>
+  </td></tr>
+
+  <tr><td style="padding:40px 40px 20px;">
+    <p style="color:#334155;font-size:16px;line-height:24px;margin:0 0 20px;">Hi <strong style="color:#0f172a;">${studentName}</strong>,</p>
+    <p style="color:#475569;font-size:16px;line-height:26px;margin:0 0 24px;">
+      Your payment for the <strong>${internshipName}</strong> internship has been successfully verified! We are thrilled to officially welcome you aboard.
+    </p>
+
+    <!-- PDF Attached Notice -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0;background:#eef2ff;border-radius:12px;border:1px solid #c7d2fe;">
+      <tr><td style="padding:16px 20px;">
+        <p style="margin:0;color:#3730a3;font-size:14px;font-weight:600;">?? Your official Joining Letter PDF is attached to this email.</p>
+        <p style="margin:4px 0 0;color:#4338ca;font-size:13px;">Please keep it for your records.</p>
+      </td></tr>
+    </table>
+
+    <div style="text-align:center;margin:36px 0 0;">
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://internexa.vercel.app'}/dashboard/internships" style="display:inline-block;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#ffffff;padding:16px 48px;text-decoration:none;border-radius:12px;font-weight:800;font-size:16px;box-shadow:0 6px 20px rgba(79,70,229,0.4);letter-spacing:0.3px;">🚀 Go to Dashboard</a>
+    </div>
+  </td></tr>
+  
+  <tr><td style="padding:28px 40px;background-color:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;">
+    <p style="color:#4f46e5;font-size:18px;font-weight:800;margin:0 0 4px;">InterNexa</p>
+    <p style="color:#64748b;font-size:13px;margin:0 0 4px;">Need help? Contact <a href="mailto:info.internexa@gmail.com" style="color:#4f46e5;text-decoration:none;font-weight:600;">info.internexa@gmail.com</a></p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+
+  let attachment: any[] = [];
+  if (pdfUrl) {
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+        process.env.SUPABASE_SERVICE_ROLE_KEY || ""
+      );
+      
+      const { data, error } = await supabaseAdmin.storage.from('documents').download(pdfUrl);
+      if (data) {
+        const arrayBuffer = await data.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        attachment = [{
+          content: buffer.toString('base64'),
+          name: 'InterNexa_Joining_Letter.pdf'
+        }];
+      }
+    } catch (err) {
+      console.error("Failed to fetch pdf for attachment:", err);
+    }
+  }
+
+  return sendBrevoEmail({
+    to: [{ email, name: studentName }],
+    subject: "Payment Verified: Your InterNexa Joining Letter",
+    htmlContent,
+    attachment: attachment.length > 0 ? attachment : undefined
+  });
+}

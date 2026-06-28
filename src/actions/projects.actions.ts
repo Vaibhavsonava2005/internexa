@@ -39,6 +39,23 @@ export async function submitProject(data: {
 
     if (error) throw error;
 
+    // Grant XP for submitting a project (250 XP)
+    const { data: userData } = await supabaseAdmin
+      .from('users')
+      .select('xp, level')
+      .eq('clerk_id', user.id)
+      .single();
+
+    if (userData) {
+      const newXp = (userData.xp || 0) + 250;
+      const newLevel = Math.floor(newXp / 1000) + 1;
+      
+      await supabaseAdmin
+        .from('users')
+        .update({ xp: newXp, level: newLevel })
+        .eq('clerk_id', user.id);
+    }
+
     return { success: true };
   } catch (err: any) {
     console.error("Project submission error:", err);

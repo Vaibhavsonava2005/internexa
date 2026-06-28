@@ -8,7 +8,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import { createClient } from "@supabase/supabase-js";
-import { CheckoutModal } from "@/components/dashboard/CheckoutModal";
+import { createClient } from "@supabase/supabase-js";
 import { getUserApplications } from "@/actions/application.actions";
 
 export default function MyInternshipsPage() {
@@ -18,18 +18,7 @@ export default function MyInternshipsPage() {
   const [applications, setApplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Checkout State
-  const [checkoutData, setCheckoutData] = useState<{
-    isOpen: boolean;
-    appId: string;
-    internshipName: string;
-    amount: number;
-  }>({
-    isOpen: false,
-    appId: "",
-    internshipName: "",
-    amount: 0
-  });
+
 
   const fetchApplications = async (silent = false) => {
     if (!user) return;
@@ -54,11 +43,6 @@ export default function MyInternshipsPage() {
     }, 10000);
     return () => clearInterval(interval);
   }, [user]);
-
-  const handleCheckoutSuccess = () => {
-    // Refresh applications to show Enrolled/Active status
-    fetchApplications();
-  };
 
   const filtered = applications.filter(app => {
     if (filter === "all") return true;
@@ -159,7 +143,7 @@ export default function MyInternshipsPage() {
                     )}
 
                     {isActive && (
-                      <>
+                      <div className="space-y-3">
                         <ProgressBar value={15} showLabel className="mb-4" />
                         <Link
                           href={`/dashboard/internships/${app.id}`}
@@ -168,7 +152,18 @@ export default function MyInternshipsPage() {
                           <PlayCircle className="w-4 h-4" />
                           Continue Learning
                         </Link>
-                      </>
+                        {(app.joiningLetterFileId || app.joining_letter_file_id) && (
+                          <a
+                            href={`/api/downloads/${app.joiningLetterFileId || app.joining_letter_file_id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-medium hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                            Download Joining Letter
+                          </a>
+                        )}
+                      </div>
                     )}
 
                     {isAccepted && (
@@ -211,18 +206,6 @@ export default function MyInternshipsPage() {
           </Link>
         </div>
       )}
-
-      <CheckoutModal 
-        isOpen={checkoutData.isOpen}
-        onClose={() => setCheckoutData(prev => ({ ...prev, isOpen: false }))}
-        applicationId={checkoutData.appId}
-        internshipName={checkoutData.internshipName}
-        amount={checkoutData.amount}
-        clerkId={user?.id || ""}
-        studentName={user?.fullName || ""}
-        email={user?.primaryEmailAddress?.emailAddress || ""}
-        onSuccess={handleCheckoutSuccess}
-      />
     </div>
   );
 }

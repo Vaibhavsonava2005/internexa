@@ -18,6 +18,46 @@ export async function getOrCreateUserProfile() {
       .single();
 
     if (existing) {
+      const now = new Date();
+      const lastActive = new Date(existing.last_active || now);
+      
+      const isDifferentDay = now.toDateString() !== lastActive.toDateString();
+      
+      if (isDifferentDay) {
+        // Check if it was yesterday for streak
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        let newStreak = existing.streak || 0;
+        let xpGained = 10; // 10 XP for daily login
+        
+        if (lastActive.toDateString() === yesterday.toDateString()) {
+          newStreak += 1;
+          if (newStreak >= 3) xpGained += 50; // 50 XP Streak bonus
+        } else {
+          newStreak = 1; // Reset streak
+        }
+        
+        const newXp = (existing.xp || 0) + xpGained;
+        const newLevel = Math.floor(newXp / 1000) + 1; // 1000 XP per level
+        
+        const { data: updated, error: updateError } = await supabaseAdmin
+          .from('users')
+          .update({ 
+            last_active: now.toISOString(),
+            streak: newStreak,
+            xp: newXp,
+            level: newLevel
+          })
+          .eq('id', existing.id)
+          .select()
+          .single();
+          
+        if (updated && !updateError) {
+          return { success: true, data: updated };
+        }
+      }
+      
       return { success: true, data: existing };
     }
 

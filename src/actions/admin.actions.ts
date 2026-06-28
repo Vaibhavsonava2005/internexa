@@ -3,7 +3,8 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { sendOfferLetterEmail } from "@/lib/email";
-import { generateAndUploadOfferLetter } from "@/lib/pdf-generator";
+import { generateAndUploadOfferLetter, generateAndUploadJoiningLetter } from "@/lib/pdf-generator";
+import { sendJoiningLetterEmail, sendPaymentRejectedEmail } from "@/lib/email";
 
 // Helper for Activity Log
 export async function logActivity(clerk_id: string, action: string, description?: string, metadata?: any) {
@@ -173,17 +174,19 @@ export async function rejectApplication(applicationId: string) {
 export async function getAdminData() {
   try {
     await verifyAdmin();
-    const [appsRes, usersRes, txRes, projectsRes] = await Promise.all([
+    const [appsRes, usersRes, txRes, projectsRes, paymentsRes] = await Promise.all([
       supabaseAdmin.from('applications').select('*, internships(title)'),
       supabaseAdmin.from('users').select('*'),
       supabaseAdmin.from('transactions').select('*'),
-      supabaseAdmin.from('project_submissions').select('*').order('submitted_at', { ascending: false })
+      supabaseAdmin.from('project_submissions').select('*').order('submitted_at', { ascending: false }),
+      supabaseAdmin.from('manual_payments').select('*, applications(full_name, internships(title))').order('created_at', { ascending: false })
     ]);
 
     const applications = appsRes.data || [];
     const users = usersRes.data || [];
     const transactions = txRes.data || [];
     const submissions = projectsRes.data || [];
+    const manualPayments = paymentsRes.data || [];
 
     return {
       success: true,
@@ -191,7 +194,8 @@ export async function getAdminData() {
         applications,
         users,
         transactions,
-        submissions
+        submissions,
+        manualPayments
       }
     };
   } catch (error: any) {
@@ -211,3 +215,148 @@ export async function loginAdmin(password: string) {
   }
   return { success: false, error: "Invalid password" };
 }
+
+
+export async function approveManualPayment(paymentId: string) {
+  const admin = await currentUser();
+  if (!admin) return { success: false, error: "Not authenticated" };
+
+  try {
+    await verifyAdmin();
+
+    // 1. Fetch payment and application details
+    const { data: payment, error: fetchError } = await supabaseAdmin
+      .from('manual_payments')
+      .select('*, applications(*, internships(title, duration))')
+      .eq('id', paymentId)
+      .single();
+
+    if (fetchError || !payment) {
+      return { success: false, error: "Payment record not found" };
+    }
+
+    if (payment.status !== "Pending") {
+      return { success: false, error: "Payment is already processed" };
+    }
+
+    const application = payment.applications;
+
+    // 2. Generate PDF Joining Letter
+    const offerLetterId = `JOIN-${new Date().getFullYear()}-${String(Math.floor(1000 + Math.random() * 9000))}`;
+    
+    const pdfResult = await generateAndUploadJoiningLetter({
+      offerId: offerLetterId,
+      applicationId: application.application_id || application.reference_number || application.id,
+      studentName: application.full_name,
+      internshipName: application.internships.title,
+      date: new Date().toLocaleDateString(),
+      duration: application.internships.duration,
+    });
+
+    if (!pdfResult.success) {
+      throw new Error(pdfResult.error || "PDF Generation failed");
+    }
+
+    // Calculate start date (tomorrow)
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() + 1);
+
+    // 3. Update Application Status to Enrolled
+    await supabaseAdmin
+      .from('applications')
+      .update({
+        status: "Enrolled",
+        joining_letter_file_id: pdfResult.fileId,
+        start_date: startDate.toISOString().split('T')[0]
+      })
+      .eq('id', application.id);
+
+    // 4. Update Payment Status to Approved
+    await supabaseAdmin
+      .from('manual_payments')
+      .update({ status: "Approved" })
+      .eq('id', paymentId);
+
+    // 5. Send Joining Letter Email
+    await sendJoiningLetterEmail({
+      studentName: application.full_name,
+      email: payment.email_id,
+      internshipName: application.internships.title,
+      letterId: offerLetterId,
+      applicationId: application.application_id || application.reference_number || application.id,
+      duration: application.internships.duration || "4 Weeks",
+      pdfUrl: pdfResult.fileId
+    });
+
+    // 6. Create Notification
+    await supabaseAdmin.from('notifications').insert([{
+      clerk_id: application.clerk_id,
+      title: "Payment Approved!",
+      message: `Your payment for ${application.internships.title} is verified. Welcome aboard!`,
+      type: "success",
+      link: "/dashboard/internships"
+    }]);
+
+    await logActivity(application.clerk_id, "Payment Approved", "Payment verified by admin.");
+    
+    return { success: true };
+  } catch (error: any) {
+    console.error("Approve payment error:", error);
+    return { success: false, error: error.message || "Failed to approve payment" };
+  }
+}
+
+export async function rejectManualPayment(paymentId: string) {
+  const admin = await currentUser();
+  if (!admin) return { success: false, error: "Not authenticated" };
+
+  try {
+    await verifyAdmin();
+
+    const { data: payment, error: fetchError } = await supabaseAdmin
+      .from('manual_payments')
+      .select('*, applications(*, internships(title))')
+      .eq('id', paymentId)
+      .single();
+
+    if (fetchError || !payment) {
+      return { success: false, error: "Payment record not found" };
+    }
+
+    const application = payment.applications;
+
+    // 1. Update Payment Status to Rejected
+    await supabaseAdmin
+      .from('manual_payments')
+      .update({ status: "Rejected" })
+      .eq('id', paymentId);
+
+    // 2. Update Application Status
+    await supabaseAdmin
+      .from('applications')
+      .update({ status: "Accepted" }) // Revert to Accepted so they can pay again
+      .eq('id', application.id);
+
+    // 3. Send Rejection Email
+    await sendPaymentRejectedEmail({
+      email: payment.email_id,
+      name: application.full_name,
+      internshipName: application.internships.title,
+    });
+
+    // 4. Create Notification
+    await supabaseAdmin.from('notifications').insert([{
+      clerk_id: application.clerk_id,
+      title: "Payment Verification Failed",
+      message: `Your recent payment submission could not be verified. Please try again.`,
+      type: "error",
+      link: `/offer/${application.id}/onboarding`
+    }]);
+    
+    return { success: true };
+  } catch (error: any) {
+    console.error("Reject payment error:", error);
+    return { success: false, error: error.message };
+  }
+}
+
