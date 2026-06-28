@@ -73,8 +73,8 @@ export default function OnboardingPage() {
 
   const handleManualSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!referenceNumber || !emailId || !upiId || !screenshot) {
-      setError("All fields are required for manual verification.");
+    if (!referenceNumber || !emailId || !upiId) {
+      setError("Reference Number, Email, and UPI ID are required.");
       return;
     }
 
@@ -91,7 +91,9 @@ export default function OnboardingPage() {
       formData.append("referenceNumber", referenceNumber);
       formData.append("emailId", emailId);
       formData.append("upiId", upiId);
-      formData.append("screenshot", screenshot);
+      if (screenshot) {
+        formData.append("screenshot", screenshot);
+      }
 
       const res = await submitManualPayment(formData);
 
@@ -305,13 +307,12 @@ export default function OnboardingPage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm text-slate-400 mb-2">Payment Screenshot Proof</label>
+                        <label className="block text-sm font-medium text-slate-400 mb-2">Payment Screenshot Proof (Optional)</label>
                         <div className="relative">
                           <input
                             type="file"
                             accept="image/*"
                             onChange={(e) => setScreenshot(e.target.files?.[0] || null)}
-                            required
                             className="hidden"
                             id="screenshot-upload"
                           />

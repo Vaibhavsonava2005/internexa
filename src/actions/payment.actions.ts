@@ -14,23 +14,27 @@ export async function submitManualPayment(formData: FormData) {
     const upiId = formData.get("upiId") as string;
     const screenshot = formData.get("screenshot") as File;
 
-    if (!applicationId || !referenceNumber || !emailId || !upiId || !screenshot) {
-      return { success: false, error: "All fields are required" };
+    if (!applicationId || !referenceNumber || !emailId || !upiId) {
+      return { success: false, error: "Reference Number, Email, and UPI ID are required" };
     }
 
-    // 1. Upload screenshot to Supabase Storage
-    const fileExt = screenshot.name.split('.').pop();
-    const fileName = `payments/${user.id}_${Date.now()}.${fileExt}`;
-    const arrayBuffer = await screenshot.arrayBuffer();
-    const buffer = new Uint8Array(arrayBuffer);
+    let fileName = null;
 
-    const { error: uploadError } = await supabaseAdmin.storage
-      .from('documents')
-      .upload(fileName, buffer, {
-        contentType: screenshot.type,
-      });
+    if (screenshot && typeof screenshot === "object" && screenshot.name) {
+      // 1. Upload screenshot to Supabase Storage
+      const fileExt = screenshot.name.split('.').pop();
+      fileName = `payments/${user.id}_${Date.now()}.${fileExt}`;
+      const arrayBuffer = await screenshot.arrayBuffer();
+      const buffer = new Uint8Array(arrayBuffer);
 
-    if (uploadError) throw uploadError;
+      const { error: uploadError } = await supabaseAdmin.storage
+        .from('documents')
+        .upload(fileName, buffer, {
+          contentType: screenshot.type,
+        });
+
+      if (uploadError) throw uploadError;
+    }
 
     // 2. Insert into manual_payments table
     const { error: dbError } = await supabaseAdmin.from('manual_payments').insert([{
@@ -45,7 +49,9 @@ export async function submitManualPayment(formData: FormData) {
 
     if (dbError) {
       // Clean up file if db insert fails
-      await supabaseAdmin.storage.from('documents').remove([fileName]);
+      if (fileName) {
+        await supabaseAdmin.storage.from('documents').remove([fileName]);
+      }
       throw dbError;
     }
 

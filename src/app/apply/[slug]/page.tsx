@@ -37,10 +37,7 @@ export default function ApplyPage() {
   }
 
   const onSubmit = async (data: ApplicationFormData) => {
-    if (!resumeFile) {
-      setError("Please upload your resume (PDF)");
-      return;
-    }
+    // Resume upload is now optional
     
     setIsSubmitting(true);
     setError("");
@@ -50,7 +47,9 @@ export default function ApplyPage() {
       Object.entries(data).forEach(([key, value]) => {
         formData.append(key, (value ?? "").toString());
       });
-      formData.append("resume", resumeFile);
+      if (resumeFile) {
+        formData.append("resume", resumeFile);
+      }
       formData.append("internshipSlug", slug as string);
 
       const result = await submitApplication(formData);
@@ -158,7 +157,7 @@ export default function ApplyPage() {
               <div className="border-2 border-dashed border-brand-200 dark:border-brand-800 rounded-xl p-8 text-center bg-brand-50 dark:bg-[#0a0a0a]">
                 <UploadCloud className="w-8 h-8 text-brand-400 mx-auto mb-4" />
                 <label className="block text-sm font-medium text-brand-900 dark:text-white mb-2 cursor-pointer">
-                  <span className="text-accent-600 dark:text-accent-500 hover:underline">Click to upload</span> or drag and drop
+                  <span className="text-accent-600 dark:text-accent-500 hover:underline">Click to upload (Optional)</span> or drag and drop
                   <input 
                     type="file" 
                     accept=".pdf,.doc,.docx" 

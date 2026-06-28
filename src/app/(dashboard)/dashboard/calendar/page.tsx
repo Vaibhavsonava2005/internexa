@@ -14,7 +14,7 @@ export default function CalendarPage() {
     async function load() {
       const res = await getUserApplications();
       if (res.success && res.data) {
-        const activeOrCompleted = res.data.find(app => app.status === "Active" || app.status === "Completed");
+        const activeOrCompleted = res.data.find(app => app.status === "Active" || app.status === "Completed" || app.status === "Enrolled");
         setApplication(activeOrCompleted);
       }
       setIsLoading(false);
