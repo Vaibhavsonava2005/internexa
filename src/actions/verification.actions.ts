@@ -29,7 +29,7 @@ export async function verifyDocumentAction(docId: string) {
     const { data, error } = await supabaseAdmin
       .from('applications')
       .select('*, internships(title)')
-      .or(`application_id.eq.${potentialAppId},offer_letter_id.eq.${upperId},reference_number.eq.${upperId},id.ilike.${potentialIdPrefix}%`)
+      .or(`application_id.eq.${potentialAppId},offer_letter_id.eq.${upperId},certificate_id.eq.${upperId},reference_number.eq.${upperId},id.ilike.${potentialIdPrefix}%`)
       .limit(1)
       .single();
 

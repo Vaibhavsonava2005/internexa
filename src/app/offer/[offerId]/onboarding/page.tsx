@@ -225,18 +225,18 @@ export default function OnboardingPage() {
                 </div>
               </div>
 
-              {!paymentClicked ? (
-                <a
-                  href={`upi://pay?pa=internexa@slc&pn=InterNexa&am=${offer?.price || 199}&cu=INR`}
-                  onClick={() => {
-                    setPaymentClicked(true);
-                    setShowManualForm(true);
-                  }}
-                  className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 mb-4 text-lg"
-                >
-                  <CreditCard className="w-6 h-6" /> Pay Now via UPI <ExternalLink className="w-4 h-4" />
-                </a>
-              ) : (
+              <a
+                href={`upi://pay?pa=internexa@slc&pn=InterNexa&am=${offer?.price || 199}&cu=INR`}
+                onClick={() => {
+                  setPaymentClicked(true);
+                  setShowManualForm(true);
+                }}
+                className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 mb-4 text-lg"
+              >
+                <CreditCard className="w-6 h-6" /> Pay Now via UPI <ExternalLink className="w-4 h-4" />
+              </a>
+
+              {paymentClicked && (
                 <div className="space-y-4">
                   {!showManualForm ? (
                     <div className="bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-4">

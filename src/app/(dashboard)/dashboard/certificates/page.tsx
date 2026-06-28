@@ -32,7 +32,7 @@ export default function CertificatesPage() {
         const res = await getUserApplications();
         if (res.success && res.data) {
           const completed = res.data.filter(app => app.status === "Completed");
-          const active = res.data.filter(app => app.status === "Active");
+          const active = res.data.filter(app => app.status === "Active" || app.status === "Enrolled");
           setCertificates(completed);
           setActiveApps(active);
         }
@@ -92,7 +92,7 @@ export default function CertificatesPage() {
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">Fast-Track Your Certificate</h3>
                 <p className="text-indigo-200 text-sm max-w-xl">
-                  Don't want to wait for the internship timeline to finish? You can instantly generate your Official Certificate, Letter of Recommendation, and Experience Letter right now for just ₹99.
+                  Don't want to wait for the internship timeline to finish? You can instantly generate your Official Certificate, Letter of Recommendation, and Experience Letter right now for just ₹199.
                 </p>
               </div>
             </div>
