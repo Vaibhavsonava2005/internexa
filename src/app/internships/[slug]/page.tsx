@@ -240,7 +240,7 @@ export default function InternshipDetailPage() {
                         <div>
                           <h3 className="text-lg font-bold text-brand-900 dark:text-white mb-4">What you'll learn</h3>
                           <ul className="space-y-3">
-                            {internship.learningOutcomes.map((outcome, i) => (
+                            {internship.learningOutcomes.map((outcome: string, i: number) => (
                               <li key={i} className="flex items-start gap-3">
                                 <CheckCircle className="w-5 h-5 text-accent-500 shrink-0 mt-0.5" />
                                 <span className="text-brand-600 dark:text-brand-400 text-sm leading-relaxed">{outcome}</span>
@@ -251,7 +251,7 @@ export default function InternshipDetailPage() {
                         <div>
                           <h3 className="text-lg font-bold text-brand-900 dark:text-white mb-4">Requirements</h3>
                           <ul className="space-y-3">
-                            {internship.requirements.map((req, i) => (
+                            {internship.requirements.map((req: string, i: number) => (
                               <li key={i} className="flex items-start gap-3 text-brand-600 dark:text-brand-400 text-sm">
                                 <div className="w-1.5 h-1.5 rounded-full bg-brand-400 shrink-0 mt-2" />
                                 <span>{req}</span>
@@ -273,7 +273,7 @@ export default function InternshipDetailPage() {
                     >
                       <h3 className="text-xl font-bold text-brand-900 dark:text-white mb-6">Course Timeline</h3>
                       <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-brand-200 dark:before:via-brand-800 before:to-transparent">
-                        {internship.curriculum.map((module, i) => (
+                        {internship.curriculum.map((module: any, i: number) => (
                           <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                             <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white dark:border-brand-950 bg-brand-100 dark:bg-brand-900 text-brand-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
                                {i + 1}
@@ -284,7 +284,7 @@ export default function InternshipDetailPage() {
                               </div>
                               <span className="text-xs font-semibold text-accent-600 dark:text-accent-500 mb-3 block">{module.duration}</span>
                               <ul className="space-y-2">
-                                {module.lessons.map((lesson, idx) => (
+                                {module.lessons.map((lesson: string, idx: number) => (
                                   <li key={idx} className="flex items-center gap-2 text-sm text-brand-600 dark:text-brand-400">
                                     <div className="w-1 h-1 rounded-full bg-brand-300 dark:bg-brand-700" />
                                     {lesson}
@@ -306,7 +306,7 @@ export default function InternshipDetailPage() {
                       exit={{ opacity: 0, y: -10 }}
                       className="grid grid-cols-1 md:grid-cols-2 gap-6"
                     >
-                      {internship.projects.map((project, i) => (
+                      {internship.projects.map((project: any, i: number) => (
                         <div key={i} className="p-6 rounded-xl border border-brand-200 dark:border-brand-800 bg-white dark:bg-brand-950">
                           <div className="w-10 h-10 rounded-lg bg-brand-50 dark:bg-brand-900 flex items-center justify-center mb-4 text-accent-500">
                             <BookOpen className="w-5 h-5" />
@@ -346,7 +346,7 @@ export default function InternshipDetailPage() {
                       exit={{ opacity: 0, y: -10 }}
                       className="space-y-6"
                     >
-                      {internship.reviews.map((review) => (
+                      {internship.reviews.map((review: any) => (
                         <div key={review.id} className="p-6 rounded-xl border border-brand-200 dark:border-brand-800 bg-white dark:bg-brand-950">
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-3">

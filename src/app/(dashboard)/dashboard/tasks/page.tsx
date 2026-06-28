@@ -21,7 +21,7 @@ export default function TasksPage() {
   useEffect(() => {
     async function load() {
       const apps = await getUserApplications();
-      const activeApp = apps.find((app: any) => app.status === "Active" || app.status === "Completed");
+      const activeApp = apps.success && apps.data ? apps.data.find((app: any) => app.status === "Active" || app.status === "Completed") : null;
       setApplication(activeApp || null);
       if (activeApp?.status === "Completed") {
         setTasks(tasks.map(t => ({ ...t, completed: true })));

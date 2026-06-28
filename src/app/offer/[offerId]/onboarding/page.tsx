@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileSignature, UploadCloud, Shield, CheckCircle2, Loader2, FileText, ChevronRight, CreditCard, ExternalLink, AlertTriangle } from "lucide-react";

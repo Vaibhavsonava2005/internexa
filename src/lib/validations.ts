@@ -21,8 +21,8 @@ export const applicationSchema = z.object({
   careerGoals: z.string().optional(),
   whyJoin: z.string().optional(),
   previousExperience: z.string().optional(),
-  termsAccepted: z.literal(true, {
-    errorMap: () => ({ message: "You must accept the terms and conditions" }),
+  termsAccepted: z.boolean().refine((val) => val === true, {
+    message: "You must accept the terms and conditions",
   }),
 });
 
