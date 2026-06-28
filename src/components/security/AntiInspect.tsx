@@ -23,24 +23,10 @@ export function AntiInspect() {
       }
     };
 
-    // 3. Debugger Trap (Pauses execution if DevTools is open)
-    const antiDebug = () => {
-      setInterval(() => {
-        const start = performance.now();
-        // eslint-disable-next-line no-debugger
-        debugger;
-        if (performance.now() - start > 100) {
-          // DevTools is likely open, we could redirect or clear the DOM
-          // document.body.innerHTML = 'Security violation detected.';
-        }
-      }, 1000);
-    };
-
     // Only run in production to allow developers to build the app
     if (process.env.NODE_ENV !== "development") {
       document.addEventListener("contextmenu", handleContextMenu);
       document.addEventListener("keydown", handleKeyDown);
-      antiDebug();
     }
 
     return () => {
