@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { approveApplication, rejectApplication, getAdminData, approveRewardClaim, approveManualPayment, rejectManualPayment } from "@/actions/admin.actions";
+import { approveApplication, rejectApplication, getAdminData, approveRewardClaim, approveManualPayment, rejectManualPayment, approveFastTrackPayment, rejectFastTrackPayment } from "@/actions/admin.actions";
 import { generateCertificateAction } from "@/actions/certificate.actions";
 import { Button, Badge } from "@/components/shared";
 import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock, FolderGit2, Shield, Gift, Award, Download, RefreshCw } from "lucide-react";
@@ -306,119 +306,257 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
 
         {/* Manual Payments */}
         {activeTab === "manualPayments" && (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm whitespace-nowrap">
-              <thead className="bg-brand-50 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400">
-                <tr>
-                  <th className="px-6 py-4 font-medium">Applicant</th>
-                  <th className="px-6 py-4 font-medium">Internship</th>
-                  <th className="px-6 py-4 font-medium">UTR / UPI ID</th>
-                  <th className="px-6 py-4 font-medium">Proof</th>
-                  <th className="px-6 py-4 font-medium">Status</th>
-                  <th className="px-6 py-4 font-medium text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-brand-100 dark:divide-brand-800">
-                {[...(data.manualPayments || [])].sort((a: any, b: any) => {
-                  if (a.status === "Pending" && b.status !== "Pending") return -1;
-                  if (a.status !== "Pending" && b.status === "Pending") return 1;
-                  return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
-                }).map((payment: any) => (
-                  <tr key={payment.id} className="hover:bg-brand-50/50 dark:hover:bg-brand-900/20 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-brand-900 dark:text-white">{payment.applications?.full_name || "Unknown"}</div>
-                      <div className="text-xs text-brand-500">{payment.email_id}</div>
-                    </td>
-                    <td className="px-6 py-4 text-brand-900 dark:text-white">{payment.applications?.internships?.title || "Unknown"}</td>
-                    <td className="px-6 py-4">
-                      <div className="font-mono text-xs">{payment.reference_number}</div>
-                      <div className="text-xs text-brand-500 mt-1">{payment.upi_id}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      {payment.screenshot_file_id ? (
-                        <a 
-                          href={`${process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"}/storage/v1/object/public/documents/${payment.screenshot_file_id}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-indigo-500 hover:underline text-xs flex items-center gap-1"
-                        >
-                          <FileText className="w-3 h-3" /> View Proof
-                        </a>
-                      ) : (
-                        <span className="text-brand-400 text-xs italic">Not Provided</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <Badge variant={payment.status === "Approved" ? "success" : payment.status === "Rejected" ? "destructive" : "warning"}>
-                        {payment.status}
-                      </Badge>
-                    </td>
-                    <td className="px-6 py-4 text-right space-x-2">
-                      {payment.status === "Pending" ? (
-                        <div className="flex justify-end gap-2">
-                          <Button 
-                            size="sm"
-                            variant="outline"
-                            onClick={async () => {
-                              if (!confirm("Are you sure you want to reject this payment?")) return;
-                              setLoadingAction(`rej_${payment.id}`);
-                              const res = await rejectManualPayment(payment.id);
-                              if (res.success) {
-                                setData((prev: any) => ({
-                                  ...prev,
-                                  manualPayments: prev.manualPayments.map((p: any) => 
-                                    p.id === payment.id ? { ...p, status: "Rejected" } : p
-                                  )
-                                }));
-                              } else {
-                                alert(res.error || "Failed to reject payment");
-                              }
-                              setLoadingAction(null);
-                            }}
-                            disabled={loadingAction === `rej_${payment.id}` || loadingAction === `app_${payment.id}`}
-                          >
-                            {loadingAction === `rej_${payment.id}` ? "..." : "Reject"}
-                          </Button>
-                          <Button 
-                            size="sm"
-                            onClick={async () => {
-                              if (!confirm("Are you sure you want to approve this payment and issue the Joining Letter?")) return;
-                              setLoadingAction(`app_${payment.id}`);
-                              const res = await approveManualPayment(payment.id);
-                              if (res.success) {
-                                setData((prev: any) => ({
-                                  ...prev,
-                                  manualPayments: prev.manualPayments.map((p: any) => 
-                                    p.id === payment.id ? { ...p, status: "Approved" } : p
-                                  )
-                                }));
-                              } else {
-                                alert(res.error || "Failed to approve payment");
-                              }
-                              setLoadingAction(null);
-                            }}
-                            disabled={loadingAction === `rej_${payment.id}` || loadingAction === `app_${payment.id}`}
-                          >
-                            {loadingAction === `app_${payment.id}` ? "Approving..." : "Approve"}
-                          </Button>
-                        </div>
-                      ) : (
-                        <span className={payment.status === "Approved" ? "text-emerald-500 text-xs flex justify-end items-center gap-1" : "text-red-500 text-xs flex justify-end items-center gap-1"}>
-                          {payment.status === "Approved" ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />} {payment.status}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-                {(!data.manualPayments || data.manualPayments.length === 0) && (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-brand-500">
-                      No manual payments found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+          <div className="space-y-12">
+            
+            {/* Onboarding Payments (199) */}
+            <div>
+              <h3 className="text-xl font-bold text-brand-900 dark:text-white mb-4 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-indigo-500" />
+                Onboarding Payments (₹199)
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm whitespace-nowrap">
+                  <thead className="bg-brand-50 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400">
+                    <tr>
+                      <th className="px-6 py-4 font-medium">Applicant</th>
+                      <th className="px-6 py-4 font-medium">Internship</th>
+                      <th className="px-6 py-4 font-medium">UTR / UPI ID</th>
+                      <th className="px-6 py-4 font-medium">Proof</th>
+                      <th className="px-6 py-4 font-medium">Status</th>
+                      <th className="px-6 py-4 font-medium text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-brand-100 dark:divide-brand-800">
+                    {[...(data.manualPayments || [])]
+                      .filter((p: any) => !p.reference_number?.startsWith("FAST-"))
+                      .sort((a: any, b: any) => {
+                      if (a.status === "Pending" && b.status !== "Pending") return -1;
+                      if (a.status !== "Pending" && b.status === "Pending") return 1;
+                      return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+                    }).map((payment: any) => (
+                      <tr key={payment.id} className="hover:bg-brand-50/50 dark:hover:bg-brand-900/20 transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="font-medium text-brand-900 dark:text-white">{payment.applications?.full_name || "Unknown"}</div>
+                          <div className="text-xs text-brand-500">{payment.email_id}</div>
+                        </td>
+                        <td className="px-6 py-4 text-brand-900 dark:text-white">{payment.applications?.internships?.title || "Unknown"}</td>
+                        <td className="px-6 py-4">
+                          <div className="font-mono text-xs">{payment.reference_number}</div>
+                          <div className="text-xs text-brand-500 mt-1">{payment.upi_id}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          {payment.screenshot_file_id ? (
+                            <a 
+                              href={`${process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"}/storage/v1/object/public/documents/${payment.screenshot_file_id}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-indigo-500 hover:underline text-xs flex items-center gap-1"
+                            >
+                              <FileText className="w-3 h-3" /> View Proof
+                            </a>
+                          ) : (
+                            <span className="text-brand-400 text-xs italic">Not Provided</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <Badge variant={payment.status === "Approved" ? "success" : payment.status === "Rejected" ? "destructive" : "warning"}>
+                            {payment.status}
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-4 text-right space-x-2">
+                          {payment.status === "Pending" ? (
+                            <div className="flex justify-end gap-2">
+                              <Button 
+                                size="sm"
+                                variant="outline"
+                                onClick={async () => {
+                                  if (!confirm("Are you sure you want to reject this payment?")) return;
+                                  setLoadingAction(`rej_${payment.id}`);
+                                  const res = await rejectManualPayment(payment.id);
+                                  if (res.success) {
+                                    setData((prev: any) => ({
+                                      ...prev,
+                                      manualPayments: prev.manualPayments.map((p: any) => 
+                                        p.id === payment.id ? { ...p, status: "Rejected" } : p
+                                      )
+                                    }));
+                                  } else {
+                                    alert(res.error || "Failed to reject payment");
+                                  }
+                                  setLoadingAction(null);
+                                }}
+                                disabled={loadingAction === `rej_${payment.id}` || loadingAction === `app_${payment.id}`}
+                              >
+                                {loadingAction === `rej_${payment.id}` ? "..." : "Reject"}
+                              </Button>
+                              <Button 
+                                size="sm"
+                                onClick={async () => {
+                                  if (!confirm("Are you sure you want to approve this payment and issue the Joining Letter?")) return;
+                                  setLoadingAction(`app_${payment.id}`);
+                                  const res = await approveManualPayment(payment.id);
+                                  if (res.success) {
+                                    setData((prev: any) => ({
+                                      ...prev,
+                                      manualPayments: prev.manualPayments.map((p: any) => 
+                                        p.id === payment.id ? { ...p, status: "Approved" } : p
+                                      )
+                                    }));
+                                  } else {
+                                    alert(res.error || "Failed to approve payment");
+                                  }
+                                  setLoadingAction(null);
+                                }}
+                                disabled={loadingAction === `rej_${payment.id}` || loadingAction === `app_${payment.id}`}
+                              >
+                                {loadingAction === `app_${payment.id}` ? "Approving..." : "Approve"}
+                              </Button>
+                            </div>
+                          ) : (
+                            <span className={payment.status === "Approved" ? "text-emerald-500 text-xs flex justify-end items-center gap-1" : "text-red-500 text-xs flex justify-end items-center gap-1"}>
+                              {payment.status === "Approved" ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />} {payment.status}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                    {(!data.manualPayments || data.manualPayments.filter((p: any) => !p.reference_number?.startsWith("FAST-")).length === 0) && (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-12 text-center text-brand-500">
+                          No onboarding payments found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Fast-Track Certification Payments (99) */}
+            <div>
+              <h3 className="text-xl font-bold text-brand-900 dark:text-white mb-4 flex items-center gap-2">
+                <Award className="w-5 h-5 text-indigo-500" />
+                Fast-Track Certification Payments (₹99)
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm whitespace-nowrap border-t-2 border-indigo-500/20">
+                  <thead className="bg-brand-50 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400">
+                    <tr>
+                      <th className="px-6 py-4 font-medium">Applicant</th>
+                      <th className="px-6 py-4 font-medium">Internship</th>
+                      <th className="px-6 py-4 font-medium">UTR / UPI ID</th>
+                      <th className="px-6 py-4 font-medium">Proof</th>
+                      <th className="px-6 py-4 font-medium">Status</th>
+                      <th className="px-6 py-4 font-medium text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-brand-100 dark:divide-brand-800">
+                    {[...(data.manualPayments || [])]
+                      .filter((p: any) => p.reference_number?.startsWith("FAST-"))
+                      .sort((a: any, b: any) => {
+                      if (a.status === "Pending" && b.status !== "Pending") return -1;
+                      if (a.status !== "Pending" && b.status === "Pending") return 1;
+                      return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+                    }).map((payment: any) => (
+                      <tr key={payment.id} className="hover:bg-brand-50/50 dark:hover:bg-brand-900/20 transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="font-medium text-brand-900 dark:text-white">{payment.applications?.full_name || "Unknown"}</div>
+                          <div className="text-xs text-brand-500">{payment.email_id}</div>
+                        </td>
+                        <td className="px-6 py-4 text-brand-900 dark:text-white">{payment.applications?.internships?.title || "Unknown"}</td>
+                        <td className="px-6 py-4">
+                          <div className="font-mono text-xs font-semibold text-indigo-400">{payment.reference_number}</div>
+                          <div className="text-xs text-brand-500 mt-1">{payment.upi_id}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          {payment.screenshot_file_id ? (
+                            <a 
+                              href={`${process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"}/storage/v1/object/public/documents/${payment.screenshot_file_id}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-indigo-500 hover:underline text-xs flex items-center gap-1"
+                            >
+                              <FileText className="w-3 h-3" /> View Proof
+                            </a>
+                          ) : (
+                            <span className="text-brand-400 text-xs italic">Not Provided</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <Badge variant={payment.status === "Approved" ? "success" : payment.status === "Rejected" ? "destructive" : "warning"}>
+                            {payment.status}
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-4 text-right space-x-2">
+                          {payment.status === "Pending" ? (
+                            <div className="flex justify-end gap-2">
+                              <Button 
+                                size="sm"
+                                variant="outline"
+                                onClick={async () => {
+                                  if (!confirm("Are you sure you want to reject this FAST-TRACK payment?")) return;
+                                  setLoadingAction(`rej_${payment.id}`);
+                                  const res = await rejectFastTrackPayment(payment.id);
+                                  if (res.success) {
+                                    setData((prev: any) => ({
+                                      ...prev,
+                                      manualPayments: prev.manualPayments.map((p: any) => 
+                                        p.id === payment.id ? { ...p, status: "Rejected" } : p
+                                      )
+                                    }));
+                                  } else {
+                                    alert(res.error || "Failed to reject payment");
+                                  }
+                                  setLoadingAction(null);
+                                }}
+                                disabled={loadingAction === `rej_${payment.id}` || loadingAction === `app_${payment.id}`}
+                              >
+                                {loadingAction === `rej_${payment.id}` ? "..." : "Reject"}
+                              </Button>
+                              <Button 
+                                size="sm"
+                                onClick={async () => {
+                                  if (!confirm("Are you sure you want to approve this FAST-TRACK payment and generate documents?")) return;
+                                  setLoadingAction(`app_${payment.id}`);
+                                  const res = await approveFastTrackPayment(payment.id);
+                                  if (res.success) {
+                                    setData((prev: any) => ({
+                                      ...prev,
+                                      manualPayments: prev.manualPayments.map((p: any) => 
+                                        p.id === payment.id ? { ...p, status: "Approved" } : p
+                                      )
+                                    }));
+                                  } else {
+                                    alert(res.error || "Failed to approve payment");
+                                  }
+                                  setLoadingAction(null);
+                                }}
+                                disabled={loadingAction === `rej_${payment.id}` || loadingAction === `app_${payment.id}`}
+                                className="bg-indigo-600 hover:bg-indigo-500 text-white"
+                              >
+                                {loadingAction === `app_${payment.id}` ? "Generating..." : "Approve & Generate"}
+                              </Button>
+                            </div>
+                          ) : (
+                            <span className={payment.status === "Approved" ? "text-emerald-500 text-xs flex justify-end items-center gap-1" : "text-red-500 text-xs flex justify-end items-center gap-1"}>
+                              {payment.status === "Approved" ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />} {payment.status}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                    {(!data.manualPayments || data.manualPayments.filter((p: any) => p.reference_number?.startsWith("FAST-")).length === 0) && (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-12 text-center text-brand-500">
+                          No fast-track payments found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
           </div>
         )}
 

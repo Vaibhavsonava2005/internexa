@@ -265,7 +265,102 @@ export async function loginAdmin(password: string) {
   return { success: false, error: "Invalid password" };
 }
 
+import { generateCertificate } from "@/lib/document-engine";
+import { sendCertificateEmail } from "@/lib/email";
 
+export async function approveFastTrackPayment(paymentId: string) {
+  try {
+    await verifyAdmin();
+
+    const { data: payment, error: fetchError } = await supabaseAdmin
+      .from('manual_payments')
+      .select('*, applications(*, internships(title))')
+      .eq('id', paymentId)
+      .single();
+
+    if (fetchError || !payment) return { success: false, error: "Payment not found" };
+
+    const application = payment.applications;
+
+    // 1. Update Payment Status
+    await supabaseAdmin.from('manual_payments').update({ status: "Approved" }).eq('id', paymentId);
+
+    // 2. Generate Certificate
+    const certificateId = application.application_id ? application.application_id.replace("APP-", "CERT-") : `CERT-${new Date().getFullYear()}-${String(Math.floor(100000 + Math.random() * 900000))}`;
+    
+    let pdfFileId = null;
+    try {
+      const pdfResult = await generateCertificate({
+        documentId: certificateId,
+        applicationId: application.application_id || application.reference_number || application.id,
+        studentName: application.full_name,
+        internshipName: application.internships.title,
+        date: new Date().toLocaleDateString(),
+        grade: "A+",
+      });
+      if (pdfResult.success) pdfFileId = pdfResult.fileId;
+    } catch (e) {
+      console.error("Fast track cert generation failed", e);
+    }
+
+    // 3. Update Application Status
+    await supabaseAdmin
+      .from('applications')
+      .update({ 
+        status: "Completed",
+        certificate_id: certificateId
+      })
+      .eq('id', application.id);
+
+    // 4. Send Email with all 3 docs attached
+    try {
+      await sendCertificateEmail({
+        studentName: application.full_name,
+        email: payment.email_id,
+        internshipName: application.internships.title,
+        certificateId: certificateId,
+        pdfUrl: pdfFileId || undefined
+      });
+    } catch (e) {
+      console.error("Fast track email failed", e);
+    }
+
+    // 5. Notify
+    await supabaseAdmin.from('notifications').insert([{
+      clerk_id: application.clerk_id,
+      title: "Fast-Track Certification Approved! 🎉",
+      message: `Your fast-track request for ${application.internships.title} is approved. Documents sent to email!`,
+      type: "success",
+      link: "/dashboard/certificates"
+    }]);
+
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function rejectFastTrackPayment(paymentId: string) {
+  try {
+    await verifyAdmin();
+    const { data: payment } = await supabaseAdmin.from('manual_payments').select('*, applications(*)').eq('id', paymentId).single();
+    if (!payment) return { success: false };
+
+    await supabaseAdmin.from('manual_payments').update({ status: "Rejected" }).eq('id', paymentId);
+
+    await supabaseAdmin.from('notifications').insert([{
+      clerk_id: payment.clerk_id,
+      title: "Fast-Track Verification Failed",
+      message: `Your recent fast-track payment submission could not be verified.`,
+      type: "error",
+      link: "/dashboard/certificates"
+    }]);
+
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
 export async function approveManualPayment(paymentId: string) {
   const admin = await currentUser();
   if (!admin) return { success: false, error: "Not authenticated" };
