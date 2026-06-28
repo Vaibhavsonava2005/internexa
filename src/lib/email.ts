@@ -551,3 +551,102 @@ export async function sendJoiningLetterEmail({
     attachment: attachment.length > 0 ? attachment : undefined
   });
 }
+
+export async function sendCertificateEmail({
+  studentName,
+  email,
+  internshipName,
+  certificateId,
+  pdfUrl,
+}: {
+  studentName: string;
+  email: string;
+  internshipName: string;
+  certificateId: string;
+  pdfUrl?: string;
+}) {
+  const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background-color:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;padding:40px 20px;">
+<tr><td align="center">
+<table width="100%" max-width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,0.05);max-width:600px;margin:0 auto;">
+  
+  <tr><td style="padding:40px;text-align:center;background:linear-gradient(135deg,#10b981,#059669);">
+    <h1 style="color:#ffffff;font-size:32px;margin:0 0 12px;font-weight:800;letter-spacing:-0.5px;">Congratulations! 🎉</h1>
+    <p style="color:rgba(255,255,255,0.9);font-size:18px;margin:0;">You've completed your internship!</p>
+  </td></tr>
+
+  <tr><td style="padding:40px 40px 20px;">
+    <p style="color:#334155;font-size:16px;line-height:24px;margin:0 0 20px;">Hi <strong style="color:#0f172a;">${studentName}</strong>,</p>
+    <p style="color:#475569;font-size:16px;line-height:26px;margin:0 0 24px;">
+      We are thrilled to present you with your official <strong>Certificate of Completion</strong>, <strong>Experience Letter</strong>, and <strong>Letter of Recommendation (LOR)</strong> for the <strong>${internshipName}</strong> internship program at InterNexa.
+    </p>
+
+    <!-- Certificate Box -->
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin-bottom:32px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="color:#64748b;font-size:13px;padding-bottom:4px;">CERTIFICATE ID</td>
+        </tr>
+        <tr>
+          <td style="color:#0f172a;font-size:20px;font-weight:800;font-family:monospace;letter-spacing:1px;">${certificateId}</td>
+        </tr>
+      </table>
+    </div>
+    
+    <!-- PDF Attached Notice -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0;background:#ecfdf5;border-radius:12px;border:1px solid #a7f3d0;">
+      <tr><td style="padding:16px 20px;">
+        <p style="margin:0;color:#065f46;font-size:14px;font-weight:600;">📎 Your official Documents PDF is attached to this email.</p>
+        <p style="margin:4px 0 0;color:#047857;font-size:13px;">This single PDF contains your Certificate, LOR, and Experience Letter.</p>
+      </td></tr>
+    </table>
+
+    <div style="text-align:center;margin:36px 0 0;">
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://internexa.vercel.app'}/dashboard" style="display:inline-block;background:linear-gradient(135deg,#10b981,#059669);color:#ffffff;padding:16px 48px;text-decoration:none;border-radius:12px;font-weight:800;font-size:16px;box-shadow:0 6px 20px rgba(16,185,129,0.4);letter-spacing:0.3px;">Go to Dashboard</a>
+    </div>
+  </td></tr>
+  
+  <tr><td style="padding:28px 40px;background-color:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;">
+    <p style="color:#10b981;font-size:18px;font-weight:800;margin:0 0 4px;">InterNexa</p>
+    <p style="color:#64748b;font-size:13px;margin:0 0 4px;">Need help? Contact <a href="mailto:info.internexa@gmail.com" style="color:#10b981;text-decoration:none;font-weight:600;">info.internexa@gmail.com</a></p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+
+  let attachment: any[] = [];
+  if (pdfUrl) {
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+        process.env.SUPABASE_SERVICE_ROLE_KEY || ""
+      );
+      
+      const { data, error } = await supabaseAdmin.storage.from('documents').download(pdfUrl);
+      if (data) {
+        const arrayBuffer = await data.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        attachment = [{
+          content: buffer.toString('base64'),
+          name: 'InterNexa_Certificate_Documents.pdf'
+        }];
+      }
+    } catch (err) {
+      console.error("Failed to fetch pdf for attachment:", err);
+    }
+  }
+
+  return sendBrevoEmail({
+    to: [{ email, name: studentName }],
+    subject: `🎓 Congratulations ${studentName}! Your InterNexa Certificate is Here`,
+    htmlContent,
+    attachment: attachment.length > 0 ? attachment : undefined
+  });
+}

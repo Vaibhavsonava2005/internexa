@@ -2,6 +2,7 @@
 
 import { supabaseAdmin } from "@/lib/supabase";
 import { generateCertificate } from "@/lib/document-engine";
+import { sendCertificateEmail } from "@/lib/email";
 
 export async function generateCertificateAction(applicationId: string) {
   try {
@@ -49,9 +50,26 @@ export async function generateCertificateAction(applicationId: string) {
       })
       .eq('id', app.id);
 
-    if (updateError) throw updateError;
+    if (updateError) {
+      console.error("Database update failed:", updateError);
+      return { success: false, error: "Failed to update status" };
+    }
 
-    // 5. Notifications
+    // 5. Send Certificate Email
+    try {
+      await sendCertificateEmail({
+        studentName: app.full_name,
+        email: app.email,
+        internshipName: app.internships.title,
+        certificateId: certificateId,
+        pdfUrl: certRes.fileId
+      });
+    } catch (emailErr) {
+      console.error("Failed to send certificate email:", emailErr);
+      // We don't fail the action if email fails, since PDF is generated
+    }
+
+    // 6. Notifications
     await supabaseAdmin.from('notifications').insert([{
       clerk_id: app.clerk_id,
       title: "Internship Completed! 🎉",

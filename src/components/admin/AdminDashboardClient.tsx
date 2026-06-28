@@ -479,6 +479,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
               <thead className="bg-brand-50 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400">
                 <tr>
                   <th className="px-6 py-4 font-medium">Student Name</th>
+                  <th className="px-6 py-4 font-medium">Email</th>
                   <th className="px-6 py-4 font-medium">Program</th>
                   <th className="px-6 py-4 font-medium">Certificate ID</th>
                   <th className="px-6 py-4 font-medium">Status</th>
@@ -489,7 +490,8 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                 {data.applications.filter((a: any) => a.status === "Enrolled" || a.status === "Active" || a.status === "Completed").map((app: any) => (
                   <tr key={app.id} className="hover:bg-brand-50/50 dark:hover:bg-brand-900/20 transition-colors">
                     <td className="px-6 py-4 font-medium text-brand-900 dark:text-white">{app.full_name}</td>
-                    <td className="px-6 py-4">{app.internships?.title || "Unknown"}</td>
+                    <td className="px-6 py-4 text-brand-500">{app.email}</td>
+                    <td className="px-6 py-4 font-medium text-indigo-600 dark:text-indigo-400">{app.internships?.title || "Unknown"}</td>
                     <td className="px-6 py-4 font-mono text-xs">{app.status === "Completed" ? `CERT-${app.id.substring(0,8).toUpperCase()}` : "-"}</td>
                     <td className="px-6 py-4">
                       {app.status === "Completed" ? (

@@ -179,43 +179,65 @@ export async function generateCertificate(data: CertificateData): Promise<{ succ
     doc.rect(12, 12, 273, 186);
 
     // Header Branding
-    doc.setFont("helvetica", "bold");
+    doc.setFont("times", "bold");
     doc.setTextColor(79, 70, 229);
-    doc.setFontSize(40);
+    doc.setFontSize(42);
     doc.text("InterNexa", 148, 40, { align: "center" });
 
     doc.setTextColor(0, 0, 0);
-    doc.setFontSize(24);
+    doc.setFontSize(26);
     doc.text("CERTIFICATE OF COMPLETION", 148, 65, { align: "center" });
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(14);
+    doc.setFont("times", "italic");
+    doc.setFontSize(16);
+    doc.setTextColor(100, 100, 100);
     doc.text("This is to certify that", 148, 90, { align: "center" });
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(28);
+    doc.setFont("times", "bolditalic");
+    doc.setFontSize(32);
     doc.setTextColor(79, 70, 229);
     doc.text(data.studentName, 148, 110, { align: "center" });
 
-    doc.setFont("helvetica", "normal");
+    doc.setFont("times", "normal");
     doc.setFontSize(14);
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor(50, 50, 50);
     doc.text(`has successfully completed the ${data.internshipName} internship program`, 148, 125, { align: "center" });
     doc.text(`with a grade of ${data.grade}.`, 148, 135, { align: "center" });
 
     // --- Page 1: Certificate (Landscape) ---
     // Footer signatures
-    doc.setFont("helvetica", "bold");
+    
+    // Director Signature
+    doc.setFont("times", "italic");
+    doc.setFontSize(24);
+    doc.setTextColor(20, 20, 100);
+    doc.text("A. Sharma", 60, 168, { align: "center" });
+    
+    doc.setFont("times", "bold");
     doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
     doc.text("_______________________", 60, 170, { align: "center" });
     doc.text("Program Director", 60, 180, { align: "center" });
 
+    // HR Signature
+    doc.setFont("times", "italic");
+    doc.setFontSize(24);
+    doc.setTextColor(20, 20, 100);
+    doc.text("M. Verma", 237, 168, { align: "center" });
+
+    doc.setFont("times", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
     doc.text("_______________________", 237, 170, { align: "center" });
     doc.text("InterNexa HR", 237, 180, { align: "center" });
 
-    // Certificate ID & Date
-    doc.setFont("helvetica", "normal");
+    // Certificate ID & Date & ISO Marks
+    doc.setFont("times", "bold");
     doc.setFontSize(10);
+    doc.setTextColor(150, 150, 150);
+    doc.text("ISO 9001:2015 CERTIFIED | Govt. of India Recognized", 148, 195, { align: "center" });
+
+    doc.setFont("times", "normal");
     doc.setTextColor(100, 100, 100);
     doc.text(`Certificate ID: ${data.documentId}`, 148, 180, { align: "center" });
     doc.text(`Date of Issue: ${data.date}`, 148, 185, { align: "center" });
@@ -268,9 +290,17 @@ We wish them all the best in their future endeavors.`;
     const expLines = doc.splitTextToSize(expBody, 170);
     doc.text(expLines, 20, 95);
 
-    doc.setFont("helvetica", "bold");
+    // Experience Letter Signatures
+    doc.setFont("times", "italic");
+    doc.setFontSize(24);
+    doc.setTextColor(20, 20, 100);
+    doc.text("M. Verma", 20, 215);
+
+    doc.setFont("times", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
     doc.text("Authorized Signatory", 20, 220);
-    doc.setFont("helvetica", "italic");
+    doc.setFont("times", "italic");
     doc.text("Human Resources", 20, 226);
     doc.text("InterNexa Education", 20, 232);
 

@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, ShieldCheck, FileText, BadgeCheck, XCircle, Loader2 } from "lucide-react";
+import { Search, ShieldCheck, BadgeCheck, XCircle, Loader2 } from "lucide-react";
+import { verifyDocumentAction } from "@/actions/verification.actions";
 
 export default function VerificationPortal() {
   const [docId, setDocId] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "valid" | "invalid">("idle");
-  const [docType, setDocType] = useState("");
+  const [docData, setDocData] = useState<{ docType: string; studentName: string; internshipName: string } | null>(null);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,26 +17,15 @@ export default function VerificationPortal() {
 
     setStatus("loading");
     
-    // Simulate API call for document verification
-    setTimeout(() => {
-      const upperId = docId.toUpperCase().trim();
-      
-      if (upperId.startsWith("OFF-")) {
-        setDocType("Offer Letter");
-        setStatus("valid");
-      } else if (upperId.startsWith("JOIN-")) {
-        setDocType("Joining Letter");
-        setStatus("valid");
-      } else if (upperId.startsWith("CERT-")) {
-        setDocType("Completion Certificate");
-        setStatus("valid");
-      } else if (upperId.startsWith("NDA-")) {
-        setDocType("Non-Disclosure Agreement");
-        setStatus("valid");
-      } else {
-        setStatus("invalid");
-      }
-    }, 1500);
+    const res = await verifyDocumentAction(docId);
+    
+    if (res.success && res.data) {
+      setDocData(res.data);
+      setStatus("valid");
+    } else {
+      setErrorMsg(res.error || "Document verification failed");
+      setStatus("invalid");
+    }
   };
 
   return (
@@ -95,7 +86,7 @@ export default function VerificationPortal() {
           </form>
 
           {/* Results Area */}
-          {status === "valid" && (
+          {status === "valid" && docData && (
             <motion.div 
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
@@ -106,8 +97,14 @@ export default function VerificationPortal() {
                 <div>
                   <h3 className="text-emerald-400 font-bold">Authentic Document Verified</h3>
                   <p className="text-sm text-slate-300 mt-1">
-                    The reference ID <strong className="font-mono text-white">{docId.toUpperCase()}</strong> is a valid and authentic <strong className="text-white">{docType}</strong> issued by InterNexa.
+                    The reference ID <strong className="font-mono text-white">{docId.toUpperCase()}</strong> is a valid and authentic <strong className="text-white">{docData.docType}</strong> issued by InterNexa.
                   </p>
+                  <div className="mt-3 p-3 bg-emerald-950/50 rounded-lg border border-emerald-500/20">
+                    <p className="text-xs text-emerald-500 font-semibold mb-1">ISSUED TO</p>
+                    <p className="text-white font-medium">{docData.studentName}</p>
+                    <p className="text-xs text-emerald-500 font-semibold mb-1 mt-2">PROGRAM</p>
+                    <p className="text-white font-medium">{docData.internshipName}</p>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -124,7 +121,7 @@ export default function VerificationPortal() {
                 <div>
                   <h3 className="text-red-400 font-bold">Verification Failed</h3>
                   <p className="text-sm text-slate-300 mt-1">
-                    No authentic document was found matching the ID <strong className="font-mono text-white">{docId.toUpperCase()}</strong>.
+                    {errorMsg || `No authentic document was found matching the ID ${docId.toUpperCase()}.`}
                   </p>
                 </div>
               </div>
