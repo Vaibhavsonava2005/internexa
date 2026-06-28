@@ -90,7 +90,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
               <Icon className="w-4 h-4" />
               {tab.label}
               <Badge variant={isActive ? "default" : "secondary"} className="ml-2 rounded-full px-2 py-0.5 text-xs">
-              {tab.id === "certificates" ? data.applications.filter((a: any) => a.status === "Active" || a.status === "Completed").length : (data[tab.id]?.length || 0)}
+              {tab.id === "certificates" ? data.applications.filter((a: any) => a.status === "Enrolled" || a.status === "Active" || a.status === "Completed").length : (data[tab.id]?.length || 0)}
               </Badge>
             </button>
           );
@@ -471,7 +471,78 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
             </table>
           </div>
         )}
+
+        {/* Certificates Tab */}
+        {activeTab === "certificates" && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="bg-brand-50 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400">
+                <tr>
+                  <th className="px-6 py-4 font-medium">Student Name</th>
+                  <th className="px-6 py-4 font-medium">Program</th>
+                  <th className="px-6 py-4 font-medium">Certificate ID</th>
+                  <th className="px-6 py-4 font-medium">Status</th>
+                  <th className="px-6 py-4 font-medium text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-brand-100 dark:divide-brand-800">
+                {data.applications.filter((a: any) => a.status === "Enrolled" || a.status === "Active" || a.status === "Completed").map((app: any) => (
+                  <tr key={app.id} className="hover:bg-brand-50/50 dark:hover:bg-brand-900/20 transition-colors">
+                    <td className="px-6 py-4 font-medium text-brand-900 dark:text-white">{app.full_name}</td>
+                    <td className="px-6 py-4">{app.internships?.title || "Unknown"}</td>
+                    <td className="px-6 py-4 font-mono text-xs">{app.certificate_id || "-"}</td>
+                    <td className="px-6 py-4">
+                      {app.status === "Completed" ? (
+                        <Badge variant="success" className="bg-emerald-500 text-white border-0">Generated</Badge>
+                      ) : (
+                        <Badge className="bg-amber-100 text-amber-800 border-0">Pending</Badge>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      {app.status === "Completed" && app.certificate_file_id ? (
+                        <a 
+                          href={`${process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"}/storage/v1/object/public/documents/${app.certificate_file_id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center h-9 px-4 rounded-md text-sm font-medium bg-brand-100 text-brand-700 hover:bg-brand-200 transition-colors"
+                        >
+                          <Download className="w-4 h-4 mr-2" />
+                          View
+                        </a>
+                      ) : (
+                        <Button
+                          size="sm"
+                          onClick={async () => {
+                            if (!confirm("Generate completion certificate, experience letter, and LOR for this student?")) return;
+                            setLoadingAction(`cert_${app.id}`);
+                            const res = await generateCertificateAction(app.id);
+                            if (res.success) {
+                              setData((prev: any) => ({
+                                ...prev,
+                                applications: prev.applications.map((a: any) => 
+                                  a.id === app.id ? { ...a, status: "Completed", certificate_id: res.certificateId, certificate_file_id: res.fileId } : a
+                                )
+                              }));
+                            } else {
+                              alert(res.error || "Failed to generate certificates");
+                            }
+                            setLoadingAction(null);
+                          }}
+                          disabled={loadingAction === `cert_${app.id}`}
+                          className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                        >
+                          {loadingAction === `cert_${app.id}` ? "Generating..." : "Generate Certificates"}
+                        </Button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }
-

@@ -8,7 +8,7 @@ export async function generateCertificateAction(applicationId: string) {
     // 1. Fetch application details
     const { data: app, error: fetchError } = await supabaseAdmin
       .from('applications')
-      .select('*, internships(title)')
+      .select('*, internships(title, duration)')
       .eq('id', applicationId)
       .single();
 
@@ -31,6 +31,7 @@ export async function generateCertificateAction(applicationId: string) {
       documentId: certificateId,
       studentName: app.full_name,
       internshipName: app.internships.title,
+      duration: app.internships.duration,
       date: dateStr,
       grade: "A+" // For this implementation, everyone who finishes all tasks gets an A+
     });

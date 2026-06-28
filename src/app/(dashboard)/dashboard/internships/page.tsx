@@ -94,7 +94,7 @@ export default function MyInternshipsPage() {
           {filtered.map((app, index) => {
             const internship = app.internships;
             const isAccepted = app.status === "Accepted" || app.status === "Offer Accepted";
-            const isPending = app.status === "Submitted" || app.status === "Under Review";
+            const isPending = app.status === "Submitted" || app.status === "Under Review" || app.status === "Payment Verification Pending";
             const isActive = app.status === "Active" || app.status === "Enrolled";
             const isCompleted = app.status === "Completed";
             

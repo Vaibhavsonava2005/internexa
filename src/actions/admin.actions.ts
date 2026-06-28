@@ -293,17 +293,21 @@ export async function approveManualPayment(paymentId: string) {
     // 2. Generate PDF Joining Letter
     const offerLetterId = `JOIN-${new Date().getFullYear()}-${String(Math.floor(1000 + Math.random() * 9000))}`;
     
-    const pdfResult = await generateAndUploadJoiningLetter({
-      offerId: offerLetterId,
-      applicationId: application.application_id || application.reference_number || application.id,
-      studentName: application.full_name,
-      internshipName: application.internships.title,
-      date: new Date().toLocaleDateString(),
-      duration: application.internships.duration,
-    });
-
-    if (!pdfResult.success) {
-      throw new Error(pdfResult.error || "PDF Generation failed");
+    let pdfFileId = null;
+    try {
+      const pdfResult = await generateAndUploadJoiningLetter({
+        offerId: offerLetterId,
+        applicationId: application.application_id || application.reference_number || application.id,
+        studentName: application.full_name,
+        internshipName: application.internships.title,
+        date: new Date().toLocaleDateString(),
+        duration: application.internships.duration,
+      });
+      if (pdfResult.success) {
+        pdfFileId = pdfResult.fileId;
+      }
+    } catch (pdfError) {
+      console.error("PDF Generation failed in manual approval:", pdfError);
     }
 
     // Calculate start date (tomorrow)
@@ -315,7 +319,7 @@ export async function approveManualPayment(paymentId: string) {
       .from('applications')
       .update({
         status: "Enrolled",
-        joining_letter_file_id: pdfResult.fileId,
+        ...(pdfFileId ? { joining_letter_file_id: pdfFileId } : {}),
         start_date: startDate.toISOString().split('T')[0]
       })
       .eq('id', application.id);
@@ -334,15 +338,19 @@ export async function approveManualPayment(paymentId: string) {
       .eq('status', 'Pending');
 
     // 5. Send Joining Letter Email
-    await sendJoiningLetterEmail({
-      studentName: application.full_name,
-      email: payment.email_id,
-      internshipName: application.internships.title,
-      letterId: offerLetterId,
-      applicationId: application.application_id || application.reference_number || application.id,
-      duration: application.internships.duration || "4 Weeks",
-      pdfUrl: pdfResult.fileId
-    });
+    try {
+      await sendJoiningLetterEmail({
+        studentName: application.full_name,
+        email: payment.email_id,
+        internshipName: application.internships.title,
+        letterId: offerLetterId,
+        applicationId: application.application_id || application.reference_number || application.id,
+        duration: application.internships.duration || "4 Weeks",
+        pdfUrl: pdfFileId
+      });
+    } catch (emailErr) {
+      console.error("Failed to send joining email in manual approval", emailErr);
+    }
 
     // 6. Create Notification
     await supabaseAdmin.from('notifications').insert([{

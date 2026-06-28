@@ -29,7 +29,7 @@ function getStepIndex(status: string) {
   if (status === "Submitted") return 0;
   if (status === "Under Review") return 1;
   if (status === "Accepted") return 2;
-  if (status === "Offer Accepted") return 3;
+  if (status === "Offer Accepted" || status === "Payment Verification Pending") return 3;
   if (status === "Enrolled") return 4;
   if (status === "Active") return 5;
   if (status === "Completed") return 6; // Certificate Generated is 7, we assume 6 is Internship Completed
