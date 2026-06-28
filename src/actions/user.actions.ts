@@ -18,38 +18,51 @@ export async function getOrCreateUserProfile() {
       .limit(1)
       .single();
 
+    const generateReferralCode = (name: string) => {
+      const cleanName = (name || "USER").replace(/[^a-zA-Z0-9]/g, '').toUpperCase().substring(0, 5);
+      const randomChars = Math.random().toString(36).substring(2, 6).toUpperCase();
+      return `${cleanName}${randomChars}`;
+    };
+
     if (existing) {
       const now = new Date();
       const lastActive = new Date(existing.last_active || now);
-      
       const isDifferentDay = now.toDateString() !== lastActive.toDateString();
       
+      let needsUpdate = false;
+      let updateData: any = {};
+
       if (isDifferentDay) {
-        // Check if it was yesterday for streak
+        needsUpdate = true;
         const yesterday = new Date(now);
         yesterday.setDate(yesterday.getDate() - 1);
         
         let newStreak = existing.streak || 0;
-        let xpGained = 10; // 10 XP for daily login
+        let xpGained = 10;
         
         if (lastActive.toDateString() === yesterday.toDateString()) {
           newStreak += 1;
-          if (newStreak >= 3) xpGained += 50; // 50 XP Streak bonus
+          if (newStreak >= 3) xpGained += 50;
         } else {
-          newStreak = 1; // Reset streak
+          newStreak = 1;
         }
         
         const newXp = (existing.xp || 0) + xpGained;
-        const newLevel = Math.floor(newXp / 1000) + 1; // 1000 XP per level
+        const newLevel = Math.floor(newXp / 1000) + 1;
         
+        updateData = { ...updateData, last_active: now.toISOString(), streak: newStreak, xp: newXp, level: newLevel };
+      }
+
+      // Backfill referral code if missing
+      if (!existing.referral_code) {
+        needsUpdate = true;
+        updateData.referral_code = generateReferralCode(existing.name || existing.full_name || "USER");
+      }
+      
+      if (needsUpdate) {
         const { data: updated, error: updateError } = await supabaseAdmin
           .from('users')
-          .update({ 
-            last_active: now.toISOString(),
-            streak: newStreak,
-            xp: newXp,
-            level: newLevel
-          })
+          .update(updateData)
           .eq('id', existing.id)
           .select()
           .single();
@@ -62,8 +75,9 @@ export async function getOrCreateUserProfile() {
       return { success: true, data: existing };
     }
 
-    // Generate a unique 6 character referral code
-    const referralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+    // Generate a unique referral code
+    const newUserName = `${user.firstName || ""} ${user.lastName || ""}`.trim() || "Student";
+    const referralCode = generateReferralCode(newUserName);
     
     // Check for referred_by cookie
     const cookieStore = await cookies();

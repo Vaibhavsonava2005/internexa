@@ -43,8 +43,10 @@ export function FloatingReferButton() {
           text: 'Join 50,000+ students on InterNexa and get premium AI-powered internships. Use my link to sign up!',
           url: referralLink,
         });
-      } catch (error) {
-        console.log('Error sharing:', error);
+      } catch (error: any) {
+        if (error.name !== 'AbortError') {
+          handleCopy();
+        }
       }
     } else {
       handleCopy();
@@ -146,8 +148,17 @@ export function FloatingReferButton() {
                       onClick={handleShare}
                       className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
                     >
-                      <Share2 className="w-5 h-5" />
-                      Share Link Now
+                      {copied ? (
+                        <>
+                          <CheckCircle className="w-5 h-5 text-emerald-300" />
+                          Link Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Share2 className="w-5 h-5" />
+                          Share Link Now
+                        </>
+                      )}
                     </button>
                     
                     <div className="text-center">
