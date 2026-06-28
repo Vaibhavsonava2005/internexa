@@ -8,7 +8,6 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import { createClient } from "@supabase/supabase-js";
-import { createClient } from "@supabase/supabase-js";
 import { getUserApplications } from "@/actions/application.actions";
 
 export default function MyInternshipsPage() {
