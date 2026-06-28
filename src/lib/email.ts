@@ -501,7 +501,7 @@ export async function sendJoiningLetterEmail({
     <!-- PDF Attached Notice -->
     <table width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0;background:#eef2ff;border-radius:12px;border:1px solid #c7d2fe;">
       <tr><td style="padding:16px 20px;">
-        <p style="margin:0;color:#3730a3;font-size:14px;font-weight:600;">?? Your official Joining Letter PDF is attached to this email.</p>
+        <p style="margin:0;color:#3730a3;font-size:14px;font-weight:600;">📎 Your official Joining Letter PDF is attached to this email.</p>
         <p style="margin:4px 0 0;color:#4338ca;font-size:13px;">Please keep it for your records.</p>
       </td></tr>
     </table>
@@ -546,7 +546,7 @@ export async function sendJoiningLetterEmail({
 
   return sendBrevoEmail({
     to: [{ email, name: studentName }],
-    subject: "Payment Verified: Your InterNexa Joining Letter",
+    subject: `🎉 Congratulations ${studentName}! Your InterNexa Joining Letter`,
     htmlContent,
     attachment: attachment.length > 0 ? attachment : undefined
   });

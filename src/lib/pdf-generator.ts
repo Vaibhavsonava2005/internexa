@@ -222,7 +222,33 @@ We wish you a very productive, challenging, and enriching experience with InterN
 
     let currentY = drawParagraphs(doc, bodyText, 115);
     
-    currentY += 20;
+    currentY += 15;
+    
+    // Benefits Section
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(79, 70, 229); // Brand color
+    doc.text("What is included in your enrollment:", 20, currentY);
+    
+    currentY += 8;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(30, 41, 59);
+    
+    const benefits = [
+      "Industry-recognized Professional Certificate with QR verification",
+      "Official Experience Letter upon completion",
+      "Performance-based Letter of Recommendation (LOR)",
+      "1-on-1 Expert Mentorship and Career Guidance",
+      "Real-world Portfolio Projects and Assessment Badges"
+    ];
+    
+    benefits.forEach((benefit) => {
+      doc.text(`• ${benefit}`, 25, currentY);
+      currentY += 6;
+    });
+
+    currentY += 15;
 
     // Signatures
     doc.setFont("helvetica", "bold");

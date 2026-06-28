@@ -71,14 +71,23 @@ export default function DashboardHome() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 px-4 sm:px-0">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-brand-900 dark:text-white tracking-tight mb-1">
-            {(() => {
-              const hour = new Date().getHours();
-              const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-              const name = applications[0]?.full_name || user?.firstName || "Student";
-              return `${greeting}, ${name}!`;
-            })()}
-          </h1>
+          {isLoading ? (
+            <div className="h-8 w-64 bg-brand-100 dark:bg-brand-900 animate-pulse rounded-lg mb-2"></div>
+          ) : (
+            <h1 className="text-2xl md:text-3xl font-bold text-brand-900 dark:text-white tracking-tight mb-1">
+              {(() => {
+                const hour = new Date().getHours();
+                const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+                
+                // Prioritize application name, fallback to Clerk firstName, fallback to "Student"
+                const name = (applications.length > 0 && applications[0]?.full_name) 
+                  ? applications[0].full_name.split(' ')[0] 
+                  : (user?.firstName || "Student");
+                  
+                return `${greeting}, ${name}!`;
+              })()}
+            </h1>
+          )}
           <p className="text-brand-500 dark:text-brand-400 text-sm">
             Track your applications and learning journey.
           </p>

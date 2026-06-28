@@ -83,7 +83,7 @@ export default function OnboardingPage() {
 
     try {
       const formData = new FormData();
-      formData.append("applicationId", offerId);
+      formData.append("applicationId", offer?.id);
       formData.append("referenceNumber", referenceNumber);
       formData.append("emailId", emailId);
       formData.append("upiId", upiId);
