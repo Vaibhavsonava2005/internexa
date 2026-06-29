@@ -36,12 +36,19 @@ export async function logAudit(admin_id: string, action: string, target_user_id?
 }
 
 import { cookies } from "next/headers";
+import { verifyAdminJwt, signAdminJwt } from "@/lib/jwt";
 
 async function verifyAdmin() {
   const cookieStore = await cookies();
   const adminSession = cookieStore.get("admin_session");
-  if (adminSession?.value !== "true") {
+  
+  if (!adminSession?.value) {
     throw new Error("Unauthorized: Admin access required");
+  }
+
+  const isValid = await verifyAdminJwt(adminSession.value);
+  if (!isValid) {
+    throw new Error("Unauthorized: Invalid admin session");
   }
 }
 
@@ -259,7 +266,14 @@ export async function approveRewardClaim(claimId: string) {
 
 export async function loginAdmin(password: string) {
   if (password === "0202") {
-    (await cookies()).set("admin_session", "true", { path: "/" });
+    const token = await signAdminJwt();
+    (await cookies()).set("admin_session", token, { 
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7 // 7 days
+    });
     return { success: true };
   }
   return { success: false, error: "Invalid password" };

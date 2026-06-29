@@ -35,7 +35,7 @@ function addPremiumLetterhead(doc: jsPDF, title: string, data: OfferLetterData) 
   doc.setFontSize(9);
   doc.setTextColor(255, 255, 255);
   doc.text("info.internexa@gmail.com", 190, 20, { align: "right" });
-  doc.text("www.internexa.com", 190, 25, { align: "right" });
+  doc.text("www.internexalabs.online", 190, 25, { align: "right" });
 
   // Document Title
   doc.setFont("helvetica", "bold");

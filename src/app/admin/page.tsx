@@ -1,10 +1,12 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AdminLogin } from "@/components/admin/AdminLogin";
+import { verifyAdminJwt } from "@/lib/jwt";
 
 export default async function AdminPage() {
   const cookieStore = await cookies();
-  const isAdmin = cookieStore.get("admin_session")?.value === "true";
+  const sessionCookie = cookieStore.get("admin_session")?.value;
+  const isAdmin = sessionCookie ? await verifyAdminJwt(sessionCookie) : false;
 
   if (isAdmin) {
     redirect("/admin/dashboard");

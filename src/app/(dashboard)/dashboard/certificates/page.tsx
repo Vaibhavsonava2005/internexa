@@ -161,7 +161,7 @@ export default function CertificatesPage() {
 
               <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
                 <a 
-                  href={cert.application_id ? `/api/downloads/${cert.id}` : "#"} 
+                  href={cert.certificate_file_id ? `/api/downloads/${encodeURIComponent(cert.certificate_file_id)}?type=certificate_file` : (cert.application_id ? `/api/downloads/${cert.application_id}.pdf?type=certificate` : "#")} 
                   target="_blank" 
                   rel="noreferrer"
                   className="flex items-center justify-center gap-2 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors text-sm"

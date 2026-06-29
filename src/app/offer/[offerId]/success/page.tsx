@@ -106,7 +106,7 @@ export default function SuccessPage() {
           <div className="text-right text-sm text-gray-600">
             <p>123 Innovation Drive, Tech Park</p>
             <p>Bengaluru, Karnataka 560100</p>
-            <p>contact@internexa.com | www.internexa.com</p>
+            <p>info.internexa@gmail.com | www.internexalabs.online</p>
           </div>
         </div>
 

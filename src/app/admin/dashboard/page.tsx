@@ -2,12 +2,14 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AdminDashboardClient } from "@/components/admin/AdminDashboardClient";
 import { getAdminData } from "@/actions/admin.actions";
+import { verifyAdminJwt } from "@/lib/jwt";
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
   const cookieStore = await cookies();
-  const isAdmin = cookieStore.get("admin_session")?.value === "true";
+  const sessionCookie = cookieStore.get("admin_session")?.value;
+  const isAdmin = sessionCookie ? await verifyAdminJwt(sessionCookie) : false;
 
   if (!isAdmin) {
     redirect("/admin");

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
 
 export async function GET(
   request: NextRequest,
@@ -13,9 +12,24 @@ export async function GET(
       return new NextResponse("File ID is required", { status: 400 });
     }
 
-    // Redirect directly to the public URL for the offer letter
+    const searchParams = request.nextUrl.searchParams;
+    const type = searchParams.get("type");
+
+    let bucket = "offer-letters";
+    let filePath = id;
+
+    if (type === "certificate") {
+      bucket = "documents";
+      filePath = `certificates/${id}`;
+    } else if (type === "certificate_file") {
+      bucket = "documents";
+      // The id here is the full path, decode it
+      filePath = decodeURIComponent(id);
+    }
+
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
-    const publicUrl = `${supabaseUrl}/storage/v1/object/public/offer-letters/${id}`;
+    // For storage v1 public URLs, the format is /storage/v1/object/public/<bucket>/<filepath>
+    const publicUrl = `${supabaseUrl}/storage/v1/object/public/${bucket}/${filePath}`;
     
     return NextResponse.redirect(publicUrl);
   } catch (error) {
