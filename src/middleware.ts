@@ -25,12 +25,12 @@ export default clerkMiddleware(async (auth, req) => {
   // Basic CSP to prevent basic XSS while allowing standard scripts
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.accounts.dev https://*.clerk.com https://checkout.razorpay.com https://challenges.cloudflare.com;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.accounts.dev https://*.clerk.com https://clerk.internexalabs.online https://checkout.razorpay.com https://challenges.cloudflare.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' data: blob: https://* http://*;
     font-src 'self' https://fonts.gstatic.com;
-    connect-src 'self' https://*.supabase.co https://*.clerk.accounts.dev https://*.clerk.com https://api.razorpay.com wss://*.supabase.co;
-    frame-src 'self' https://*.clerk.accounts.dev https://*.clerk.com https://api.razorpay.com https://challenges.cloudflare.com;
+    connect-src 'self' https://*.supabase.co https://*.clerk.accounts.dev https://*.clerk.com https://clerk.internexalabs.online https://api.razorpay.com wss://*.supabase.co;
+    frame-src 'self' https://*.clerk.accounts.dev https://*.clerk.com https://clerk.internexalabs.online https://api.razorpay.com https://challenges.cloudflare.com;
     worker-src 'self' blob:;
   `.replace(/\s{2,}/g, ' ').trim();
   
