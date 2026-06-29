@@ -69,7 +69,7 @@ export default function SignUpPage() {
           </div>
 
           <SignUp
-            fallbackRedirectUrl="/dashboard"
+            forceRedirectUrl="/internships"
             appearance={{
               elements: {
                 rootBox: "w-full",

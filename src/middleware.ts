@@ -12,6 +12,17 @@ export default clerkMiddleware(async (auth, req) => {
 
   const res = NextResponse.next();
 
+  // Handle Referrals
+  const refCode = req.nextUrl.searchParams.get("ref");
+  if (refCode) {
+    res.cookies.set("internexa_ref", refCode, { 
+      path: "/", 
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax"
+    });
+  }
   // 2. Add Security Headers
   // Prevents Clickjacking
   res.headers.set('X-Frame-Options', 'DENY');

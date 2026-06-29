@@ -48,12 +48,13 @@ export default function ReferAndEarnPage() {
   };
 
   const referralLink = userProfile?.referral_code 
-    ? `${typeof window !== 'undefined' ? window.location.origin : 'https://internexa.com'}/sign-up?ref=${userProfile.referral_code}`
+    ? `${typeof window !== 'undefined' ? window.location.origin : 'https://internexalabs.online'}/invite/${userProfile.referral_code}`
     : '';
 
   const handleCopy = () => {
     if (referralLink) {
-      navigator.clipboard.writeText(referralLink);
+      const message = `🚀 *Boost Your Career with InterNexa!* 🎓\n\nI just found this amazing AI-powered internship platform. You get:\n✅ 35+ Premium Virtual Internships\n✅ Real-world Capstone Projects\n✅ ISO-Verified Certificates & LORs\n✅ 1-on-1 Expert Mentorship\n\nSign up using my exclusive invite link and let's learn together! 👇\n${referralLink}`;
+      navigator.clipboard.writeText(message);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
