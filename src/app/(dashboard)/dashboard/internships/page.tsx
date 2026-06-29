@@ -15,21 +15,32 @@ export default function MyInternshipsPage() {
   const [filter, setFilter] = useState<"all" | "active" | "completed" | "pending" | "accepted">("all");
   
   const [applications, setApplications] = useState<any[]>([]);
+  const [allInternships, setAllInternships] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
-
 
   const fetchApplications = async (silent = false) => {
     if (!user) return;
     if (!silent) setLoading(true);
     
     try {
-      const res = await getUserApplications();
-      if (res.success && res.data) {
-        setApplications(res.data);
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co",
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder"
+      );
+
+      const [resApps, resInterns] = await Promise.all([
+        getUserApplications(),
+        supabase.from('internships').select('*').eq('is_active', true)
+      ]);
+
+      if (resApps.success && resApps.data) {
+        setApplications(resApps.data);
+      }
+      if (resInterns.data) {
+        setAllInternships(resInterns.data);
       }
     } catch (err) {
-      console.error("Failed to fetch applications:", err);
+      console.error("Failed to fetch data:", err);
     } finally {
       if (!silent) setLoading(false);
     }
@@ -43,14 +54,28 @@ export default function MyInternshipsPage() {
     return () => clearInterval(interval);
   }, [user]);
 
-  const filtered = applications.filter(app => {
-    if (filter === "all") return true;
-    if (filter === "pending" && app.status === "Submitted") return true;
-    if (filter === "accepted" && (app.status === "Accepted" || app.status === "Offer Accepted")) return true;
-    if (filter === "active" && (app.status === "Active" || app.status === "Enrolled")) return true;
-    if (filter === "completed" && app.status === "Completed") return true;
-    return false;
-  });
+  const filtered = (() => {
+    if (filter === "all") {
+      return allInternships.map(internship => {
+        const matchingApp = applications.find(app => app.internship_id === internship.id);
+        if (matchingApp) return matchingApp;
+        
+        return {
+          id: `unapplied-${internship.id}`,
+          status: "Not Applied",
+          internships: internship
+        };
+      });
+    }
+    
+    return applications.filter(app => {
+      if (filter === "pending" && (app.status === "Submitted" || app.status === "Under Review" || app.status === "Payment Verification Pending")) return true;
+      if (filter === "accepted" && (app.status === "Accepted" || app.status === "Offer Accepted")) return true;
+      if (filter === "active" && (app.status === "Active" || app.status === "Enrolled")) return true;
+      if (filter === "completed" && app.status === "Completed") return true;
+      return false;
+    });
+  })();
 
   return (
     <div className="space-y-6 md:space-y-8 relative min-h-screen px-0 sm:px-4 md:px-0">
@@ -97,6 +122,7 @@ export default function MyInternshipsPage() {
             const isPending = app.status === "Submitted" || app.status === "Under Review" || app.status === "Payment Verification Pending";
             const isActive = app.status === "Active" || app.status === "Enrolled";
             const isCompleted = app.status === "Completed";
+            const isNotApplied = app.status === "Not Applied";
             
             return (
               <motion.div
@@ -108,11 +134,12 @@ export default function MyInternshipsPage() {
               >
                 <div className={cn("h-40 relative bg-gradient-to-br", internship?.thumbnail || "from-indigo-500 to-violet-600")}>
                   <div className="absolute inset-0 bg-black/20" />
-                  <div className="absolute top-4 left-4">
+                  <div className="absolute top-4 left-4 flex flex-wrap gap-2">
                     {isCompleted && <Badge variant="success" className="bg-emerald-500 text-white border-0 px-3 py-1 text-sm font-bold shadow-sm">Completed</Badge>}
                     {isActive && <Badge variant="info" className="bg-white text-slate-900 border-0 px-3 py-1 text-sm font-bold shadow-sm">Active</Badge>}
                     {isAccepted && <Badge className="bg-amber-500 text-white border-0 px-3 py-1 text-sm font-bold shadow-sm">Action Required</Badge>}
                     {isPending && <Badge className="bg-slate-500 text-white border-0 px-3 py-1 text-sm font-bold shadow-sm">Under Review</Badge>}
+                    {isNotApplied && <Badge className="bg-indigo-500 text-white border-0 px-3 py-1 text-sm font-bold shadow-sm">Open</Badge>}
                   </div>
                 </div>
 
@@ -185,6 +212,15 @@ export default function MyInternshipsPage() {
                         <Clock className="w-4 h-4" />
                         Application under review
                       </div>
+                    )}
+
+                    {isNotApplied && (
+                      <Link
+                        href={`/apply/${internship?.slug}`}
+                        className="w-full flex items-center justify-center gap-2 h-14 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-md"
+                      >
+                        Apply Now
+                      </Link>
                     )}
                   </div>
                 </div>

@@ -107,7 +107,7 @@ export default function InternshipsPage() {
                     placeholder="Search programs..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 bg-white dark:bg-brand-950 border border-brand-200 dark:border-brand-800 rounded-lg text-sm text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500 outline-none shadow-sm transition-all"
+                    className="w-full pl-10 pr-4 py-2 bg-white dark:bg-brand-950 border border-brand-200 dark:border-brand-800 rounded-lg text-sm text-brand-900 dark:text-white focus:ring-2 focus:ring-accent-500 outline-none shadow-sm transition-all"
                   />
                 </div>
               </div>
