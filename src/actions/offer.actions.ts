@@ -66,10 +66,16 @@ export async function acceptOffer(offerLetterId: string) {
 
 export async function markPaymentComplete(offerLetterId: string, transactionRef: string) {
   try {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() + 1);
+
     // Update application status to Active/Enrolled
     const { data, error } = await supabaseAdmin
       .from('applications')
-      .update({ status: "Enrolled" })
+      .update({ 
+        status: "Enrolled",
+        start_date: startDate.toISOString().split('T')[0]
+      })
       .eq('offer_letter_id', offerLetterId)
       .select('*, internships(title)')
       .single();

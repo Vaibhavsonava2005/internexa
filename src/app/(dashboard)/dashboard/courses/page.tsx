@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Clock, PlayCircle, BookOpen, Loader2, ChevronDown, ChevronUp, CheckCircle, Video, FileText, Code } from "lucide-react";
+import { Clock, PlayCircle, BookOpen, Loader2, ChevronDown, ChevronUp, CheckCircle, Video, FileText, Code, BadgeCheck } from "lucide-react";
 import { getUserApplications } from "@/actions/application.actions";
+import { checkAndProcessGraduations } from "@/actions/graduation.actions";
+import { generateDynamicCurriculum, CurriculumModule } from "@/lib/curriculum-data";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export default function CoursesPage() {
   const [loading, setLoading] = useState(true);
@@ -13,9 +16,25 @@ export default function CoursesPage() {
 
   useEffect(() => {
     async function load() {
+      // 1. Fetch applications
       const apps = await getUserApplications();
+      
+      // 2. Determine active app
       const activeApp = apps.success && apps.data ? apps.data.find((app: any) => app.status === "Active" || app.status === "Enrolled" || app.status === "Completed") : null;
       setApplication(activeApp || null);
+      
+      // 3. Background graduation check (lazy evaluation)
+      if (activeApp && apps.success && apps.data && apps.data.length > 0) {
+        // use the clerk_id from the first application
+        const clerkId = apps.data[0].clerk_id;
+        checkAndProcessGraduations(clerkId).then(res => {
+          // If graduations were processed, we might want to reload or we can just rely on the next visit
+          if (res.success && res.processed > 0) {
+            console.log("Processed " + res.processed + " graduations");
+          }
+        });
+      }
+
       setLoading(false);
     }
     load();
@@ -41,8 +60,30 @@ export default function CoursesPage() {
     );
   }
 
+  if (application.status === "Completed") {
+    return (
+      <div className="text-center py-20">
+        <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+          <BadgeCheck className="w-10 h-10 text-emerald-500" />
+        </div>
+        <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Course Completed!</h2>
+        <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-8">
+          Congratulations! You have successfully completed this internship program. Your official certificates and documents have been generated.
+        </p>
+        <Link 
+          href="/dashboard/certificates"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-colors"
+        >
+          View My Certificates
+        </Link>
+      </div>
+    );
+  }
+
   const internship = application.internships;
-  const modules = Array.isArray(internship?.modules) ? internship.modules : [];
+  
+  // Use Dynamic Curriculum Engine
+  const modules: CurriculumModule[] = generateDynamicCurriculum(internship?.category || "Default", internship?.duration_days || 30);
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -115,22 +156,24 @@ export default function CoursesPage() {
                           </p>
                         )}
                         
-                        {mod.lessons && Array.isArray(mod.lessons) && mod.lessons.length > 0 ? (
+                        {mod.days && Array.isArray(mod.days) && mod.days.length > 0 ? (
                           <div className="space-y-3">
-                            {mod.lessons.map((lesson: any, lIndex: number) => (
+                            {mod.days.map((lesson: any, lIndex: number) => (
                               <div key={lIndex} className="flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-colors group cursor-pointer">
                                 <div className="mt-0.5">
-                                  {lesson.type === "video" ? (
+                                  {lesson.type === "Video" ? (
                                     <Video className="w-5 h-5 text-indigo-500" />
-                                  ) : lesson.type === "code" ? (
+                                  ) : lesson.type === "Coding" ? (
                                     <Code className="w-5 h-5 text-emerald-500" />
+                                  ) : lesson.type === "Project" ? (
+                                    <BadgeCheck className="w-5 h-5 text-amber-500" />
                                   ) : (
                                     <FileText className="w-5 h-5 text-blue-500" />
                                   )}
                                 </div>
                                 <div className="flex-1">
                                   <h4 className="font-bold text-slate-900 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                    {lesson.title}
+                                    Day {lesson.day}: {lesson.title}
                                   </h4>
                                   {lesson.duration && (
                                     <p className="text-xs font-medium text-slate-500 mt-1">{lesson.duration}</p>
