@@ -35,23 +35,28 @@ export default function CoursePlayerPage() {
 
   useEffect(() => {
     async function loadData() {
-      const apps = await getUserApplications();
-      const activeApp = apps.success && apps.data 
-        ? apps.data.find((app: any) => app.status === "Active" || app.status === "Enrolled" || app.status === "Completed") 
-        : null;
+      try {
+        const apps = await getUserApplications();
+        const activeApp = apps.success && apps.data 
+          ? apps.data.find((app: any) => app.status === "Active" || app.status === "Enrolled" || app.status === "Completed") 
+          : null;
 
-      if (activeApp && activeApp.internships) {
-        setApplication(activeApp);
-        setInternship(activeApp.internships);
-        setModules(activeApp.internships.modules || []);
-        
-        const prog = await getCompletedLessons(activeApp.internships.id);
-        if (prog.success) {
-          setCompletedLessons(prog.data);
+        if (activeApp && activeApp.internships) {
+          setApplication(activeApp);
+          setInternship(activeApp.internships);
+          setModules(activeApp.internships.modules || []);
+          
+          const prog = await getCompletedLessons(activeApp.internships.id);
+          if (prog.success) {
+            setCompletedLessons(prog.data);
+          }
         }
+      } catch (err) {
+        console.error("Failed to load course data", err);
+      } finally {
+        setLoading(false);
+        setIsMounted(true);
       }
-      setLoading(false);
-      setIsMounted(true);
     }
     loadData();
   }, []);
@@ -119,7 +124,11 @@ export default function CoursePlayerPage() {
     // Optimistic UI update
     setCompletedLessons(prev => [...prev, currentLesson.id]);
     
-    await markLessonComplete(currentLesson.id, internship.id);
+    try {
+      await markLessonComplete(currentLesson.id, internship.id);
+    } catch (err) {
+      console.error(err);
+    }
     
     // Auto advance
     if (nextLesson) {
@@ -140,12 +149,16 @@ export default function CoursePlayerPage() {
               setDynamicUrl(res.url);
             }
             setIsGenerating(false);
+          })
+          .catch(err => {
+            console.error("Failed to generate video", err);
+            setIsGenerating(false);
           });
-      } else if (!isDummy) {
+      } else if (!isDummy && dynamicUrl !== currentLesson.content_url) {
         setDynamicUrl(currentLesson.content_url);
       }
     } else {
-      setDynamicUrl(null);
+      if (dynamicUrl !== null) setDynamicUrl(null);
     }
   }, [currentLesson, internship?.id, internship?.title, dynamicUrl]);
 

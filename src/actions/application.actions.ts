@@ -234,6 +234,8 @@ export async function getLeaderboardStats() {
       .from('activity_logs')
       .select('clerk_id, action');
 
+    const userStats: Record<string, any> = {};
+
     data?.forEach(app => {
       const id = app.clerk_id || app.full_name;
       if (!userStats[id]) {
