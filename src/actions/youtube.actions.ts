@@ -1,13 +1,13 @@
 "use server";
 
-import ytSearch from "yt-search";
-
 export async function searchYouTubeVideo(query: string) {
   try {
-    const r = await ytSearch(query);
-    const videos = r.videos;
-    if (videos && videos.length > 0) {
-      return { success: true, url: videos[0].url };
+    const res = await fetch(`https://html.duckduckgo.com/html/?q=site:youtube.com+${encodeURIComponent(query)}`);
+    const text = await res.text();
+    const match = text.match(/v=([a-zA-Z0-9_-]{11})/);
+    
+    if (match && match[1]) {
+      return { success: true, url: `https://www.youtube.com/watch?v=${match[1]}` };
     }
     return { success: false, error: "No videos found" };
   } catch (error: any) {
@@ -23,11 +23,12 @@ export async function generateAndSaveVideoForLesson(internshipId: string, lesson
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const r = await ytSearch(query);
-    const videos = r.videos;
+    const res = await fetch(`https://html.duckduckgo.com/html/?q=site:youtube.com+${encodeURIComponent(query)}`);
+    const text = await res.text();
+    const match = text.match(/v=([a-zA-Z0-9_-]{11})/);
     
-    if (videos && videos.length > 0) {
-      const url = videos[0].url;
+    if (match && match[1]) {
+      const url = `https://www.youtube.com/watch?v=${match[1]}`;
       
       // Update database
       const { data: internship, error: fetchError } = await supabase
