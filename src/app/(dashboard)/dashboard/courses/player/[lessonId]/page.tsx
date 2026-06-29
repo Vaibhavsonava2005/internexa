@@ -22,6 +22,7 @@ export default function CoursePlayerPage() {
   const lessonId = params.lessonId as string;
 
   const [loading, setLoading] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
   const [internship, setInternship] = useState<any>(null);
   const [modules, setModules] = useState<any[]>([]);
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
@@ -46,6 +47,7 @@ export default function CoursePlayerPage() {
         }
       }
       setLoading(false);
+      setIsMounted(true);
     }
     loadData();
   }, []);
@@ -137,24 +139,20 @@ export default function CoursePlayerPage() {
 
     switch (currentLesson.type) {
       case "Video":
-        // Parse YouTube URL to standard embed URL
-        let embedUrl = currentLesson.content_url;
-        if (embedUrl?.includes("youtube.com/watch?v=")) {
-          const videoId = embedUrl.split("v=")[1]?.split("&")[0];
-          if (videoId) embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0`;
-        } else if (embedUrl?.includes("youtu.be/")) {
-          const videoId = embedUrl.split("youtu.be/")[1]?.split("?")[0];
-          if (videoId) embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0`;
-        }
-
         return (
           <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-lg border border-slate-800 relative">
-            {embedUrl ? (
-              <iframe 
-                src={embedUrl}
-                className="w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
+            {currentLesson.content_url && isMounted ? (
+              <ReactPlayer 
+                url={currentLesson.content_url}
+                width="100%"
+                height="100%"
+                controls
+                onEnded={handleMarkComplete}
+                config={{
+                  youtube: {
+                    playerVars: { showinfo: 0, rel: 0, origin: typeof window !== 'undefined' ? window.location.origin : '' }
+                  }
+                }}
               />
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
