@@ -13,8 +13,10 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
 import { differenceInDays, format, addDays } from "date-fns";
+import { generateAndSaveVideoForLesson } from "@/actions/youtube.actions";
 
-const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
+// We no longer need ReactPlayer, using native iframe
+// const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
 export default function CoursePlayerPage() {
   const params = useParams();
@@ -28,6 +30,8 @@ export default function CoursePlayerPage() {
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [application, setApplication] = useState<any>(null);
+  const [dynamicUrl, setDynamicUrl] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -116,6 +120,26 @@ export default function CoursePlayerPage() {
     }
   };
 
+  useEffect(() => {
+    if (currentLesson && currentLesson.type === "Video") {
+      const isDummy = !currentLesson.content_url || currentLesson.content_url.includes("tgbNymZ7vqY") || currentLesson.content_url.trim() === "";
+      if (isDummy && !dynamicUrl && !isGenerating && internship?.id) {
+        setIsGenerating(true);
+        generateAndSaveVideoForLesson(internship.id, currentLesson.id, `${internship.title} ${currentLesson.title} programming tutorial`)
+          .then(res => {
+            if (res.success && res.url) {
+              setDynamicUrl(res.url);
+            }
+            setIsGenerating(false);
+          });
+      } else if (!isDummy) {
+        setDynamicUrl(currentLesson.content_url);
+      }
+    } else {
+      setDynamicUrl(null);
+    }
+  }, [currentLesson, internship?.id, internship?.title, dynamicUrl]);
+
   const renderContent = () => {
     if (!currentLesson) return <p>Select a lesson from the sidebar.</p>;
 
@@ -139,25 +163,46 @@ export default function CoursePlayerPage() {
 
     switch (currentLesson.type) {
       case "Video":
+        let embedUrl = dynamicUrl;
+        let videoId = null;
+        
+        if (embedUrl) {
+          const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+          const match = embedUrl.match(regExp);
+          if (match && match[2].length === 11) {
+            videoId = match[2];
+            embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?rel=0`;
+          }
+        }
+
         return (
           <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-lg border border-slate-800 relative">
-            {currentLesson.content_url && isMounted ? (
-              <ReactPlayer 
-                url={currentLesson.content_url}
-                width="100%"
-                height="100%"
-                controls
-                onEnded={handleMarkComplete}
-                config={{
-                  youtube: {
-                    playerVars: { showinfo: 0, rel: 0, origin: typeof window !== 'undefined' ? window.location.origin : '' }
-                  }
-                }}
+            {isGenerating && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900 z-10 text-white">
+                <Loader2 className="w-12 h-12 animate-spin mb-4 text-indigo-500" />
+                <p className="animate-pulse text-lg font-bold">AI is generating the perfect video for this topic...</p>
+                <p className="text-slate-400 text-sm mt-2">This may take a few seconds.</p>
+              </div>
+            )}
+            
+            {embedUrl && videoId ? (
+              <iframe 
+                src={embedUrl}
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
               />
-            ) : (
+            ) : !isGenerating && (
               <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
-                <Video className="w-12 h-12 mb-2 opacity-50" />
-                <p>Could not find a video for this topic.</p>
+                <Video className="w-16 h-16 mb-4 opacity-50" />
+                <h3 className="text-xl font-bold text-white mb-2">Video Unavailable</h3>
+                <p>We couldn't automatically fetch a video for this specific topic.</p>
+                <button 
+                  onClick={() => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(internship?.title + ' ' + currentLesson.title)}`, '_blank')}
+                  className="mt-6 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+                >
+                  Search Manually
+                </button>
               </div>
             )}
           </div>
