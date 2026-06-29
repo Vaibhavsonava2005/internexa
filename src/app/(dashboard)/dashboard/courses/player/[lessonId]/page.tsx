@@ -101,8 +101,17 @@ export default function CoursePlayerPage() {
 
   const isCompleted = currentLesson ? completedLessons.includes(currentLesson.id) : false;
 
-  const startDate = application ? new Date(application.start_date || application.submission_date) : new Date();
-  const daysPassed = Math.max(0, differenceInDays(new Date(), startDate));
+  let startDate = new Date();
+  if (application) {
+    const rawDate = application.start_date || application.submission_date;
+    if (rawDate) {
+      const parsed = new Date(rawDate);
+      if (!isNaN(parsed.getTime())) {
+        startDate = parsed;
+      }
+    }
+  }
+  const daysPassed = Math.max(0, differenceInDays(new Date(), startDate)) || 0;
 
   const handleMarkComplete = async () => {
     if (!currentLesson || isCompleted || currentLesson.globalIndex > daysPassed) return;
@@ -155,7 +164,7 @@ export default function CoursePlayerPage() {
             This lesson is part of a daily drip schedule to ensure you properly absorb the material.
           </p>
           <div className="px-6 py-3 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 font-bold rounded-xl border border-indigo-100 dark:border-indigo-800">
-            Unlocks on {format(unlockDate, 'PPP')}
+            Unlocks on {isNaN(unlockDate.getTime()) ? "a future date" : format(unlockDate, 'PPP')}
           </div>
         </div>
       );
@@ -169,7 +178,7 @@ export default function CoursePlayerPage() {
         if (embedUrl) {
           const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
           const match = embedUrl.match(regExp);
-          if (match && match[2].length === 11) {
+          if (match && match[2] && match[2].length === 11) {
             videoId = match[2];
             embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?rel=0`;
           }
