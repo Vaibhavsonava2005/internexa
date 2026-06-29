@@ -110,7 +110,7 @@ Please log in to your Student Dashboard to access your initial tasks and connect
     doc.text("InterNexa HR Department", 20, 230);
     doc.text("Digitally Signed", 20, 240);
 
-    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://internexa.vercel.app'}/verify?id=${data.documentId}`;
+    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://internexalabs.online'}/verify?id=${data.documentId}`;
     await generateQRAndAdd(doc, verificationUrl);
 
     const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
@@ -153,7 +153,7 @@ By accepting the offer and proceeding with the internship, the Intern digitally 
     doc.text(`IP: Logged in System`, 20, 230);
     doc.text(`Timestamp: ${data.date}`, 20, 240);
 
-    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://internexa.vercel.app'}/verify?id=${data.documentId}`;
+    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://internexalabs.online'}/verify?id=${data.documentId}`;
     await generateQRAndAdd(doc, verificationUrl);
 
     const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
@@ -242,7 +242,7 @@ export async function generateCertificate(data: CertificateData): Promise<{ succ
     doc.text(`Certificate ID: ${data.documentId}`, 148, 180, { align: "center" });
     doc.text(`Date of Issue: ${data.date}`, 148, 185, { align: "center" });
 
-    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://internexa.vercel.app'}/verify?id=${data.documentId}`;
+    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://internexalabs.online'}/verify?id=${data.documentId}`;
     let qrDataUrl = '';
     try {
       qrDataUrl = await QRCode.toDataURL(verificationUrl, { errorCorrectionLevel: 'H' });

@@ -62,7 +62,7 @@ export async function completeOnboarding(offerLetterId: string, signatureText: s
 
     // 5. Send Email with Joining Letter
     try {
-      const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://internexa.vercel.app'}/offer/${offerLetterId}/success`;
+      const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://internexalabs.online'}/offer/${offerLetterId}/success`;
       const emailHtml = `
         <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
           <div style="background-color: #4f46e5; padding: 20px; text-align: center;">

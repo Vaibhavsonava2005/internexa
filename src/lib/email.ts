@@ -2,7 +2,7 @@ const getBaseUrl = () => {
   if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
   if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return 'https://internexa.vercel.app';
+  return 'https://internexalabs.online';
 };
 const APP_URL = getBaseUrl();
 const BRAND_COLOR = "#4f46e5";
@@ -441,7 +441,7 @@ export async function sendPaymentRejectedEmail({
     </div>
 
     <div style="text-align:center;margin:36px 0 0;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://internexa.vercel.app'}/dashboard/internships" style="display:inline-block;background:#ef4444;color:#ffffff;padding:16px 48px;text-decoration:none;border-radius:12px;font-weight:800;font-size:16px;box-shadow:0 6px 20px rgba(239,68,68,0.4);">Go to Dashboard</a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://internexalabs.online'}/dashboard/internships" style="display:inline-block;background:#ef4444;color:#ffffff;padding:16px 48px;text-decoration:none;border-radius:12px;font-weight:800;font-size:16px;box-shadow:0 6px 20px rgba(239,68,68,0.4);">Go to Dashboard</a>
     </div>
   </td></tr>
   
@@ -507,7 +507,7 @@ export async function sendJoiningLetterEmail({
     </table>
 
     <div style="text-align:center;margin:36px 0 0;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://internexa.vercel.app'}/dashboard/internships" style="display:inline-block;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#ffffff;padding:16px 48px;text-decoration:none;border-radius:12px;font-weight:800;font-size:16px;box-shadow:0 6px 20px rgba(79,70,229,0.4);letter-spacing:0.3px;">🚀 Go to Dashboard</a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://internexalabs.online'}/dashboard/internships" style="display:inline-block;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#ffffff;padding:16px 48px;text-decoration:none;border-radius:12px;font-weight:800;font-size:16px;box-shadow:0 6px 20px rgba(79,70,229,0.4);letter-spacing:0.3px;">🚀 Go to Dashboard</a>
     </div>
   </td></tr>
   
@@ -606,7 +606,7 @@ export async function sendCertificateEmail({
     </table>
 
     <div style="text-align:center;margin:36px 0 0;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://internexa.vercel.app'}/dashboard" style="display:inline-block;background:linear-gradient(135deg,#10b981,#059669);color:#ffffff;padding:16px 48px;text-decoration:none;border-radius:12px;font-weight:800;font-size:16px;box-shadow:0 6px 20px rgba(16,185,129,0.4);letter-spacing:0.3px;">Go to Dashboard</a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://internexalabs.online'}/dashboard" style="display:inline-block;background:linear-gradient(135deg,#10b981,#059669);color:#ffffff;padding:16px 48px;text-decoration:none;border-radius:12px;font-weight:800;font-size:16px;box-shadow:0 6px 20px rgba(16,185,129,0.4);letter-spacing:0.3px;">Go to Dashboard</a>
     </div>
   </td></tr>
   

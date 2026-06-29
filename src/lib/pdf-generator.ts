@@ -159,7 +159,7 @@ We look forward to welcoming you aboard and wish you a highly successful and enr
     doc.text("InterNexa Education Team", 20, currentY + 5);
 
     // QR Code for Verification
-    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://internexa.vercel.app'}/verify?id=${data.offerId}`;
+    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://internexalabs.online'}/verify?id=${data.offerId}`;
     const qrCodeDataUri = await QRCode.toDataURL(verificationUrl, { margin: 1, color: { dark: '#1e293b', light: '#ffffff' } });
     
     addPremiumFooter(doc, qrCodeDataUri);
@@ -262,7 +262,7 @@ We wish you a very productive, challenging, and enriching experience with InterN
     doc.text("InterNexa Education Team", 20, currentY + 5);
 
     // QR Code for Verification
-    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://internexa.vercel.app'}/verify?id=${data.offerId}`;
+    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://internexalabs.online'}/verify?id=${data.offerId}`;
     const qrCodeDataUri = await QRCode.toDataURL(verificationUrl, { margin: 1, color: { dark: '#1e293b', light: '#ffffff' } });
     
     addPremiumFooter(doc, qrCodeDataUri);
