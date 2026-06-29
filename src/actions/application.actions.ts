@@ -229,7 +229,10 @@ export async function getLeaderboardStats() {
 
     if (error) throw error;
 
-    const userStats: Record<string, { name: string, xp: number, active: number, completed: number, clerk_id: string }> = {};
+    // Fetch activity logs for XP
+    const { data: logs } = await supabaseAdmin
+      .from('activity_logs')
+      .select('clerk_id, action');
 
     data?.forEach(app => {
       const id = app.clerk_id || app.full_name;
@@ -244,6 +247,18 @@ export async function getLeaderboardStats() {
       if (app.status === "Completed") {
         userStats[id].xp += 1000;
         userStats[id].completed += 1;
+      }
+    });
+
+    // Add real-time XP from logs
+    logs?.forEach(log => {
+      const id = log.clerk_id;
+      if (userStats[id]) {
+        if (log.action === 'lesson_completed') {
+          userStats[id].xp += 10; // 10 XP per lesson
+        } else if (log.action === 'PROJECT_SUBMISSION') {
+          userStats[id].xp += 100; // 100 XP per project
+        }
       }
     });
 

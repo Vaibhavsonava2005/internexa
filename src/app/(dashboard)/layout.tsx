@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { TopBar } from "@/components/dashboard/TopBar";
+
+export const dynamic = 'force-dynamic';
+
 import { MobileBottomNav } from "@/components/dashboard/MobileBottomNav";
 import { cn } from "@/lib/utils";
 import { usePathname, useRouter } from "next/navigation";
