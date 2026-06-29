@@ -32,7 +32,7 @@ export function FloatingReferButton() {
 
   const handleShare = async () => {
     if (!isSignedIn) {
-      window.location.href = "/sign-up";
+      window.location.assign("/sign-up");
       return;
     }
 

@@ -82,8 +82,9 @@ export default function CoursesPage() {
 
   const internship = application.internships;
   
-  // Use Dynamic Curriculum Engine
-  const modules: CurriculumModule[] = generateDynamicCurriculum(internship?.category || "Default", internship?.duration_days || 30);
+  const modules = internship?.modules && Array.isArray(internship.modules) && internship.modules.length > 0
+    ? internship.modules
+    : generateDynamicCurriculum(internship?.category || "Default", internship?.duration_days || 30);
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -159,7 +160,11 @@ export default function CoursesPage() {
                         {mod.days && Array.isArray(mod.days) && mod.days.length > 0 ? (
                           <div className="space-y-3">
                             {mod.days.map((lesson: any, lIndex: number) => (
-                              <div key={lIndex} className="flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-colors group cursor-pointer">
+                              <Link 
+                                href={`/dashboard/courses/player/${lesson.id || 'default'}`}
+                                key={lIndex} 
+                                className="flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-colors group cursor-pointer"
+                              >
                                 <div className="mt-0.5">
                                   {lesson.type === "Video" ? (
                                     <Video className="w-5 h-5 text-indigo-500" />
@@ -180,7 +185,7 @@ export default function CoursesPage() {
                                   )}
                                 </div>
                                 <PlayCircle className="w-6 h-6 text-slate-300 dark:text-slate-700 group-hover:text-indigo-500 transition-colors" />
-                              </div>
+                              </Link>
                             ))}
                           </div>
                         ) : (

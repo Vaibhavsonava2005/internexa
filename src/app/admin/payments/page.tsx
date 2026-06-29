@@ -13,10 +13,6 @@ export default function AdminPaymentsPage() {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const fetchData = async () => {
     setLoading(true);
     const res = await getAdminData();
@@ -25,6 +21,10 @@ export default function AdminPaymentsPage() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleApprove = async (id: string) => {
     if (!window.confirm("Are you sure you want to approve this payment? This will email the official joining letter to the student.")) return;

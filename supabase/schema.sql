@@ -231,3 +231,47 @@ CREATE POLICY "Users can insert their own activity logs" ON activity_logs FOR IN
  ) ; 
   
  
+-- 7. Course Curriculum Tables
+CREATE TABLE IF NOT EXISTS modules (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  internship_id UUID NOT NULL REFERENCES internships(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT,
+  week_number INTEGER NOT NULL,
+  order_index INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS lessons (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  module_id UUID NOT NULL REFERENCES modules(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  type TEXT NOT NULL,
+  content_url TEXT,
+  description TEXT,
+  duration TEXT,
+  day_number INTEGER NOT NULL,
+  order_index INTEGER DEFAULT 0,
+  is_published BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS lesson_progress (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  clerk_id TEXT NOT NULL REFERENCES users(clerk_id) ON DELETE CASCADE,
+  lesson_id UUID NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+  status TEXT DEFAULT 'Completed',
+  completed_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  UNIQUE(clerk_id, lesson_id)
+);
+
+ALTER TABLE modules ENABLE ROW LEVEL SECURITY;
+ALTER TABLE lessons ENABLE ROW LEVEL SECURITY;
+ALTER TABLE lesson_progress ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Modules are viewable by everyone" ON modules FOR SELECT USING (true);
+CREATE POLICY "Lessons are viewable by everyone" ON lessons FOR SELECT USING (true);
+CREATE POLICY "Users can view their own progress" ON lesson_progress FOR SELECT USING (clerk_id = current_setting('request.jwt.claims')::json->>'sub');
+CREATE POLICY "Users can insert their own progress" ON lesson_progress FOR INSERT WITH CHECK (clerk_id = current_setting('request.jwt.claims')::json->>'sub');
+CREATE POLICY "Users can update their own progress" ON lesson_progress FOR UPDATE USING (clerk_id = current_setting('request.jwt.claims')::json->>'sub');
+
