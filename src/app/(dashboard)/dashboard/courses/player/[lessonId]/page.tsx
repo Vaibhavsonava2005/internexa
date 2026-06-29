@@ -7,11 +7,13 @@ import { markLessonComplete, getCompletedLessons } from "@/actions/progress.acti
 import { motion } from "framer-motion";
 import { CheckCircle, PlayCircle, Video, Code, BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Menu, Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import ReactPlayer from "react-player/lazy";
+import dynamic from 'next/dynamic';
 import Editor from "@monaco-editor/react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
+
+const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
 export default function CoursePlayerPage() {
   const params = useParams();
