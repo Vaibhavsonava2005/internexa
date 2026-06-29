@@ -5,14 +5,14 @@ import { useParams, useRouter } from "next/navigation";
 import { getUserApplications } from "@/actions/application.actions";
 import { markLessonComplete, getCompletedLessons } from "@/actions/progress.actions";
 import { motion } from "framer-motion";
-import { CheckCircle, PlayCircle, Video, Code, BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Menu, Loader2, ArrowLeft } from "lucide-react";
+import { CheckCircle, PlayCircle, Video, Code, BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Menu, Loader2, ArrowLeft, Lock } from "lucide-react";
 import Link from "next/link";
 import dynamic from 'next/dynamic';
 import Editor from "@monaco-editor/react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
-import { searchYouTubeVideo } from "@/actions/youtube.actions";
+import { differenceInDays, format, addDays } from "date-fns";
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
@@ -26,8 +26,7 @@ export default function CoursePlayerPage() {
   const [modules, setModules] = useState<any[]>([]);
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [dynamicVideoUrl, setDynamicVideoUrl] = useState<string | null>(null);
-  const [isFetchingVideo, setIsFetchingVideo] = useState(false);
+  const [application, setApplication] = useState<any>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -37,6 +36,7 @@ export default function CoursePlayerPage() {
         : null;
 
       if (activeApp && activeApp.internships) {
+        setApplication(activeApp);
         setInternship(activeApp.internships);
         setModules(activeApp.internships.modules || []);
         
@@ -74,9 +74,11 @@ export default function CoursePlayerPage() {
   let prevLesson = null;
   
   let flatLessons: any[] = [];
+  let gIndex = 0;
   modules.forEach(mod => {
     mod.days?.forEach((day: any) => {
-      flatLessons.push({ ...day, moduleTitle: mod.title });
+      flatLessons.push({ ...day, moduleTitle: mod.title, globalIndex: gIndex });
+      gIndex++;
     });
   });
 
@@ -93,8 +95,11 @@ export default function CoursePlayerPage() {
 
   const isCompleted = currentLesson ? completedLessons.includes(currentLesson.id) : false;
 
+  const startDate = application ? new Date(application.start_date || application.submission_date) : new Date();
+  const daysPassed = Math.max(0, differenceInDays(new Date(), startDate));
+
   const handleMarkComplete = async () => {
-    if (!currentLesson || isCompleted) return;
+    if (!currentLesson || isCompleted || currentLesson.globalIndex > daysPassed) return;
     
     // Optimistic UI update
     setCompletedLessons(prev => [...prev, currentLesson.id]);
@@ -109,48 +114,40 @@ export default function CoursePlayerPage() {
     }
   };
 
-  useEffect(() => {
-    if (currentLesson && currentLesson.type === "Video") {
-      const isDummy = !currentLesson.content_url || currentLesson.content_url.includes("tgbNymZ7vqY");
-      if (isDummy) {
-        setIsFetchingVideo(true);
-        searchYouTubeVideo(`${internship?.title} ${currentLesson.title} programming tutorial in hindi or english`)
-          .then((res) => {
-            if (res.success && res.url) {
-              setDynamicVideoUrl(res.url);
-            }
-            setIsFetchingVideo(false);
-          });
-      } else {
-        setDynamicVideoUrl(currentLesson.content_url);
-      }
-    } else {
-      setDynamicVideoUrl(null);
-    }
-  }, [currentLesson, internship?.title]);
-
   const renderContent = () => {
     if (!currentLesson) return <p>Select a lesson from the sidebar.</p>;
+
+    if (currentLesson.globalIndex > daysPassed) {
+      const unlockDate = addDays(startDate, currentLesson.globalIndex);
+      return (
+        <div className="w-full aspect-video flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 text-center py-20 shadow-sm">
+          <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
+            <Lock className="w-10 h-10 text-slate-400" />
+          </div>
+          <h2 className="text-2xl font-bold mb-2">Lesson Locked</h2>
+          <p className="text-slate-500 max-w-sm mb-4">
+            This lesson is part of a daily drip schedule to ensure you properly absorb the material.
+          </p>
+          <div className="px-6 py-3 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 font-bold rounded-xl border border-indigo-100 dark:border-indigo-800">
+            Unlocks on {format(unlockDate, 'PPP')}
+          </div>
+        </div>
+      );
+    }
 
     switch (currentLesson.type) {
       case "Video":
         return (
           <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-lg border border-slate-800 relative">
-            {isFetchingVideo && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-10 text-white">
-                <Loader2 className="w-10 h-10 animate-spin mb-4 text-indigo-500" />
-                <p className="animate-pulse text-slate-300 font-medium">Finding the best video for this topic...</p>
-              </div>
-            )}
-            {dynamicVideoUrl ? (
+            {currentLesson.content_url ? (
               <ReactPlayer 
-                url={dynamicVideoUrl}
+                url={currentLesson.content_url}
                 width="100%"
                 height="100%"
                 controls
                 onEnded={handleMarkComplete}
               />
-            ) : !isFetchingVideo && (
+            ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
                 <Video className="w-12 h-12 mb-2 opacity-50" />
                 <p>Could not find a video for this topic.</p>
@@ -252,20 +249,25 @@ export default function CoursePlayerPage() {
                 {mod.days?.map((lesson: any) => {
                   const isActive = lesson.id === currentLesson?.id;
                   const isDone = completedLessons.includes(lesson.id);
+                  const isLocked = lesson.globalIndex > daysPassed;
                   
                   return (
                     <Link 
-                      href={`/dashboard/courses/player/${lesson.id}`}
+                      href={isLocked ? "#" : `/dashboard/courses/player/${lesson.id}`}
                       key={lesson.id}
+                      onClick={(e) => isLocked && e.preventDefault()}
                       className={cn(
-                        "flex items-start gap-3 p-3 rounded-xl transition-colors",
+                        "flex items-start gap-3 p-3 rounded-xl transition-colors relative",
                         isActive 
                           ? "bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800/50" 
-                          : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent"
+                          : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent",
+                        isLocked && "opacity-60 cursor-not-allowed hover:bg-transparent dark:hover:bg-transparent"
                       )}
                     >
                       <div className="mt-0.5 shrink-0">
-                        {isDone ? (
+                        {isLocked ? (
+                          <Lock className="w-5 h-5 text-slate-400 dark:text-slate-500" />
+                        ) : isDone ? (
                           <CheckCircle2 className="w-5 h-5 text-emerald-500" />
                         ) : (
                           <PlayCircle className={cn("w-5 h-5", isActive ? "text-indigo-600 dark:text-indigo-400" : "text-slate-300 dark:text-slate-600")} />
@@ -314,12 +316,14 @@ export default function CoursePlayerPage() {
           
           <button 
             onClick={handleMarkComplete}
-            disabled={isCompleted}
+            disabled={isCompleted || (currentLesson && currentLesson.globalIndex > daysPassed)}
             className={cn(
               "flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold transition-all shadow-sm",
               isCompleted 
                 ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 cursor-default" 
-                : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/20"
+                : (currentLesson && currentLesson.globalIndex > daysPassed)
+                  ? "bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed border border-slate-200 dark:border-slate-700"
+                  : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/20"
             )}
           >
             {isCompleted ? (
@@ -343,8 +347,12 @@ export default function CoursePlayerPage() {
         <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
           {prevLesson ? (
             <Link 
-              href={`/dashboard/courses/player/${prevLesson.id}`}
-              className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
+              href={prevLesson.globalIndex > daysPassed ? "#" : `/dashboard/courses/player/${prevLesson.id}`}
+              onClick={(e) => prevLesson.globalIndex > daysPassed && e.preventDefault()}
+              className={cn(
+                "flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm",
+                prevLesson.globalIndex > daysPassed && "opacity-50 cursor-not-allowed hover:bg-white dark:hover:bg-slate-900"
+              )}
             >
               <ChevronLeft className="w-5 h-5" /> Previous Lesson
             </Link>
@@ -352,8 +360,12 @@ export default function CoursePlayerPage() {
           
           {nextLesson ? (
             <Link 
-              href={`/dashboard/courses/player/${nextLesson.id}`}
-              className="flex items-center gap-2 px-5 py-2.5 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 rounded-xl text-indigo-700 dark:text-indigo-400 font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors shadow-sm"
+              href={nextLesson.globalIndex > daysPassed ? "#" : `/dashboard/courses/player/${nextLesson.id}`}
+              onClick={(e) => nextLesson.globalIndex > daysPassed && e.preventDefault()}
+              className={cn(
+                "flex items-center gap-2 px-5 py-2.5 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 rounded-xl text-indigo-700 dark:text-indigo-400 font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors shadow-sm",
+                nextLesson.globalIndex > daysPassed && "opacity-50 cursor-not-allowed hover:bg-indigo-50 dark:hover:bg-indigo-900/30"
+              )}
             >
               Next Lesson <ChevronRight className="w-5 h-5" />
             </Link>
