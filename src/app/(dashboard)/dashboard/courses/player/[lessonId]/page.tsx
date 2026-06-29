@@ -12,6 +12,7 @@ import Editor from "@monaco-editor/react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
+import { searchYouTubeVideo } from "@/actions/youtube.actions";
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
@@ -25,6 +26,8 @@ export default function CoursePlayerPage() {
   const [modules, setModules] = useState<any[]>([]);
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [dynamicVideoUrl, setDynamicVideoUrl] = useState<string | null>(null);
+  const [isFetchingVideo, setIsFetchingVideo] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -106,25 +109,51 @@ export default function CoursePlayerPage() {
     }
   };
 
+  useEffect(() => {
+    if (currentLesson && currentLesson.type === "Video") {
+      const isDummy = !currentLesson.content_url || currentLesson.content_url.includes("tgbNymZ7vqY");
+      if (isDummy) {
+        setIsFetchingVideo(true);
+        searchYouTubeVideo(`${internship?.title} ${currentLesson.title} programming tutorial in hindi or english`)
+          .then((res) => {
+            if (res.success && res.url) {
+              setDynamicVideoUrl(res.url);
+            }
+            setIsFetchingVideo(false);
+          });
+      } else {
+        setDynamicVideoUrl(currentLesson.content_url);
+      }
+    } else {
+      setDynamicVideoUrl(null);
+    }
+  }, [currentLesson, internship?.title]);
+
   const renderContent = () => {
     if (!currentLesson) return <p>Select a lesson from the sidebar.</p>;
 
     switch (currentLesson.type) {
       case "Video":
         return (
-          <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-lg border border-slate-800">
-            {currentLesson.content_url ? (
+          <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-lg border border-slate-800 relative">
+            {isFetchingVideo && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-10 text-white">
+                <Loader2 className="w-10 h-10 animate-spin mb-4 text-indigo-500" />
+                <p className="animate-pulse text-slate-300 font-medium">Finding the best video for this topic...</p>
+              </div>
+            )}
+            {dynamicVideoUrl ? (
               <ReactPlayer 
-                url={currentLesson.content_url}
+                url={dynamicVideoUrl}
                 width="100%"
                 height="100%"
                 controls
                 onEnded={handleMarkComplete}
               />
-            ) : (
+            ) : !isFetchingVideo && (
               <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
                 <Video className="w-12 h-12 mb-2 opacity-50" />
-                <p>Video content is being prepared.</p>
+                <p>Could not find a video for this topic.</p>
               </div>
             )}
           </div>

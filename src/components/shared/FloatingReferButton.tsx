@@ -39,8 +39,8 @@ export function FloatingReferButton() {
     if (navigator.share && referralLink) {
       try {
         await navigator.share({
-          title: 'Launch your career with InterNexa!',
-          text: 'Join 50,000+ students on InterNexa and get premium AI-powered internships. Use my link to sign up!',
+          title: '🚀 Launch Your Career with InterNexa!',
+          text: 'Join 50,000+ students on InterNexa and get a premium AI-powered internship!\n\n✨ Benefits include:\n💸 Up to ₹15,000 Stipend\n📜 Guaranteed Letter of Recommendation (LoR)\n🎓 Industry-Recognized Certificate\n\nUse my link to sign up for free:',
           url: referralLink,
         });
       } catch (error: any) {

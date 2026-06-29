@@ -32,18 +32,27 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "InterNexa" }],
   openGraph: {
-    title: "InterNexa — Bridge the Gap Between Learning and Leading",
+    title: "InterNexa | Launch Your Career in AI & Tech",
     description:
-      "Premium AI-powered internship platform with 200+ programs, expert mentors, and industry-recognized certificates.",
+      "Join 50,000+ students on InterNexa. Premium AI-powered internships with up to ₹15,000 stipend, guaranteed Letter of Recommendation (LoR), and industry-recognized certificates. Start today!",
     type: "website",
     locale: "en_IN",
     siteName: "InterNexa",
+    images: [
+      {
+        url: "/og-banner.png",
+        width: 1200,
+        height: 630,
+        alt: "InterNexa - Launch Your Career",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "InterNexa — AI-Powered Internship Platform",
+    title: "InterNexa | Premium AI-Powered Internships",
     description:
-      "200+ internships, 35+ domains, expert mentors. Start your career journey today.",
+      "Get up to ₹15,000 stipend, guaranteed LoR, and verified certificates. 200+ programs across 35+ domains. Apply now!",
+    images: ["/og-banner.png"],
   },
   robots: {
     index: true,
