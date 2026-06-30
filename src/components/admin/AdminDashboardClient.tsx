@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { approveApplication, rejectApplication, getAdminData, approveRewardClaim, approveManualPayment, rejectManualPayment, approveFastTrackPayment, rejectFastTrackPayment, updateAppSettings, getAppSettings, sendGlobalNotification, sendUserNotification, deleteUserCompletely } from "@/actions/admin.actions";
+import { approveApplication, rejectApplication, getAdminData, approveRewardClaim, approveManualPayment, rejectManualPayment, approveFastTrackPayment, rejectFastTrackPayment, updateAppSettings, getAppSettings, sendGlobalNotification, sendUserNotification, deleteUserCompletely, uploadQRImage } from "@/actions/admin.actions";
 import { generateCertificateAction } from "@/actions/certificate.actions";
 import { Button, Badge } from "@/components/shared";
 import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock, FolderGit2, Shield, Gift, Award, Download, RefreshCw, Bell, Settings, Send, Eye, MessageSquare, Trash2 } from "lucide-react";
@@ -37,6 +37,30 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
     await updateAppSettings('payment_99', { upi_link: settingsForm.payment_99_upi, qr_code_url: settingsForm.payment_99_qr });
     setLoadingAction(null);
     alert('Settings updated successfully!');
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: '199' | '99') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLoadingAction(`upload_${type}`);
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const res = await uploadQRImage(formData);
+    if (res.success && res.url) {
+      if (type === '199') {
+        setSettingsForm(prev => ({ ...prev, payment_199_qr: res.url! }));
+        await updateAppSettings('payment_199', { upi_link: settingsForm.payment_199_upi, qr_code_url: res.url! });
+      } else {
+        setSettingsForm(prev => ({ ...prev, payment_99_qr: res.url! }));
+        await updateAppSettings('payment_99', { upi_link: settingsForm.payment_99_upi, qr_code_url: res.url! });
+      }
+      alert('QR Code updated instantly!');
+    } else {
+      alert(res.error || 'Failed to upload QR Code');
+    }
+    setLoadingAction(null);
   };
 
   const handleSendNotification = async (e: React.FormEvent) => {
@@ -799,8 +823,32 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                   <input type="text" value={settingsForm.payment_199_upi} onChange={e => setSettingsForm({...settingsForm, payment_199_upi: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-brand-900 text-brand-900 dark:text-white" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">QR Code Image URL</label>
-                  <input type="text" value={settingsForm.payment_199_qr} onChange={e => setSettingsForm({...settingsForm, payment_199_qr: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-brand-900 text-brand-900 dark:text-white" />
+                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-2">Live QR Code</label>
+                  <div className="flex items-start gap-4">
+                    {settingsForm.payment_199_qr ? (
+                      <div className="relative w-32 h-32 border-2 border-brand-200 dark:border-brand-800 rounded-xl overflow-hidden group">
+                        <img src={settingsForm.payment_199_qr} alt="QR 199" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button onClick={() => setSettingsForm({...settingsForm, payment_199_qr: ''})} className="text-white hover:text-red-400 p-2">
+                            <Trash2 className="w-6 h-6" />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-32 h-32 border-2 border-dashed border-brand-200 dark:border-brand-800 rounded-xl flex items-center justify-center bg-brand-50 dark:bg-brand-900/50">
+                        <span className="text-xs text-brand-400">No Image</span>
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <label className="flex items-center justify-center w-full md:w-auto px-4 py-2 border border-brand-200 dark:border-brand-800 rounded-lg cursor-pointer hover:bg-brand-50 dark:hover:bg-brand-800 transition-colors">
+                        <span className="text-sm font-medium text-brand-600 dark:text-brand-400">
+                          {loadingAction === 'upload_199' ? 'Uploading...' : 'Upload New Image'}
+                        </span>
+                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, '199')} disabled={loadingAction === 'upload_199'} />
+                      </label>
+                      <p className="text-xs text-brand-500 mt-2">Instantly updates the live site. (JPG, PNG)</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -813,8 +861,32 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                   <input type="text" value={settingsForm.payment_99_upi} onChange={e => setSettingsForm({...settingsForm, payment_99_upi: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-brand-900 text-brand-900 dark:text-white" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">QR Code Image URL</label>
-                  <input type="text" value={settingsForm.payment_99_qr} onChange={e => setSettingsForm({...settingsForm, payment_99_qr: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-brand-900 text-brand-900 dark:text-white" />
+                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-2">Live QR Code</label>
+                  <div className="flex items-start gap-4">
+                    {settingsForm.payment_99_qr ? (
+                      <div className="relative w-32 h-32 border-2 border-brand-200 dark:border-brand-800 rounded-xl overflow-hidden group">
+                        <img src={settingsForm.payment_99_qr} alt="QR 99" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button onClick={() => setSettingsForm({...settingsForm, payment_99_qr: ''})} className="text-white hover:text-red-400 p-2">
+                            <Trash2 className="w-6 h-6" />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-32 h-32 border-2 border-dashed border-brand-200 dark:border-brand-800 rounded-xl flex items-center justify-center bg-brand-50 dark:bg-brand-900/50">
+                        <span className="text-xs text-brand-400">No Image</span>
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <label className="flex items-center justify-center w-full md:w-auto px-4 py-2 border border-brand-200 dark:border-brand-800 rounded-lg cursor-pointer hover:bg-brand-50 dark:hover:bg-brand-800 transition-colors">
+                        <span className="text-sm font-medium text-brand-600 dark:text-brand-400">
+                          {loadingAction === 'upload_99' ? 'Uploading...' : 'Upload New Image'}
+                        </span>
+                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, '99')} disabled={loadingAction === 'upload_99'} />
+                      </label>
+                      <p className="text-xs text-brand-500 mt-2">Instantly updates the live site. (JPG, PNG)</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

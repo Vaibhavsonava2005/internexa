@@ -672,3 +672,31 @@ export async function deleteUserCompletely(clerkId: string) {
     return { success: false, error: error.message };
   }
 }
+export async function uploadQRImage(formData: FormData) {
+  const admin = await currentUser();
+  if (!admin) return { success: false, error: "Not authenticated" };
+
+  try {
+    await verifyAdmin();
+    const file = formData.get('file') as File;
+    if (!file) return { success: false, error: "No file provided" };
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const fileName = \qrcodes/\-\\;
+
+    const { error: uploadError } = await supabaseAdmin.storage
+      .from('assets')
+      .upload(fileName, buffer, {
+        contentType: file.type,
+        upsert: true
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data: publicUrlData } = supabaseAdmin.storage.from('assets').getPublicUrl(fileName);
+    return { success: true, url: publicUrlData.publicUrl };
+  } catch (error: any) {
+    console.error("Upload QR Image error:", error);
+    return { success: false, error: error.message };
+  }
+}
