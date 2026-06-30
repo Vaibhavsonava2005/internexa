@@ -1,16 +1,85 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { approveApplication, rejectApplication, getAdminData, approveRewardClaim, approveManualPayment, rejectManualPayment, approveFastTrackPayment, rejectFastTrackPayment } from "@/actions/admin.actions";
+import { approveApplication, rejectApplication, getAdminData, approveRewardClaim, approveManualPayment, rejectManualPayment, approveFastTrackPayment, rejectFastTrackPayment, updateAppSettings, getAppSettings, sendGlobalNotification, sendUserNotification, deleteUserCompletely } from "@/actions/admin.actions";
 import { generateCertificateAction } from "@/actions/certificate.actions";
 import { Button, Badge } from "@/components/shared";
-import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock, FolderGit2, Shield, Gift, Award, Download, RefreshCw } from "lucide-react";
+import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock, FolderGit2, Shield, Gift, Award, Download, RefreshCw, Bell, Settings, Send, Eye, MessageSquare, Trash2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
 export function AdminDashboardClient({ initialData }: { initialData: any }) {
-  const [activeTab, setActiveTab] = useState<"applications" | "users" | "transactions" | "submissions" | "manualPayments" | "rewardClaims" | "certificates">("applications");
+  const [activeTab, setActiveTab] = useState<"applications" | "users" | "transactions" | "submissions" | "manualPayments" | "rewardClaims" | "certificates" | "settings" | "notifications">("applications");
   const [data, setData] = useState(initialData);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
+  
+  const [appDetailsModal, setAppDetailsModal] = useState<any>(null);
+  const [settingsForm, setSettingsForm] = useState({ payment_199_upi: '', payment_199_qr: '', payment_99_upi: '', payment_99_qr: '' });
+  const [notifForm, setNotifForm] = useState({ title: '', message: '', type: 'info' as any, link: '' });
+  const [selectedUserForNotif, setSelectedUserForNotif] = useState<any>(null);
+
+  useEffect(() => {
+    async function loadSettings() {
+      const s199 = await getAppSettings('payment_199');
+      const s99 = await getAppSettings('payment_99');
+      setSettingsForm({
+        payment_199_upi: s199?.data?.upi_link || '',
+        payment_199_qr: s199?.data?.qr_code_url || '',
+        payment_99_upi: s99?.data?.upi_link || '',
+        payment_99_qr: s99?.data?.qr_code_url || '',
+      });
+    }
+    loadSettings();
+  }, []);
+
+  const handleUpdateSettings = async () => {
+    setLoadingAction('settings');
+    await updateAppSettings('payment_199', { upi_link: settingsForm.payment_199_upi, qr_code_url: settingsForm.payment_199_qr });
+    await updateAppSettings('payment_99', { upi_link: settingsForm.payment_99_upi, qr_code_url: settingsForm.payment_99_qr });
+    setLoadingAction(null);
+    alert('Settings updated successfully!');
+  };
+
+  const handleSendNotification = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoadingAction('notification');
+    
+    if (selectedUserForNotif) {
+      const res = await sendUserNotification(selectedUserForNotif.clerk_id, notifForm.title, notifForm.message, notifForm.type, notifForm.link);
+      setLoadingAction(null);
+      if(res.success) {
+        alert(`Notification sent to ${selectedUserForNotif.full_name}!`);
+        setNotifForm({ title: '', message: '', type: 'info', link: '' });
+        setSelectedUserForNotif(null);
+      } else {
+        alert('Failed: ' + res.error);
+      }
+    } else {
+      const res = await sendGlobalNotification(notifForm.title, notifForm.message, notifForm.type, notifForm.link);
+      setLoadingAction(null);
+      if(res.success) {
+        alert('Notification sent to ' + res.count + ' users!');
+        setNotifForm({ title: '', message: '', type: 'info', link: '' });
+      } else {
+        alert('Failed: ' + res.error);
+      }
+    }
+  };
+
+  const handleDeleteUser = async (clerkId: string, name: string) => {
+    if(!confirm(`WARNING: Are you absolutely sure you want to delete all data for ${name}? This action CANNOT be undone and will erase all their applications, projects, and payments.`)) return;
+    if(!confirm(`FINAL CONFIRMATION: Type OK to delete ${name}.`)) return; // Simple double confirmation
+
+    setLoadingAction(`delete_${clerkId}`);
+    const res = await deleteUserCompletely(clerkId);
+    setLoadingAction(null);
+
+    if (res.success) {
+      alert(`User ${name} has been completely deleted.`);
+      fetchAdminData();
+    } else {
+      alert('Failed to delete user: ' + res.error);
+    }
+  };
 
   const fetchAdminData = async () => {
     const res = await getAdminData();
@@ -89,6 +158,8 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
           { id: "manualPayments", label: "Manual Verifications", icon: Shield },
           { id: "certificates", label: "Certificates", icon: Award },
           { id: "rewardClaims", label: "Reward Claims", icon: Gift },
+          { id: "notifications", label: "Notifications", icon: Bell },
+          { id: "settings", label: "Settings", icon: Settings },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -143,7 +214,10 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                         {app.status}
                       </Badge>
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right flex justify-end gap-2">
+                      <Button size="sm" variant="outline" onClick={() => setAppDetailsModal(app)}>
+                        <Eye className="w-4 h-4 mr-1.5" /> Details
+                      </Button>
                       {app.status === "Submitted" && (
                         <div className="flex justify-end gap-2">
                           <Button 
@@ -200,6 +274,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                   <th className="px-6 py-4 font-medium">Role</th>
                   <th className="px-6 py-4 font-medium">Joined</th>
                   <th className="px-6 py-4 font-medium">Successful Referrals</th>
+                  <th className="px-6 py-4 font-medium text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-brand-100 dark:divide-brand-800">
@@ -211,6 +286,14 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                     <td className="px-6 py-4"><Badge variant="secondary">{u.role}</Badge></td>
                     <td className="px-6 py-4">{u.created_at ? new Date(u.created_at).toLocaleDateString() : "N/A"}</td>
                     <td className="px-6 py-4 font-medium text-emerald-600 dark:text-emerald-400">{u.successful_referrals || 0}</td>
+                    <td className="px-6 py-4 text-right flex justify-end gap-2">
+                      <Button size="sm" variant="outline" onClick={() => setSelectedUserForNotif(u)} className="border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-900 dark:text-indigo-400 dark:hover:bg-indigo-900/30">
+                        <MessageSquare className="w-4 h-4 mr-1.5" /> Message
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => handleDeleteUser(u.clerk_id, u.full_name)} disabled={loadingAction === `delete_${u.clerk_id}`} className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-900/30">
+                        <Trash2 className="w-4 h-4 mr-1.5" /> {loadingAction === `delete_${u.clerk_id}` ? "..." : "Delete Data"}
+                      </Button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -704,6 +787,167 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
             </table>
           </div>
         )}
+
+        {/* Settings Tab */}
+        {activeTab === "settings" && (
+          <div className="p-6 md:p-8 space-y-8">
+            <div>
+              <h3 className="text-xl font-bold text-brand-900 dark:text-white mb-4">Onboarding Payments (₹199)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">UPI Link</label>
+                  <input type="text" value={settingsForm.payment_199_upi} onChange={e => setSettingsForm({...settingsForm, payment_199_upi: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-brand-900 text-brand-900 dark:text-white" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">QR Code Image URL</label>
+                  <input type="text" value={settingsForm.payment_199_qr} onChange={e => setSettingsForm({...settingsForm, payment_199_qr: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-brand-900 text-brand-900 dark:text-white" />
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-xl font-bold text-brand-900 dark:text-white mb-4">Fast-Track Payments (₹99)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">UPI Link</label>
+                  <input type="text" value={settingsForm.payment_99_upi} onChange={e => setSettingsForm({...settingsForm, payment_99_upi: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-brand-900 text-brand-900 dark:text-white" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">QR Code Image URL</label>
+                  <input type="text" value={settingsForm.payment_99_qr} onChange={e => setSettingsForm({...settingsForm, payment_99_qr: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-brand-900 text-brand-900 dark:text-white" />
+                </div>
+              </div>
+            </div>
+
+            <Button onClick={handleUpdateSettings} disabled={loadingAction === "settings"} className="w-full md:w-auto">
+              {loadingAction === "settings" ? "Updating..." : "Save All Settings"}
+            </Button>
+          </div>
+        )}
+
+        {/* Notifications Tab */}
+        {activeTab === "notifications" && (
+          <div className="p-6 md:p-8">
+            <h2 className="text-2xl font-bold text-brand-900 dark:text-white mb-6">Send Global Notification</h2>
+            <form onSubmit={handleSendNotification} className="space-y-4 max-w-2xl">
+              <div>
+                <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Notification Title</label>
+                <input required type="text" value={notifForm.title} onChange={e => setNotifForm({...notifForm, title: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-brand-900 text-brand-900 dark:text-white" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Message</label>
+                <textarea required value={notifForm.message} onChange={e => setNotifForm({...notifForm, message: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-brand-900 text-brand-900 dark:text-white h-24" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Type</label>
+                  <select value={notifForm.type} onChange={e => setNotifForm({...notifForm, type: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-brand-900 text-brand-900 dark:text-white">
+                    <option value="info">Info</option>
+                    <option value="success">Success</option>
+                    <option value="warning">Warning</option>
+                    <option value="error">Error</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Link (Optional)</label>
+                  <input type="text" value={notifForm.link} onChange={e => setNotifForm({...notifForm, link: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-brand-900 text-brand-900 dark:text-white" />
+                </div>
+              </div>
+              <Button type="submit" disabled={loadingAction === "notification"} className="w-full flex items-center justify-center gap-2">
+                <Send className="w-4 h-4" /> {loadingAction === "notification" ? "Sending..." : "Broadcast to All Users"}
+              </Button>
+            </form>
+          </div>
+        )}
       </div>
+
+      {/* Application Details Modal */}
+      {appDetailsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-brand-900 rounded-3xl p-6 md:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-brand-200 dark:border-brand-800 shadow-2xl relative">
+            <button onClick={() => setAppDetailsModal(null)} className="absolute top-6 right-6 text-brand-400 hover:text-brand-900 dark:hover:text-white">✕</button>
+            <h2 className="text-2xl font-bold text-brand-900 dark:text-white mb-6">Application Details</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+              <div>
+                <p className="text-brand-500 mb-1">Full Name</p>
+                <p className="font-medium text-brand-900 dark:text-white">{appDetailsModal.full_name}</p>
+              </div>
+              <div>
+                <p className="text-brand-500 mb-1">Email</p>
+                <p className="font-medium text-brand-900 dark:text-white">{appDetailsModal.email}</p>
+              </div>
+              <div>
+                <p className="text-brand-500 mb-1">Phone</p>
+                <p className="font-medium text-brand-900 dark:text-white">{appDetailsModal.phone}</p>
+              </div>
+              <div>
+                <p className="text-brand-500 mb-1">College</p>
+                <p className="font-medium text-brand-900 dark:text-white">{appDetailsModal.college_name}</p>
+              </div>
+              <div>
+                <p className="text-brand-500 mb-1">Degree & Branch</p>
+                <p className="font-medium text-brand-900 dark:text-white">{appDetailsModal.degree} - {appDetailsModal.branch}</p>
+              </div>
+              <div>
+                <p className="text-brand-500 mb-1">Current Skills</p>
+                <p className="font-medium text-brand-900 dark:text-white">{appDetailsModal.current_skills}</p>
+              </div>
+              <div>
+                <p className="text-brand-500 mb-1">Resume</p>
+                {appDetailsModal.resume_file_id ? (
+                  <a href={`${process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"}/storage/v1/object/public/documents/${appDetailsModal.resume_file_id}`} target="_blank" rel="noreferrer" className="text-indigo-500 hover:underline">View Resume</a>
+                ) : (
+                  <p>No Resume</p>
+                )}
+              </div>
+              <div className="col-span-1 md:col-span-2">
+                <p className="text-brand-500 mb-1">Why Join?</p>
+                <p className="font-medium text-brand-900 dark:text-white bg-brand-50 dark:bg-brand-950 p-4 rounded-xl">{appDetailsModal.why_join}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Specific User Notification Modal */}
+      {selectedUserForNotif && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-brand-900 rounded-3xl p-6 md:p-8 max-w-lg w-full border border-brand-200 dark:border-brand-800 shadow-2xl relative">
+            <button onClick={() => setSelectedUserForNotif(null)} className="absolute top-6 right-6 text-brand-400 hover:text-brand-900 dark:hover:text-white">✕</button>
+            <h2 className="text-2xl font-bold text-brand-900 dark:text-white mb-2">Message User</h2>
+            <p className="text-brand-500 mb-6 text-sm">Send a direct notification to {selectedUserForNotif.full_name} ({selectedUserForNotif.email}).</p>
+            
+            <form onSubmit={handleSendNotification} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Notification Title</label>
+                <input required type="text" value={notifForm.title} onChange={e => setNotifForm({...notifForm, title: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-brand-950 text-brand-900 dark:text-white" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Message</label>
+                <textarea required value={notifForm.message} onChange={e => setNotifForm({...notifForm, message: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-brand-950 text-brand-900 dark:text-white h-24" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Type</label>
+                  <select value={notifForm.type} onChange={e => setNotifForm({...notifForm, type: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-brand-950 text-brand-900 dark:text-white">
+                    <option value="info">Info</option>
+                    <option value="success">Success</option>
+                    <option value="warning">Warning</option>
+                    <option value="error">Error</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Link (Optional)</label>
+                  <input type="text" value={notifForm.link} onChange={e => setNotifForm({...notifForm, link: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-brand-950 text-brand-900 dark:text-white" />
+                </div>
+              </div>
+              <Button type="submit" disabled={loadingAction === "notification"} className="w-full flex items-center justify-center gap-2 mt-2">
+                <Send className="w-4 h-4" /> {loadingAction === "notification" ? "Sending..." : "Send to User"}
+              </Button>
+            </form>
+          </div>
+        </div>
+      )}
   );
 }

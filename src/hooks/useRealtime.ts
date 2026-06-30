@@ -15,6 +15,7 @@ const getSupabase = () => {
 export function useNotifications() {
   const { userId } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [latestNotification, setLatestNotification] = useState<any>(null);
 
   useEffect(() => {
     if (!userId) return;
@@ -46,8 +47,9 @@ export function useNotifications() {
           table: 'notifications',
           filter: `clerk_id=eq.${userId}`
         },
-        () => {
+        (payload) => {
           setUnreadCount((prev) => prev + 1);
+          setLatestNotification(payload.new);
         }
       )
       .on(
@@ -70,5 +72,8 @@ export function useNotifications() {
     };
   }, [userId]);
 
-  return { unreadCount };
+  const clearLatestNotification = () => setLatestNotification(null);
+
+  return { unreadCount, latestNotification, clearLatestNotification };
 }
+

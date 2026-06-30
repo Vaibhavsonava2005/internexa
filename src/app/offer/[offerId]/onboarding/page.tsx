@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FileSignature, UploadCloud, Shield, CheckCircle2, Loader2, FileText, ChevronRight, CreditCard, ExternalLink, AlertTriangle } from "lucide-react";
 import { completeOnboarding } from "@/actions/onboarding.actions";
 import { submitManualPayment } from "@/actions/payment.actions";
+import { getAppSettings } from "@/actions/admin.actions";
 
 export default function OnboardingPage() {
   const params = useParams();
@@ -28,6 +29,8 @@ export default function OnboardingPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [offer, setOffer] = useState<any>(null);
+  const [paymentLink, setPaymentLink] = useState("upi://pay?pa=internexa@slc&pn=Internexa%20labs&am=199&tn=");
+  const [qrUrl, setQrUrl] = useState("/qr-199.png");
 
   useEffect(() => {
     async function load() {
@@ -37,8 +40,15 @@ export default function OnboardingPage() {
           setOffer(res.data);
           if (res.data.status === "Enrolled" || res.data.status === "Active") {
             setSuccess(true);
-          }
         }
+        
+        // Fetch dynamic payment settings
+        const settingsRes = await getAppSettings("payment_199");
+        if (settingsRes.success && settingsRes.data) {
+          if (settingsRes.data.upi_link) setPaymentLink(settingsRes.data.upi_link);
+          if (settingsRes.data.qr_code_url) setQrUrl(settingsRes.data.qr_code_url);
+        }
+        
         setIsLoading(false);
       });
     }
@@ -227,7 +237,7 @@ export default function OnboardingPage() {
 
               <div className="flex flex-col sm:flex-row gap-4 mb-4">
                 <a
-                  href="upi://pay?pa=internexa@slc&pn=Internexa%20labs&am=199&tn="
+                  href={paymentLink}
                   onClick={() => {
                     setPaymentClicked(true);
                     setShowManualForm(true);
@@ -239,7 +249,7 @@ export default function OnboardingPage() {
               </div>
               <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center mb-4">
                 <p className="text-sm text-slate-400 mb-2">Or scan QR to pay securely</p>
-                <img src="/qr-199.png" alt="Scan to pay 199" className="w-32 h-32 mx-auto rounded-lg border-2 border-emerald-500/30 mb-2" />
+                <img src={qrUrl} alt="Scan to pay 199" className="w-32 h-32 mx-auto rounded-lg border-2 border-emerald-500/30 mb-2 object-cover bg-white p-1" />
                 <p className="text-xs text-slate-500 mt-2">Amount: ₹199</p>
               </div>
 

@@ -1,6 +1,6 @@
 "use server";
 
-import { currentUser } from "@clerk/nextjs/server";
+import { currentUser, clerkClient } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { sendOfferLetterEmail } from "@/lib/email";
 import { generateAndUploadOfferLetter, generateAndUploadJoiningLetter } from "@/lib/pdf-generator";
@@ -532,3 +532,143 @@ export async function rejectManualPayment(paymentId: string) {
   }
 }
 
+
+// ---------------------------------------------
+// Global Settings & Notification Actions
+// ---------------------------------------------
+
+export async function getAppSettings(key: string) {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('app_settings')
+      .select('setting_value')
+      .eq('setting_key', key)
+      .single();
+      
+    if (error || !data) return { success: false };
+    return { success: true, data: data.setting_value };
+  } catch (error) {
+    return { success: false };
+  }
+}
+
+export async function updateAppSettings(key: string, value: any) {
+  const admin = await currentUser();
+  if (!admin) return { success: false, error: "Not authenticated" };
+
+  try {
+    await verifyAdmin();
+    
+    // Upsert the setting
+    const { error } = await supabaseAdmin
+      .from('app_settings')
+      .upsert({ setting_key: key, setting_value: value, updated_at: new Date().toISOString() }, { onConflict: 'setting_key' });
+      
+    if (error) throw error;
+    
+    await logAudit(admin.id, "Update Settings", undefined, "Updated app setting: ");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Update settings error:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function sendGlobalNotification(title: string, message: string, type: "info" | "success" | "warning" | "error" = "info", link?: string) {
+  const admin = await currentUser();
+  if (!admin) return { success: false, error: "Not authenticated" };
+
+  try {
+    await verifyAdmin();
+    
+    // Fetch all user clerk IDs
+    const { data: users, error: userError } = await supabaseAdmin.from('users').select('clerk_id');
+    if (userError) throw userError;
+    if (!users || users.length === 0) return { success: true, message: "No users to notify" };
+    
+    // Prepare bulk insert payload
+    const payload = users.map(u => ({
+      clerk_id: u.clerk_id,
+      title,
+      message,
+      type,
+      link: link || "/dashboard",
+      is_read: false
+    }));
+    
+    // Insert all notifications in bulk
+    const { error: insertError } = await supabaseAdmin.from('notifications').insert(payload);
+    if (insertError) throw insertError;
+    
+    await logAudit(admin.id, "Global Notification", undefined, "Sent global notification: ");
+    return { success: true, count: payload.length };
+  } catch (error: any) {
+    console.error("Send global notification error:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function sendUserNotification(clerkId: string, title: string, message: string, type: "info" | "success" | "warning" | "error" = "info", link?: string) {
+  const admin = await currentUser();
+  if (!admin) return { success: false, error: "Not authenticated" };
+
+  try {
+    await verifyAdmin();
+    
+    const { error: insertError } = await supabaseAdmin.from('notifications').insert([{
+      clerk_id: clerkId,
+      title,
+      message,
+      type,
+      link: link || "/dashboard",
+      is_read: false
+    }]);
+    if (insertError) throw insertError;
+    
+    await logAudit(admin.id, "User Notification", clerkId, "Sent notification: ");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Send user notification error:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function deleteUserCompletely(clerkId: string) {
+  const admin = await currentUser();
+  if (!admin) return { success: false, error: "Not authenticated" };
+
+  try {
+    await verifyAdmin();
+
+    // 1. Delete from Supabase tables
+    const tables = ['applications', 'manual_payments', 'project_submissions', 'referrals', 'reward_claims', 'notifications', 'activity_logs', 'audit_logs', 'users'];
+    for (const table of tables) {
+      try {
+        // Using delete with match to ensure we catch any column named clerk_id or referred_id/referrer_id
+        if (table === 'referrals') {
+          await supabaseAdmin.from(table).delete().or("referrer_id.eq.,referred_id.eq.");
+        } else if (table === 'audit_logs') {
+          await supabaseAdmin.from(table).delete().or("admin_id.eq.,target_user_id.eq.");
+        } else {
+          await supabaseAdmin.from(table).delete().eq('clerk_id', clerkId);
+        }
+      } catch (err) {
+        console.error("Failed deleting from :", err);
+      }
+    }
+
+    // 2. Delete from Clerk
+    try {
+      const client = await clerkClient();
+      await client.users.deleteUser(clerkId);
+    } catch (clerkErr) {
+      console.error("Clerk deletion error:", clerkErr);
+    }
+
+    await logAudit(admin.id, "Delete User", clerkId, "Completely deleted user and all data");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Delete user error:", error);
+    return { success: false, error: error.message };
+  }
+}

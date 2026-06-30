@@ -7,6 +7,7 @@ import { PageHeader, Badge, Button } from "@/components/shared";
 import { useEffect, useState } from "react";
 import { getUserApplications } from "@/actions/application.actions";
 import { submitFastTrackPayment } from "@/actions/payment.actions";
+import { getAppSettings } from "@/actions/admin.actions";
 
 export default function CertificatesPage() {
   const [certificates, setCertificates] = useState<any[]>([]);
@@ -25,6 +26,8 @@ export default function CertificatesPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [paymentLink, setPaymentLink] = useState("upi://pay?pa=internexa@slc&pn=Internexa%20labs&am=99&tn=");
+  const [qrUrl, setQrUrl] = useState("/qr-99.png");
 
   useEffect(() => {
     async function loadCerts() {
@@ -35,6 +38,13 @@ export default function CertificatesPage() {
           const active = res.data.filter(app => app.status === "Active" || app.status === "Enrolled");
           setCertificates(completed);
           setActiveApps(active);
+        }
+        
+        // Fetch dynamic payment settings
+        const settingsRes = await getAppSettings("payment_99");
+        if (settingsRes.success && settingsRes.data) {
+          if (settingsRes.data.upi_link) setPaymentLink(settingsRes.data.upi_link);
+          if (settingsRes.data.qr_code_url) setQrUrl(settingsRes.data.qr_code_url);
         }
       } catch (err) {
         console.error(err);
@@ -229,13 +239,13 @@ export default function CertificatesPage() {
                 
                 <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 text-center mb-6">
                   <a
-                    href="upi://pay?pa=internexa@slc&pn=Internexa%20labs&am=99&tn="
+                    href={paymentLink}
                     className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 mb-4"
                   >
                     Pay Now via UPI
                   </a>
                   <p className="text-sm text-slate-400 mb-2">Or scan QR to pay securely</p>
-                  <img src="/qr-99.png" alt="Scan to pay 99" className="w-32 h-32 mx-auto rounded-lg border-2 border-indigo-500/30 mb-2" />
+                  <img src={qrUrl} alt="Scan to pay 99" className="w-32 h-32 mx-auto rounded-lg border-2 border-indigo-500/30 mb-2 object-cover bg-white p-1" />
                   <p className="text-xs text-slate-500 mt-2">Amount: ₹99</p>
                 </div>
 

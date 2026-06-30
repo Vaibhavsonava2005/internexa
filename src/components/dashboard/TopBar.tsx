@@ -1,6 +1,8 @@
 "use client";
 
-import { Menu, Bell, Search, Sun, Moon } from "lucide-react";
+import { Menu, Bell, Search, Sun, Moon, X, Info, CheckCircle, AlertTriangle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import { useUser, UserButton } from "@clerk/nextjs";
 import { useTheme } from "@/hooks";
 import { usePathname } from "next/navigation";
@@ -15,7 +17,7 @@ export function TopBar({ setIsMobileOpen }: TopBarProps) {
   const { user } = useUser();
   const { isDark, toggleTheme, mounted } = useTheme();
   const pathname = usePathname();
-  const { unreadCount } = useNotifications();
+  const { unreadCount, latestNotification, clearLatestNotification } = useNotifications();
 
   // Find current page title based on path
   const currentNav = DASHBOARD_NAV.find(item => pathname.startsWith(item.href)) || { label: "Dashboard" };
@@ -80,6 +82,56 @@ export function TopBar({ setIsMobileOpen }: TopBarProps) {
           </div>
         </div>
       </div>
+      </div>
+
+      {/* Global Notification Toast */}
+      <AnimatePresence>
+        {latestNotification && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+            className="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-white dark:bg-brand-900 border border-brand-200 dark:border-brand-800 shadow-2xl rounded-2xl p-4 overflow-hidden"
+          >
+            <div className={`absolute top-0 left-0 w-1.5 h-full ${
+              latestNotification.type === 'success' ? 'bg-emerald-500' :
+              latestNotification.type === 'warning' ? 'bg-amber-500' :
+              latestNotification.type === 'error' ? 'bg-red-500' : 'bg-indigo-500'
+            }`} />
+            
+            <div className="flex items-start gap-3 pl-2">
+              <div className={`mt-0.5 ${
+                latestNotification.type === 'success' ? 'text-emerald-500' :
+                latestNotification.type === 'warning' ? 'text-amber-500' :
+                latestNotification.type === 'error' ? 'text-red-500' : 'text-indigo-500'
+              }`}>
+                {latestNotification.type === 'success' ? <CheckCircle className="w-5 h-5" /> :
+                 latestNotification.type === 'warning' ? <AlertTriangle className="w-5 h-5" /> :
+                 latestNotification.type === 'error' ? <AlertTriangle className="w-5 h-5" /> :
+                 <Info className="w-5 h-5" />}
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <h4 className="text-sm font-bold text-brand-900 dark:text-white truncate pr-6">{latestNotification.title}</h4>
+                <p className="text-xs text-brand-500 mt-1 line-clamp-2">{latestNotification.message}</p>
+                
+                {latestNotification.link && (
+                  <Link href={latestNotification.link} onClick={clearLatestNotification} className="inline-block mt-2 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
+                    View Details &rarr;
+                  </Link>
+                )}
+              </div>
+              
+              <button 
+                onClick={clearLatestNotification}
+                className="text-brand-400 hover:text-brand-900 dark:hover:text-white shrink-0 p-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
