@@ -54,6 +54,11 @@ export function useNotifications() {
           setNotifications((prev) => [payload.new, ...prev]);
           setUnreadCount((prev) => prev + 1);
           setLatestNotification(payload.new);
+          
+          // Auto-dismiss after 5 seconds
+          setTimeout(() => {
+            setLatestNotification(null);
+          }, 5000);
         }
       )
       .on(
