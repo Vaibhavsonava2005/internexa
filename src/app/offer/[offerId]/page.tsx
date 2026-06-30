@@ -134,7 +134,7 @@ export default function OfferPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             {/* Logo */}
             <div className="mb-6">
-              <h2 className="text-2xl sm:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-violet-400">InterNexa</h2>
+              <h2 className="text-2xl sm:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-violet-400">InterNexa Labs</h2>
               <p className="text-slate-400 text-sm mt-1">Bridge the Gap Between Learning and Leading</p>
             </div>
             
@@ -242,7 +242,7 @@ export default function OfferPage() {
                 {isExpired ? (
                   <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-center">
                     <p className="text-red-400 font-semibold">⏰ This offer has expired</p>
-                    <p className="text-red-400/70 text-sm mt-1">Please contact info.internexa@gmail.com for assistance.</p>
+                    <p className="text-red-400/70 text-sm mt-1">Please contact info.InterNexa Labs@gmail.com for assistance.</p>
                   </div>
                 ) : (
                   <button onClick={handleAccept} disabled={accepting}
@@ -332,10 +332,10 @@ export default function OfferPage() {
             <div className="flex items-center gap-2 text-xs"><Star className="w-4 h-4" /> 50,000+ Students</div>
             <div className="flex items-center gap-2 text-xs"><Heart className="w-4 h-4" /> 4.9/5 Rating</div>
           </div>
-          <h2 className="text-2xl font-extrabold text-indigo-400 mb-1">InterNexa</h2>
+          <h2 className="text-2xl font-extrabold text-indigo-400 mb-1">InterNexa Labs</h2>
           <p className="text-slate-500 text-sm mb-2">Bridge the Gap Between Learning and Leading</p>
-          <p className="text-slate-600 text-xs">Need help? <a href="mailto:info.internexa@gmail.com" className="text-indigo-400 hover:underline">info.internexa@gmail.com</a></p>
-          <p className="text-slate-700 text-xs mt-4">© {new Date().getFullYear()} InterNexa. All rights reserved.</p>
+          <p className="text-slate-600 text-xs">Need help? <a href="mailto:info.InterNexa Labs@gmail.com" className="text-indigo-400 hover:underline">info.InterNexa Labs@gmail.com</a></p>
+          <p className="text-slate-700 text-xs mt-4">© {new Date().getFullYear()} InterNexa Labs. All rights reserved.</p>
         </motion.div>
       </div>
     </div>

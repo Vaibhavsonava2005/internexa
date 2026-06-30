@@ -29,7 +29,7 @@ export default function OnboardingPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [offer, setOffer] = useState<any>(null);
-  const [paymentLink, setPaymentLink] = useState("upi://pay?pa=internexa@slc&pn=Internexa%20labs&am=199&tn=");
+  const [paymentLink, setPaymentLink] = useState("upi://pay?pa=InterNexa Labs@slc&pn=InterNexa Labs%20labs&am=199&tn=");
   const [qrUrl, setQrUrl] = useState("/qr-199.png");
 
   useEffect(() => {
@@ -144,7 +144,7 @@ export default function OnboardingPage() {
           
           <p className="text-slate-400 mb-8 max-w-md mx-auto leading-relaxed">
             {isActuallyEnrolled 
-              ? "Welcome to InterNexa! Your enrollment is fully confirmed. You can now download your Official Joining Letter and access your dashboard."
+              ? "Welcome to InterNexa Labs! Your enrollment is fully confirmed. You can now download your Official Joining Letter and access your dashboard."
               : "Your payment screenshot has been successfully submitted. Our team will verify it shortly and you will receive an email with your Official Joining Letter."
             }
           </p>
@@ -179,7 +179,7 @@ export default function OnboardingPage() {
           <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-violet-400">
             Final Onboarding Steps
           </h1>
-          <p className="text-slate-400 mt-2">Complete these final steps to officially join InterNexa.</p>
+          <p className="text-slate-400 mt-2">Complete these final steps to officially join InterNexa Labs.</p>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8">

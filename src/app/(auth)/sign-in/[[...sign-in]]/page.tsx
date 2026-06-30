@@ -26,7 +26,7 @@ export default function SignInPage() {
             <span className="text-white font-bold text-3xl font-heading">I</span>
           </div>
           <h1 className="text-4xl font-bold font-heading text-white mb-6">
-            Welcome Back to InterNexa
+            Welcome Back to InterNexa Labs
           </h1>
           <p className="text-indigo-200 text-lg">
             Continue your journey to master industry skills and land your dream job.
@@ -46,7 +46,7 @@ export default function SignInPage() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center">
                 <span className="text-white text-lg">I</span>
               </div>
-              InterNexa
+              InterNexa Labs
             </Link>
           </div>
 

@@ -9,7 +9,7 @@ export default function PressPage() {
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold text-brand-900 dark:text-white mb-6">Press & Media</h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 max-w-2xl">
-            Get the latest news, announcements, and media resources about InterNexa. We're always excited to share how we're changing the landscape of education and early career development.
+            Get the latest news, announcements, and media resources about InterNexa Labs. We're always excited to share how we're changing the landscape of education and early career development.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
@@ -18,7 +18,7 @@ export default function PressPage() {
               
               <div className="space-y-4">
                 <span className="text-sm text-brand-500 font-semibold tracking-wider uppercase">June 15, 2026</span>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">InterNexa Secures $15M Series A to Expand AI Mentorship Platform</h3>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">InterNexa Labs Secures $15M Series A to Expand AI Mentorship Platform</h3>
                 <p className="text-gray-600 dark:text-gray-300">
                   We are thrilled to announce our Series A funding round led by EdTech Ventures, which will accelerate the development of our predictive career matching algorithms.
                 </p>
@@ -27,7 +27,7 @@ export default function PressPage() {
 
               <div className="space-y-4">
                 <span className="text-sm text-brand-500 font-semibold tracking-wider uppercase">May 02, 2026</span>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">InterNexa Partners with Top 50 Global Universities</h3>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">InterNexa Labs Partners with Top 50 Global Universities</h3>
                 <p className="text-gray-600 dark:text-gray-300">
                   Our platform is now officially integrated into the career development curriculum of fifty leading universities worldwide, reaching over 500,000 active students.
                 </p>

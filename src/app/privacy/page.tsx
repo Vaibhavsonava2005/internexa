@@ -13,7 +13,7 @@ export default function PrivacyPage() {
           <div className="prose prose-lg dark:prose-invert max-w-none text-gray-600 dark:text-gray-300">
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">1. Introduction</h2>
             <p>
-              At InterNexa, we take your privacy seriously. This Privacy Policy outlines how we collect, use, and protect your personal information when you use our AI-powered educational and career development platform.
+              At InterNexa Labs, we take your privacy seriously. This Privacy Policy outlines how we collect, use, and protect your personal information when you use our AI-powered educational and career development platform.
             </p>
 
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">2. Information We Collect</h2>
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
 
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">3. How We Use Your Data</h2>
             <p>
-              The core functionality of InterNexa relies on data to provide accurate internship matching. We use your information to:
+              The core functionality of InterNexa Labs relies on data to provide accurate internship matching. We use your information to:
             </p>
             <ul className="list-disc pl-6 space-y-2 mt-4">
               <li>Power our AI recommendations for jobs and learning modules.</li>

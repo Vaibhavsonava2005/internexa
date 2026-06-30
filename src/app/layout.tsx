@@ -13,9 +13,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "InterNexa — Bridge the Gap Between Learning and Leading",
+  title: "InterNexa Labs — Bridge the Gap Between Learning and Leading",
   description:
-    "InterNexa is a premium AI-powered EdTech platform offering 200+ industry-relevant virtual internships across 35+ domains. Get certified, build projects, and launch your career with expert mentorship.",
+    "InterNexa Labs is a premium AI-powered EdTech platform offering 200+ industry-relevant virtual internships across 35+ domains. Get certified, build projects, and launch your career with expert mentorship.",
   keywords: [
     "internship",
     "online internship",
@@ -26,30 +26,30 @@ export const metadata: Metadata = {
     "data science",
     "certification",
     "edtech",
-    "InterNexa",
+    "InterNexa Labs",
     "learn coding",
     "career development",
   ],
-  authors: [{ name: "InterNexa" }],
+  authors: [{ name: "InterNexa Labs" }],
   openGraph: {
-    title: "InterNexa | Launch Your Career in AI & Tech",
+    title: "InterNexa Labs | Launch Your Career in AI & Tech",
     description:
-      "Join 50,000+ students on InterNexa. Premium AI-powered internships with up to ₹15,000 stipend, guaranteed Letter of Recommendation (LoR), and industry-recognized certificates. Start today!",
+      "Join 50,000+ students on InterNexa Labs. Premium AI-powered internships with up to ₹15,000 stipend, guaranteed Letter of Recommendation (LoR), and industry-recognized certificates. Start today!",
     type: "website",
     locale: "en_IN",
-    siteName: "InterNexa",
+    siteName: "InterNexa Labs",
     images: [
       {
         url: "/og-banner.png",
         width: 1200,
         height: 630,
-        alt: "InterNexa - Launch Your Career",
+        alt: "InterNexa Labs - Launch Your Career",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "InterNexa | Premium AI-Powered Internships",
+    title: "InterNexa Labs | Premium AI-Powered Internships",
     description:
       "Get up to ₹15,000 stipend, guaranteed LoR, and verified certificates. 200+ programs across 35+ domains. Apply now!",
     images: ["/og-banner.png"],
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "InterNexa",
+    title: "InterNexa Labs",
   },
   manifest: "/manifest.webmanifest",
 };

@@ -4,16 +4,16 @@ import { Footer } from "@/components/marketing/Footer";
 export default function FAQPage() {
   const faqs = [
     {
-      q: "What is InterNexa?",
-      a: "InterNexa is an AI-driven EdTech platform that connects students with high-quality internships and provides tailored learning paths to ensure they are job-ready."
+      q: "What is InterNexa Labs?",
+      a: "InterNexa Labs is an AI-driven EdTech platform that connects students with high-quality internships and provides tailored learning paths to ensure they are job-ready."
     },
     {
       q: "How does the AI matching work?",
       a: "Our AI analyzes your skills, coursework, and career goals to match you with internship opportunities where you have the highest likelihood of success and growth. It also identifies skill gaps and recommends targeted learning modules."
     },
     {
-      q: "Is InterNexa free for students?",
-      a: "Yes! Core features of InterNexa, including profile creation, AI matching, and basic learning paths, are completely free for students. We offer premium features for advanced mentorship and specialized certifications."
+      q: "Is InterNexa Labs free for students?",
+      a: "Yes! Core features of InterNexa Labs, including profile creation, AI matching, and basic learning paths, are completely free for students. We offer premium features for advanced mentorship and specialized certifications."
     },
     {
       q: "Can companies post internships directly?",
@@ -32,7 +32,7 @@ export default function FAQPage() {
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold text-brand-900 dark:text-white mb-6 text-center">Frequently Asked Questions</h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 text-center">
-            Everything you need to know about the InterNexa platform and how it accelerates your career.
+            Everything you need to know about the InterNexa Labs platform and how it accelerates your career.
           </p>
           
           <div className="space-y-8">

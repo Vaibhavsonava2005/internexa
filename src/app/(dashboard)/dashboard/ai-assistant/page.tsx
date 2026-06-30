@@ -16,7 +16,7 @@ export default function AIAssistantPage() {
   const [activeTool, setActiveTool] = useState("doubt");
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([
-    { role: "ai", content: "Hi! I'm InterNexa AI. I'm here to help you with your learning journey. What can I assist you with today?" }
+    { role: "ai", content: "Hi! I'm InterNexa Labs AI. I'm here to help you with your learning journey. What can I assist you with today?" }
   ]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -93,7 +93,7 @@ export default function AIAssistantPage() {
                 <Bot className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-white">InterNexa AI</h3>
+                <h3 className="font-bold text-slate-900 dark:text-white">InterNexa Labs AI</h3>
                 <p className="text-xs text-indigo-600 dark:text-indigo-400 flex items-center gap-1 font-medium">
                   <Zap className="w-3 h-3" /> Using {TOOLS.find(t => t.id === activeTool)?.label} Mode
                 </p>

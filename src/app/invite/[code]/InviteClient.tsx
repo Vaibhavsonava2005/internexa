@@ -42,7 +42,7 @@ export function InviteClient({ code }: { code: string }) {
         </h1>
         
         <p className="text-slate-500 dark:text-slate-400 mb-8">
-          A friend has invited you to join InterNexa. Start your journey today and get access to premium AI internships.
+          A friend has invited you to join InterNexa Labs. Start your journey today and get access to premium AI internships.
         </p>
 
         <div className="space-y-4 mb-8">

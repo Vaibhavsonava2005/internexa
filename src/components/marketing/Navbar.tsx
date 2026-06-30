@@ -68,7 +68,7 @@ export function Navbar() {
                   </svg>
                 </div>
                 <span className="font-extrabold text-2xl text-brand-900 dark:text-white tracking-tight">
-                  Inter<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-sky-400 dark:from-indigo-400 dark:to-purple-400">Nexa</span>
+                  Inter<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-sky-400 dark:from-indigo-400 dark:to-purple-400">Nexa</span> Labs
                 </span>
               </Link>
             </div>
@@ -162,7 +162,7 @@ export function Navbar() {
                     <span className="text-white dark:text-brand-900 font-bold text-lg leading-none">I</span>
                   </div>
                   <span className="font-bold text-xl text-brand-900 dark:text-white tracking-tight">
-                    InterNexa
+                    InterNexa Labs
                   </span>
                 </div>
                 <div className="flex items-center gap-2">

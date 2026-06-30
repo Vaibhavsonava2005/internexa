@@ -13,12 +13,12 @@ export default function TermsPage() {
           <div className="prose prose-lg dark:prose-invert max-w-none text-gray-600 dark:text-gray-300">
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">1. Acceptance of Terms</h2>
             <p>
-              By accessing or using the InterNexa platform, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.
+              By accessing or using the InterNexa Labs platform, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.
             </p>
 
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">2. Description of Service</h2>
             <p>
-              InterNexa provides an AI-driven platform connecting students with internship opportunities, educational resources, and mentorship. We reserve the right to modify, suspend, or discontinue any part of the service at any time without notice.
+              InterNexa Labs provides an AI-driven platform connecting students with internship opportunities, educational resources, and mentorship. We reserve the right to modify, suspend, or discontinue any part of the service at any time without notice.
             </p>
 
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">3. User Conduct</h2>
@@ -33,12 +33,12 @@ export default function TermsPage() {
 
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">4. Intellectual Property</h2>
             <p>
-              All content on the InterNexa platform, including logos, text, graphics, and underlying AI models, is the property of InterNexa and is protected by intellectual property laws. You may not reproduce or distribute this content without explicit permission.
+              All content on the InterNexa Labs platform, including logos, text, graphics, and underlying AI models, is the property of InterNexa Labs and is protected by intellectual property laws. You may not reproduce or distribute this content without explicit permission.
             </p>
 
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">5. Limitation of Liability</h2>
             <p>
-              InterNexa is not responsible for the ultimate success of your internship placements or career outcomes. We provide tools to facilitate connections, but employment decisions remain strictly between the student and the employer.
+              InterNexa Labs is not responsible for the ultimate success of your internship placements or career outcomes. We provide tools to facilitate connections, but employment decisions remain strictly between the student and the employer.
             </p>
           </div>
         </div>

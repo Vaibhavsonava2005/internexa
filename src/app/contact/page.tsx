@@ -9,7 +9,7 @@ export default function ContactPage() {
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold text-brand-900 dark:text-white mb-6">Contact Us</h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 max-w-2xl">
-            Have questions about our platform, partnership opportunities, or need technical assistance? Our team is here to help you navigate your InterNexa experience.
+            Have questions about our platform, partnership opportunities, or need technical assistance? Our team is here to help you navigate your InterNexa Labs experience.
           </p>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -46,8 +46,8 @@ export default function ContactPage() {
               <div>
                 <h3 className="text-xl font-semibold text-brand-900 dark:text-white mb-3">Email Us</h3>
                 <p className="text-gray-600 dark:text-gray-300">
-                  General Inquiries: info.internexa@gmail.com<br />
-                  Support: info.internexa@gmail.com
+                  General Inquiries: info.InterNexa Labs@gmail.com<br />
+                  Support: info.InterNexa Labs@gmail.com
                 </p>
               </div>
               <div>

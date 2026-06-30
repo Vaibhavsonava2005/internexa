@@ -183,7 +183,7 @@ export default function ApplyPage() {
               <label className="flex items-start gap-3 cursor-pointer">
                 <input type="checkbox" {...register("termsAccepted")} className="mt-1 w-4 h-4 rounded border-brand-300 text-accent-600 focus:ring-accent-500" />
                 <span className="text-sm text-brand-600 dark:text-brand-400">
-                  I declare that the information provided is true and correct. I understand that any false information may result in the rejection of my application. I accept the Terms and Conditions of InterNexa.
+                  I declare that the information provided is true and correct. I understand that any false information may result in the rejection of my application. I accept the Terms and Conditions of InterNexa Labs.
                 </span>
               </label>
               {errors.termsAccepted && <p className="text-red-500 text-xs mt-1 ml-7">{errors.termsAccepted.message}</p>}

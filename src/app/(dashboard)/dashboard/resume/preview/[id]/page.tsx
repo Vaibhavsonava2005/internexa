@@ -55,7 +55,7 @@ export default function ResumePreview() {
         <div className="mb-4">
           <div className="flex justify-between items-start mb-2">
             <div>
-              <h3 className="font-bold text-lg">InterNexa</h3>
+              <h3 className="font-bold text-lg">InterNexa Labs</h3>
               <p className="text-slate-700 font-medium">Software Engineering Intern</p>
             </div>
             <div className="text-right">

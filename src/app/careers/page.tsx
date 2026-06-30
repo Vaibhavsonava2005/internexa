@@ -23,7 +23,7 @@ export default function CareersPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
             <div>
-              <h2 className="text-3xl font-bold text-brand-900 dark:text-white mb-6">Why InterNexa?</h2>
+              <h2 className="text-3xl font-bold text-brand-900 dark:text-white mb-6">Why InterNexa Labs?</h2>
               <ul className="space-y-4">
                 <li className="flex items-start">
                   <span className="text-brand-500 mr-3 text-xl">✦</span>

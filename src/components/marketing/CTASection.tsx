@@ -32,7 +32,7 @@ export function CTASection() {
           transition={{ delay: 0.1 }}
           className="text-xl text-slate-300 mb-10 max-w-2xl mx-auto"
         >
-          Join 50,000+ students who have transformed their careers with InterNexa's AI-powered internships.
+          Join 50,000+ students who have transformed their careers with InterNexa Labs's AI-powered internships.
         </motion.p>
 
         <motion.div

@@ -16,7 +16,7 @@ export default function SupportPage() {
             <div className="p-8 rounded-2xl bg-brand-50 dark:bg-brand-900/20 border border-brand-100 dark:border-brand-800/50">
               <h2 className="text-2xl font-semibold text-brand-900 dark:text-white mb-4">Knowledge Base</h2>
               <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Browse our comprehensive guides and tutorials to learn how to make the most of the InterNexa platform.
+                Browse our comprehensive guides and tutorials to learn how to make the most of the InterNexa Labs platform.
               </p>
               <button className="text-brand-500 font-medium hover:text-brand-600 transition-colors">Browse Articles &rarr;</button>
             </div>

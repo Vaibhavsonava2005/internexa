@@ -53,7 +53,7 @@ export default function ReferAndEarnPage() {
 
   const handleCopy = () => {
     if (referralLink) {
-      const message = `🚀 *Boost Your Career with InterNexa!* 🎓\n\nI just found this amazing AI-powered internship platform. You get:\n✅ 35+ Premium Virtual Internships\n✅ Real-world Capstone Projects\n✅ ISO-Verified Certificates & LORs\n✅ 1-on-1 Expert Mentorship\n\nSign up using my exclusive invite link and let's learn together! 👇\n${referralLink}`;
+      const message = `🚀 *Boost Your Career with InterNexa Labs!* 🎓\n\nI just found this amazing AI-powered internship platform. You get:\n✅ 35+ Premium Virtual Internships\n✅ Real-world Capstone Projects\n✅ ISO-Verified Certificates & LORs\n✅ 1-on-1 Expert Mentorship\n\nSign up using my exclusive invite link and let's learn together! 👇\n${referralLink}`;
       navigator.clipboard.writeText(message);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -85,7 +85,7 @@ export default function ReferAndEarnPage() {
           <div className="max-w-xl">
             <h1 className="text-3xl font-bold font-heading mb-2">Refer Friends, Earn ₹100</h1>
             <p className="text-indigo-100 text-lg mb-6">
-              Invite your friends to InterNexa. For every 5 friends who successfully enroll in an internship, you earn ₹100 directly to your UPI!
+              Invite your friends to InterNexa Labs. For every 5 friends who successfully enroll in an internship, you earn ₹100 directly to your UPI!
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1 flex items-center bg-white/10 rounded-xl p-2 border border-white/20 backdrop-blur-md">

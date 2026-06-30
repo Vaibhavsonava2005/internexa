@@ -64,7 +64,7 @@ export default function VerificationPortal() {
             Document Verification
           </h1>
           <p className="text-slate-400">
-            Enter a Document ID (e.g., CERT-2026-000001) to verify its authenticity on the InterNexa blockchain network.
+            Enter a Document ID (e.g., CERT-2026-000001) to verify its authenticity on the InterNexa Labs blockchain network.
           </p>
         </div>
 
@@ -132,7 +132,7 @@ export default function VerificationPortal() {
                 <div>
                   <h3 className="text-emerald-400 font-bold">Authentic Document Verified</h3>
                   <p className="text-sm text-slate-300 mt-1">
-                    The reference ID <strong className="font-mono text-white">{docId.toUpperCase()}</strong> is a valid and authentic <strong className="text-white">{docData.docType}</strong> issued by InterNexa.
+                    The reference ID <strong className="font-mono text-white">{docId.toUpperCase()}</strong> is a valid and authentic <strong className="text-white">{docData.docType}</strong> issued by InterNexa Labs.
                   </p>
                   <div className="mt-3 p-3 bg-emerald-950/50 rounded-lg border border-emerald-500/20">
                     <p className="text-xs text-emerald-500 font-semibold mb-1">ISSUED TO</p>

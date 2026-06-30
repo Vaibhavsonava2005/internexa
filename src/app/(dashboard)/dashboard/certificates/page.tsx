@@ -26,7 +26,7 @@ export default function CertificatesPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const [paymentLink, setPaymentLink] = useState("upi://pay?pa=internexa@slc&pn=Internexa%20labs&am=99&tn=");
+  const [paymentLink, setPaymentLink] = useState("upi://pay?pa=InterNexa Labs@slc&pn=InterNexa Labs%20labs&am=99&tn=");
   const [qrUrl, setQrUrl] = useState("/qr-99.png");
 
   useEffect(() => {
@@ -152,7 +152,7 @@ export default function CertificatesPage() {
               
               <Award className="w-10 h-10 text-amber-400 mb-2 relative z-10" />
               <h4 className="text-white font-bold font-heading leading-tight relative z-10">
-                {cert.internships?.title || "InterNexa Program"}
+                {cert.internships?.title || "InterNexa Labs Program"}
               </h4>
               <p className="text-indigo-200 text-xs mt-2 relative z-10">
                 Issued to {cert.full_name || "Student"}

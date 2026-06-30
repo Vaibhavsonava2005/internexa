@@ -14,7 +14,7 @@ export function TestimonialsSection() {
             Student Success Stories
           </h2>
           <p className="text-lg text-slate-600 dark:text-slate-400">
-            Don't just take our word for it. Hear from students who launched their careers with InterNexa.
+            Don't just take our word for it. Hear from students who launched their careers with InterNexa Labs.
           </p>
         </div>
 

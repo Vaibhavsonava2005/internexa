@@ -46,7 +46,7 @@ export function WhyChooseUs() {
               transition={{ duration: 0.5 }}
             >
               <h2 className="text-3xl md:text-4xl font-bold text-brand-900 dark:text-white tracking-tight mb-4 leading-tight">
-                Why 50,000+ Students Choose InterNexa
+                Why 50,000+ Students Choose InterNexa Labs
               </h2>
               <p className="text-lg text-brand-600 dark:text-brand-400">
                 We bridge the gap between academic learning and industry requirements with a curriculum built for the real world.

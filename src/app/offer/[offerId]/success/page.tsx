@@ -99,14 +99,14 @@ export default function SuccessPage() {
               <circle cx="50" cy="45" r="8" fill="#3730a3" />
             </svg>
             <div>
-              <h1 className="text-3xl font-black text-indigo-950 tracking-tighter">InterNexa</h1>
+              <h1 className="text-3xl font-black text-indigo-950 tracking-tighter">InterNexa Labs</h1>
               <p className="text-xs font-bold tracking-widest text-indigo-800 uppercase">EdTech Private Limited</p>
             </div>
           </div>
           <div className="text-right text-sm text-gray-600">
             <p>123 Innovation Drive, Tech Park</p>
             <p>Bengaluru, Karnataka 560100</p>
-            <p>info.internexa@gmail.com | www.internexalabs.online</p>
+            <p>info.InterNexa Labs@gmail.com | www.internexalabs.online</p>
           </div>
         </div>
 
@@ -131,10 +131,10 @@ export default function SuccessPage() {
             Dear <strong>{user?.fullName || "Student Name"}</strong>,
           </p>
           <p>
-            We are thrilled to offer you the position of <strong>{application.internships.title} Intern</strong> at <strong>InterNexa</strong>. We were incredibly impressed by your background and are excited to welcome you to our cohort.
+            We are thrilled to offer you the position of <strong>{application.internships.title} Intern</strong> at <strong>InterNexa Labs</strong>. We were incredibly impressed by your background and are excited to welcome you to our cohort.
           </p>
           <p>
-            Your internship is scheduled to commence on <strong>{format(startDate, "MMMM do, yyyy")}</strong> and will conclude on <strong>{format(endDate, "MMMM do, yyyy")}</strong>. During this period, you will be expected to dedicate yourself to the curriculum, projects, and assignments provided on the InterNexa platform.
+            Your internship is scheduled to commence on <strong>{format(startDate, "MMMM do, yyyy")}</strong> and will conclude on <strong>{format(endDate, "MMMM do, yyyy")}</strong>. During this period, you will be expected to dedicate yourself to the curriculum, projects, and assignments provided on the InterNexa Labs platform.
           </p>
           
           <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg my-6">
@@ -181,7 +181,7 @@ export default function SuccessPage() {
               <div className="absolute bottom-1 right-2 font-serif text-3xl text-indigo-900 italic transform -rotate-6">R. Sharma</div>
             </div>
             <p className="font-bold text-right">Authorized Signatory</p>
-            <p className="text-sm text-gray-600 text-right">Director of Programs, InterNexa</p>
+            <p className="text-sm text-gray-600 text-right">Director of Programs, InterNexa Labs</p>
           </div>
         </div>
 
