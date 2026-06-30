@@ -55,6 +55,17 @@ export default function OnboardingPage() {
     }
     load();
   }, [offerId]);
+  useEffect(() => {
+    const savedStep = localStorage.getItem(`onboarding_step_${offerId}`);
+    if (savedStep) setStep(Number(savedStep) as 1 | 2);
+
+    const savedPayment = localStorage.getItem(`onboarding_payment_${offerId}`);
+    if (savedPayment) {
+      setPaymentClicked(true);
+      setShowManualForm(true);
+    }
+  }, [offerId]);
+
   const handleNextStep = () => {
     if (!signature.trim() || signature.length < 3) {
       setError("Please provide a valid digital signature.");
@@ -62,6 +73,7 @@ export default function OnboardingPage() {
     }
     setError("");
     setStep(2);
+    localStorage.setItem(`onboarding_step_${offerId}`, "2");
   };
 
   const handleVerifyPayment = async () => {
@@ -110,6 +122,8 @@ export default function OnboardingPage() {
 
       if (res.success) {
         setSuccess(true);
+        localStorage.removeItem(`onboarding_step_${offerId}`);
+        localStorage.removeItem(`onboarding_payment_${offerId}`);
       } else {
         setError(res.error || "Failed to submit payment verification.");
       }
@@ -239,9 +253,12 @@ export default function OnboardingPage() {
               <div className="flex flex-col sm:flex-row gap-4 mb-4">
                 <a
                   href={paymentLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   onClick={() => {
                     setPaymentClicked(true);
                     setShowManualForm(true);
+                    localStorage.setItem(`onboarding_payment_${offerId}`, "true");
                   }}
                   className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 text-lg"
                 >

@@ -240,6 +240,8 @@ export default function CertificatesPage() {
                 <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 text-center mb-6">
                   <a
                     href={paymentLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 mb-4"
                   >
                     Pay Now via UPI
