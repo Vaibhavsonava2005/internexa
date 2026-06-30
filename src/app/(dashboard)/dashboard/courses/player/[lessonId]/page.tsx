@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import { CheckCircle, PlayCircle, Video, Code, BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Menu, Loader2, ArrowLeft, Lock } from "lucide-react";
 import Link from "next/link";
 import dynamic from 'next/dynamic';
-import Editor from "@monaco-editor/react";
+const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 import { cn } from "@/lib/utils";
 import { differenceInDays, format, addDays } from "date-fns";
 import { generateAndSaveVideoForLesson } from "@/actions/youtube.actions";
@@ -85,7 +85,9 @@ export default function CoursePlayerPage() {
   let flatLessons: any[] = [];
   let gIndex = 0;
   modules.forEach(mod => {
-    mod.days?.forEach((day: any) => {
+    if (!mod) return;
+    (mod.days || []).forEach((day: any) => {
+      if (!day) return;
       flatLessons.push({ ...day, moduleTitle: mod.title, globalIndex: gIndex });
       gIndex++;
     });
@@ -326,7 +328,7 @@ export default function CoursePlayerPage() {
                 {mod.title}
               </div>
               <div className="space-y-1">
-                {mod.days?.map((lesson: any) => {
+                {(mod.days || []).map((lesson: any) => {
                   if (!lesson) return null;
                   const isActive = lesson.id === currentLesson?.id;
                   const isDone = completedLessons.includes(lesson.id);
