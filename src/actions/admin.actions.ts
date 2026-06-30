@@ -682,7 +682,7 @@ export async function uploadQRImage(formData: FormData) {
     if (!file) return { success: false, error: "No file provided" };
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const fileName = \qrcodes/\-\\;
+    const fileName = `qrcodes/${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
 
     const { error: uploadError } = await supabaseAdmin.storage
       .from('assets')
