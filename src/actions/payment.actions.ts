@@ -77,6 +77,32 @@ export async function submitManualPayment(formData: FormData) {
   }
 }
 
+export async function setApplicationPaymentIntent(applicationId: string, type: 'Onboarding' | 'Certificate' = 'Onboarding') {
+  const user = await currentUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  try {
+    // We update the updated_at column to NOW() and status to indicate a payment is in progress
+    // so the webhook knows EXACTLY which application to fulfill.
+    const status = type === 'Onboarding' ? 'Payment Processing' : 'FastTrack Processing';
+    
+    const { error } = await supabaseAdmin
+      .from('applications')
+      .update({ 
+        status: status,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', applicationId)
+      .eq('clerk_id', user.id);
+      
+    if (error) throw error;
+    return { success: true };
+  } catch (err: any) {
+    console.error("Set payment intent error:", err);
+    return { success: false, error: err.message };
+  }
+}
+
 export async function submitFastTrackPayment(formData: FormData) {
   const user = await currentUser();
   if (!user) return { success: false, error: "Not authenticated" };

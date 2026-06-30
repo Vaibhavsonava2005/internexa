@@ -68,7 +68,12 @@ export function generateDynamicCurriculum(category: string, durationDays: number
   }
 
   for (let w = 1; w <= weeks; w++) {
-    const weekData = selectedStack[Math.min(w - 1, selectedStack.length - 1)];
+    // If weeks > available predefined weeks, we append 'Part X' to the last module
+    const rawIndex = w - 1;
+    const isExtended = rawIndex >= selectedStack.length;
+    const baseWeekData = selectedStack[Math.min(rawIndex, selectedStack.length - 1)];
+    const weekSuffix = isExtended ? ` (Advanced Part ${rawIndex - selectedStack.length + 2})` : "";
+    
     const days = [];
     
     const types: ("Video" | "Coding" | "Reading" | "Project" | "Quiz")[] = [
@@ -77,7 +82,9 @@ export function generateDynamicCurriculum(category: string, durationDays: number
     const durations = ["45 mins", "30 mins", "2 hours", "45 mins", "2 hours", "1 hour", "3 hours"];
 
     for (let d = 1; d <= 7; d++) {
-      const topicTitle = weekData.topics[Math.min(d - 1, weekData.topics.length - 1)];
+      // Pick topics wrapping around if we extend
+      const topicIndex = (d - 1 + (isExtended ? d : 0)) % baseWeekData.topics.length;
+      const topicTitle = baseWeekData.topics[topicIndex];
       
       days.push({
         day: d,
@@ -89,7 +96,7 @@ export function generateDynamicCurriculum(category: string, durationDays: number
 
     curriculum.push({
       week: w,
-      title: `Week ${w}: ${weekData.weekTitle}`,
+      title: `Week ${w}: ${baseWeekData.weekTitle}${weekSuffix}`,
       duration: "1 Week",
       days
     });

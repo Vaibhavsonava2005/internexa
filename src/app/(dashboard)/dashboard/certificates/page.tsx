@@ -6,7 +6,7 @@ import { PageHeader, Badge, Button } from "@/components/shared";
 
 import { useEffect, useState } from "react";
 import { getUserApplications } from "@/actions/application.actions";
-import { submitFastTrackPayment } from "@/actions/payment.actions";
+import { submitFastTrackPayment, setApplicationPaymentIntent } from "@/actions/payment.actions";
 import { getAppSettings } from "@/actions/admin.actions";
 
 export default function CertificatesPage() {
@@ -242,6 +242,11 @@ export default function CertificatesPage() {
                     href={paymentLink}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={async () => {
+                      if (selectedApp) {
+                        await setApplicationPaymentIntent(selectedApp.id, "Certificate");
+                      }
+                    }}
                     className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 mb-4"
                   >
                     Pay Now via UPI

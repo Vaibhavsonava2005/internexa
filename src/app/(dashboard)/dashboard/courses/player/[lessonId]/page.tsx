@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import { CheckCircle, BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Menu, Loader2, ArrowLeft, Lock, FileText, Clock, Award } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { differenceInDays, format, addDays } from "date-fns";
+import { format, differenceInDays, addDays, startOfDay } from "date-fns";
 import { marked } from "marked";
 
 export default function CoursePlayerPage() {
@@ -109,7 +109,11 @@ export default function CoursePlayerPage() {
       }
     }
   }
-  const daysPassed = Math.max(0, differenceInDays(new Date(), startDate)) || 0;
+
+  // Calculate strict calendar days passed
+  const todayStart = startOfDay(new Date());
+  const courseStart = startOfDay(startDate);
+  const daysPassed = differenceInDays(todayStart, courseStart);
 
   const handleMarkComplete = async () => {
     if (!currentLesson || isCompleted || currentLesson.globalIndex > daysPassed) return;
@@ -141,7 +145,7 @@ export default function CoursePlayerPage() {
           <div className="w-24 h-24 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mb-6 shadow-sm border border-slate-100 dark:border-slate-700">
             <Lock className="w-12 h-12 text-slate-400" />
           </div>
-          <h2 className="text-3xl font-bold mb-3 text-slate-900 dark:text-white">Day {currentLesson.globalIndex + 1} is Locked</h2>
+          <h2 className="text-3xl font-bold mb-3 text-slate-900 dark:text-white">Day {currentLesson.globalIndex !== undefined ? currentLesson.globalIndex + 1 : currentLesson.day || 1} is Locked</h2>
           <p className="text-slate-500 max-w-md mb-8 text-lg">
             This module is part of your daily drip schedule to ensure you properly absorb the material.
           </p>
@@ -173,7 +177,7 @@ export default function CoursePlayerPage() {
           </div>
           <div className="relative z-10 text-white">
             <div className="flex items-center gap-3 mb-4 text-indigo-100 font-medium">
-              <span className="bg-white/20 px-3 py-1 rounded-full text-sm backdrop-blur-md border border-white/10">Day {currentLesson.globalIndex + 1}</span>
+              <span className="bg-white/20 px-3 py-1 rounded-full text-sm backdrop-blur-md border border-white/10">Day {currentLesson.globalIndex !== undefined ? currentLesson.globalIndex + 1 : currentLesson.day || 1}</span>
               <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> {currentLesson.duration || "45 mins"}</span>
               <span className="flex items-center gap-1.5"><Award className="w-4 h-4" /> {currentLesson.moduleTitle}</span>
             </div>
@@ -238,8 +242,11 @@ export default function CoursePlayerPage() {
             if (!mod) return null;
             return (
             <div key={mIndex} className="mb-4">
-              <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+              <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-2">
                 {mod.title}
+                {mod.days && mod.days.every((d: any) => completedLessons.includes(d.id)) && (
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                )}
               </div>
               <div className="space-y-1">
                 {(mod.days || []).map((lesson: any) => {
@@ -275,7 +282,7 @@ export default function CoursePlayerPage() {
                           isActive ? "text-indigo-900 dark:text-indigo-100" : "text-slate-700 dark:text-slate-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-300",
                           isLocked && "group-hover:text-slate-700 dark:group-hover:text-slate-300"
                         )}>
-                          Day {lesson.globalIndex + 1}: {lesson.title}
+                          Day {lesson.globalIndex !== undefined ? lesson.globalIndex + 1 : lesson.day || 1}: {lesson.title}
                         </p>
                         <p className="text-xs text-slate-500 mt-1 flex items-center gap-1 font-medium">
                           <Clock className="w-3 h-3" />

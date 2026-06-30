@@ -178,7 +178,7 @@ export default function CoursesPage() {
                                 </div>
                                 <div className="flex-1">
                                   <h4 className="font-bold text-slate-900 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                    Day {lesson.day}: {lesson.title}
+                                    Day {lesson.day || lesson.globalIndex + 1 || lIndex + 1}: {lesson.title}
                                   </h4>
                                   {lesson.duration && (
                                     <p className="text-xs font-medium text-slate-500 mt-1">{lesson.duration}</p>

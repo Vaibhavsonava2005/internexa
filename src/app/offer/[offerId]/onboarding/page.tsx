@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileSignature, UploadCloud, Shield, CheckCircle2, Loader2, FileText, ChevronRight, CreditCard, ExternalLink, AlertTriangle } from "lucide-react";
 import { completeOnboarding } from "@/actions/onboarding.actions";
-import { submitManualPayment } from "@/actions/payment.actions";
+import { submitManualPayment, setApplicationPaymentIntent } from "@/actions/payment.actions";
 import { getAppSettings } from "@/actions/admin.actions";
 
 export default function OnboardingPage() {
@@ -255,10 +255,12 @@ export default function OnboardingPage() {
                   href={paymentLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => {
+                  onClick={async () => {
                     setPaymentClicked(true);
                     setShowManualForm(true);
                     localStorage.setItem(`onboarding_payment_${offerId}`, "true");
+                    // Pre-flight intent mapping to prevent fraud & cross-internship conflicts
+                    await setApplicationPaymentIntent(offer?.id || offerId, "Onboarding");
                   }}
                   className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 text-lg"
                 >
