@@ -9,8 +9,6 @@ import { CheckCircle, PlayCircle, Video, Code, BookOpen, CheckCircle2, ChevronLe
 import Link from "next/link";
 import dynamic from 'next/dynamic';
 import Editor from "@monaco-editor/react";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
 import { differenceInDays, format, addDays } from "date-fns";
 import { generateAndSaveVideoForLesson } from "@/actions/youtube.actions";
@@ -147,11 +145,14 @@ export default function CoursePlayerPage() {
           .then(res => {
             if (res.success && res.url) {
               setDynamicUrl(res.url);
+            } else {
+              setDynamicUrl("error");
             }
             setIsGenerating(false);
           })
           .catch(err => {
             console.error("Failed to generate video", err);
+            setDynamicUrl("error");
             setIsGenerating(false);
           });
       } else if (!isDummy && dynamicUrl !== currentLesson.content_url) {
@@ -207,7 +208,7 @@ export default function CoursePlayerPage() {
               </div>
             )}
             
-            {embedUrl && videoId ? (
+            {embedUrl && embedUrl !== "error" && videoId ? (
               <iframe 
                 src={embedUrl}
                 className="w-full h-full border-0"
@@ -234,7 +235,10 @@ export default function CoursePlayerPage() {
         return (
           <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-200 dark:border-slate-800 prose dark:prose-invert max-w-none">
             {currentLesson.content_url && currentLesson.content_url.endsWith('.md') ? (
-              <Markdown remarkPlugins={[remarkGfm]}>{`## ${currentLesson.title}\n\nLoading content from repository...`}</Markdown>
+              <div>
+                <h2>{currentLesson.title}</h2>
+                <p>Loading content from repository...</p>
+              </div>
             ) : (
               <div>
                 <h2>{currentLesson.title}</h2>
@@ -314,16 +318,19 @@ export default function CoursePlayerPage() {
         </div>
         
         <div className="flex-1 overflow-y-auto no-scrollbar p-2">
-          {modules.map((mod: any, mIndex: number) => (
+          {modules.map((mod: any, mIndex: number) => {
+            if (!mod) return null;
+            return (
             <div key={mIndex} className="mb-2">
               <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
                 {mod.title}
               </div>
               <div className="space-y-1">
                 {mod.days?.map((lesson: any) => {
+                  if (!lesson) return null;
                   const isActive = lesson.id === currentLesson?.id;
                   const isDone = completedLessons.includes(lesson.id);
-                  const isLocked = lesson.globalIndex > daysPassed;
+                  const isLocked = (lesson.globalIndex ?? 0) > daysPassed;
                   
                   return (
                     <Link 
@@ -363,7 +370,8 @@ export default function CoursePlayerPage() {
                 })}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </motion.div>
 

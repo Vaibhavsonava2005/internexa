@@ -58,6 +58,39 @@ export async function generateAndSaveVideoForLesson(internshipId: string, lesson
       
       return { success: true, url };
     }
+    
+    // Fallback to yt-search
+    const ytSearch = (await import("yt-search")).default;
+    const ytRes = await ytSearch(query);
+    if (ytRes && ytRes.videos && ytRes.videos.length > 0) {
+      const url = ytRes.videos[0].url;
+      
+      const { data: internship, error: fetchError } = await supabase
+        .from('internships')
+        .select('modules')
+        .eq('id', internshipId)
+        .single();
+        
+      if (!fetchError && internship?.modules) {
+        let updated = false;
+        const modules = [...internship.modules];
+        for (const mod of modules) {
+          if (mod.days) {
+            for (const day of mod.days) {
+              if (day.id === lessonId) {
+                day.content_url = url;
+                updated = true;
+              }
+            }
+          }
+        }
+        if (updated) {
+          await supabase.from('internships').update({ modules }).eq('id', internshipId);
+        }
+      }
+      return { success: true, url };
+    }
+
     return { success: false, error: "No videos found" };
   } catch (error: any) {
     console.error("YouTube generate error:", error);
