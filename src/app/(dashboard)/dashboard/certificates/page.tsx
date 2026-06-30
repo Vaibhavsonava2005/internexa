@@ -40,9 +40,12 @@ export default function CertificatesPage() {
           setActiveApps(active);
         }
         
-        let link = "https://payments.cashfree.com/links?code=Makiceri2120_AAAAAAAUM2Y";
-        setPaymentLink(link);
-        setQrUrl("/qr-199.png");
+        // Fetch dynamic payment settings
+        const settingsRes = await getAppSettings("payment_99");
+        if (settingsRes.success && settingsRes.data) {
+          if (settingsRes.data.upi_link) setPaymentLink(settingsRes.data.upi_link);
+          if (settingsRes.data.qr_code_url) setQrUrl(settingsRes.data.qr_code_url);
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -208,7 +211,7 @@ export default function CertificatesPage() {
               </div>
               <h2 className="text-2xl font-bold text-white mb-2">Fast-Track Verification</h2>
               <p className="text-slate-400 text-sm">
-                Pay the professional services fee to instantly generate your Certificate, Experience Letter, and LOR for <strong>{selectedApp?.internships?.title}</strong>.
+                Pay a nominal fee of ₹99 to instantly generate your Certificate, Experience Letter, and LOR for <strong>{selectedApp?.internships?.title}</strong>.
               </p>
             </div>
 
@@ -227,25 +230,87 @@ export default function CertificatesPage() {
                 </Button>
               </div>
             ) : (
-              <div className="space-y-4">
+              <form onSubmit={handleFastTrackSubmit} className="space-y-4">
+                {errorMsg && (
+                  <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-xl">
+                    {errorMsg}
+                  </div>
+                )}
+                
                 <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 text-center mb-6">
                   <a
-                    href={selectedApp?.email ? `${paymentLink}&customer_email=${encodeURIComponent(selectedApp.email)}` : paymentLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 mb-4"
+                    href={paymentLink}
+                    className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 mb-4"
                   >
-                    Pay Now <Zap className="w-4 h-4 ml-1" />
+                    Pay Now via UPI
                   </a>
-                  
-                  <button 
-                    onClick={() => window.location.reload()}
-                    className="w-full bg-slate-800 hover:bg-slate-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all mt-4"
-                  >
-                    <ShieldCheck className="w-5 h-5" /> I have completed the payment (Refresh Status)
-                  </button>
+                  <p className="text-sm text-slate-400 mb-2">Or scan QR to pay securely</p>
+                  <img src={qrUrl} alt="Scan to pay 99" className="w-32 h-32 mx-auto rounded-lg border-2 border-indigo-500/30 mb-2 object-cover bg-white p-1" />
+                  <p className="text-xs text-slate-500 mt-2">Amount: ₹99</p>
                 </div>
-              </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1">Your Registered Email</label>
+                  <input 
+                    required 
+                    type="email"
+                    placeholder="Enter email used for payment"
+                    value={paymentForm.emailId}
+                    onChange={e => setPaymentForm({...paymentForm, emailId: e.target.value})}
+                    className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1">Your UPI ID (used for payment)</label>
+                  <input 
+                    required 
+                    placeholder="e.g. 9876543210@ybl"
+                    value={paymentForm.upiId}
+                    onChange={e => setPaymentForm({...paymentForm, upiId: e.target.value})}
+                    className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1">UTR / Transaction ID</label>
+                  <input 
+                    required 
+                    placeholder="12-digit UTR number"
+                    value={paymentForm.referenceNumber}
+                    onChange={e => setPaymentForm({...paymentForm, referenceNumber: e.target.value})}
+                    className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1">Payment Screenshot (Optional)</label>
+                  <input 
+                    type="file"
+                    accept="image/*"
+                    onChange={e => setPaymentForm({...paymentForm, screenshot: e.target.files?.[0] || null})}
+                    className="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-500/10 file:text-indigo-400 hover:file:bg-indigo-500/20"
+                  />
+                </div>
+
+                <div className="pt-4 flex gap-3">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setIsModalOpen(false)}
+                    className="flex-1 border-slate-700 text-slate-300 hover:bg-slate-800"
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white border-none"
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit Payment"}
+                  </Button>
+                </div>
+              </form>
             )}
           </motion.div>
         </div>

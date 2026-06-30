@@ -43,12 +43,12 @@ export default function OnboardingPage() {
           }
         }
         
-        let link = "https://payments.cashfree.com/links?code=uakicu68k120_AAAAAAAUM2Y";
-        if (res.data?.email) {
-          link += `&customer_email=${encodeURIComponent(res.data.email)}`;
+        // Fetch dynamic payment settings
+        const settingsRes = await getAppSettings("payment_199");
+        if (settingsRes.success && settingsRes.data) {
+          if (settingsRes.data.upi_link) setPaymentLink(settingsRes.data.upi_link);
+          if (settingsRes.data.qr_code_url) setQrUrl(settingsRes.data.qr_code_url);
         }
-        setPaymentLink(link);
-        setQrUrl("/qr-99.png");
         
         setIsLoading(false);
       });
@@ -191,8 +191,11 @@ export default function OnboardingPage() {
                 <h2 className="text-xl font-bold text-white">Non-Disclosure Agreement (NDA)</h2>
               </div>
               
-              <div className="bg-slate-950 border border-slate-800 rounded-xl p-5 mb-6 text-sm text-slate-400 space-y-4">
-                <p>By typing your name below, you digitally sign and agree to the InterNexa Labs terms and conditions.</p>
+              <div className="bg-slate-950 border border-slate-800 rounded-xl p-5 mb-6 h-48 overflow-y-auto text-sm text-slate-400 space-y-4">
+                <p><strong>1. Confidential Information:</strong> The Intern agrees that all materials, code, proprietary processes, client data, and internal communications accessed during the internship are strictly confidential.</p>
+                <p><strong>2. Non-Disclosure:</strong> The Intern shall not share, publish, or distribute any confidential information to third parties without prior written consent.</p>
+                <p><strong>3. Return of Materials:</strong> Upon completion, the Intern agrees to delete or return all confidential assets.</p>
+                <p>By typing your name below, you digitally sign and agree to these terms.</p>
               </div>
 
               <div className="mb-6">
@@ -221,7 +224,7 @@ export default function OnboardingPage() {
               </div>
               
               <div className="bg-slate-950 border border-slate-800 rounded-xl p-6 mb-8 text-slate-300 space-y-4">
-                <p className="text-lg">To finalize your enrollment, the professional services fee is required.</p>
+                <p className="text-lg">To finalize your enrollment, a nominal fee of <strong className="text-white">₹{offer?.price || 199}</strong> is required.</p>
                 <div className="space-y-3 mt-4">
                   <h4 className="font-bold text-indigo-400">What is included?</h4>
                   <ul className="space-y-2 text-sm">
@@ -233,23 +236,127 @@ export default function OnboardingPage() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-4 mb-4">
+              <div className="flex flex-col sm:flex-row gap-4 mb-4">
                 <a
                   href={paymentLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  onClick={() => {
+                    setPaymentClicked(true);
+                    setShowManualForm(true);
+                  }}
                   className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 text-lg"
                 >
-                  <CreditCard className="w-6 h-6" /> Pay Now <ExternalLink className="w-4 h-4" />
+                  <CreditCard className="w-6 h-6" /> Pay Now via UPI <ExternalLink className="w-4 h-4" />
                 </a>
-                
-                <button 
-                  onClick={() => window.location.reload()}
-                  className="w-full bg-slate-800 hover:bg-slate-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all mt-4"
-                >
-                  <Shield className="w-5 h-5" /> I have completed the payment (Refresh Status)
-                </button>
               </div>
+              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center mb-4">
+                <p className="text-sm text-slate-400 mb-2">Or scan QR to pay securely</p>
+                <img src={qrUrl} alt="Scan to pay 199" className="w-32 h-32 mx-auto rounded-lg border-2 border-emerald-500/30 mb-2 object-cover bg-white p-1" />
+                <p className="text-xs text-slate-500 mt-2">Amount: ₹199</p>
+              </div>
+
+              {paymentClicked && (
+                <div className="space-y-4">
+                  {!showManualForm ? (
+                    <div className="bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-4">
+                      <h3 className="font-bold text-white mb-2">Verify Your Payment</h3>
+                      <div>
+                        <label className="block text-sm text-slate-400 mb-2">UPI UTR Number / Reference ID</label>
+                        <input
+                          type="text"
+                          value={referenceNumber}
+                          onChange={(e) => setReferenceNumber(e.target.value)}
+                          placeholder="e.g. 123456789012"
+                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+                      <button 
+                        onClick={handleVerifyPayment} 
+                        disabled={isSubmitting || !referenceNumber} 
+                        className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-50 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all"
+                      >
+                        {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Shield className="w-5 h-5" />}
+                        {isSubmitting ? "Verifying..." : "Verify Payment"}
+                      </button>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleManualSubmit} className="bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                      <div className="bg-indigo-500/10 border border-indigo-500/20 p-4 rounded-lg flex gap-3 mb-4">
+                        <AlertTriangle className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
+                        <div className="text-sm text-indigo-200">
+                          <p className="font-semibold text-indigo-300 mb-1">Manual Verification Required</p>
+                          <p>Since your payment couldn't be instantly verified, please submit your payment details below. Our team will verify it and issue your joining letter shortly.</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm text-slate-400 mb-2">Payment Reference ID</label>
+                          <input
+                            type="text"
+                            value={referenceNumber}
+                            onChange={(e) => setReferenceNumber(e.target.value)}
+                            required
+                            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-slate-400 mb-2">Your UPI ID (used for payment)</label>
+                          <input
+                            type="text"
+                            value={upiId}
+                            onChange={(e) => setUpiId(e.target.value)}
+                            placeholder="e.g. 9876543210@ybl"
+                            required
+                            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm text-slate-400 mb-2">Email ID (for communication)</label>
+                        <input
+                          type="email"
+                          value={emailId}
+                          onChange={(e) => setEmailId(e.target.value)}
+                          placeholder="e.g. john@example.com"
+                          required
+                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-400 mb-2">Payment Screenshot Proof (Optional)</label>
+                        <div className="relative">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setScreenshot(e.target.files?.[0] || null)}
+                            className="hidden"
+                            id="screenshot-upload"
+                          />
+                          <label htmlFor="screenshot-upload" className="w-full border-2 border-dashed border-slate-700 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-800/50 transition-colors">
+                            <UploadCloud className="w-8 h-8 text-slate-400 mb-2" />
+                            {screenshot ? (
+                              <span className="text-emerald-400 font-medium">{screenshot.name}</span>
+                            ) : (
+                              <span className="text-slate-400 text-sm">Click to upload payment screenshot (JPG/PNG)</span>
+                            )}
+                          </label>
+                        </div>
+                      </div>
+
+                      <button 
+                        type="submit"
+                        disabled={isSubmitting} 
+                        className="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 disabled:opacity-50 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all mt-4"
+                      >
+                        {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Shield className="w-5 h-5" />}
+                        {isSubmitting ? "Submitting..." : "Submit Proof for Verification"}
+                      </button>
+                    </form>
+                  )}
+                </div>
+              )}
             </motion.div>
           )}
 
