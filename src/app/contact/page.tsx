@@ -46,8 +46,8 @@ export default function ContactPage() {
               <div>
                 <h3 className="text-xl font-semibold text-brand-900 dark:text-white mb-3">Email Us</h3>
                 <p className="text-gray-600 dark:text-gray-300">
-                  General Inquiries: info.InterNexa Labs@gmail.com<br />
-                  Support: info.InterNexa Labs@gmail.com
+                  General Inquiries: info.internexa@gmail.com<br />
+                  Support: info.internexa@gmail.com
                 </p>
               </div>
               <div>

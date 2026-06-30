@@ -63,7 +63,7 @@ export function Footer() {
             <ul className="space-y-4 text-sm">
               <li><Link href="/about" className="text-brand-500 hover:text-brand-900 dark:hover:text-white transition-colors">About Us</Link></li>
               <li><Link href="/contact" className="text-brand-500 hover:text-brand-900 dark:hover:text-white transition-colors">Contact</Link></li>
-              <li><Link href="mailto:info@internexa.ai" className="text-brand-500 hover:text-brand-900 dark:hover:text-white transition-colors">Support</Link></li>
+              <li><Link href="mailto:info.internexa@gmail.com" className="text-brand-500 hover:text-brand-900 dark:hover:text-white transition-colors">Support</Link></li>
               <li><Link href="/careers" className="text-brand-500 hover:text-brand-900 dark:hover:text-white transition-colors">Careers</Link></li>
               <li><Link href="/press" className="text-brand-500 hover:text-brand-900 dark:hover:text-white transition-colors">Press</Link></li>
               <li><Link href="/community" className="text-brand-500 hover:text-brand-900 dark:hover:text-white transition-colors">Community</Link></li>
