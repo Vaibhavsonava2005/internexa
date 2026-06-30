@@ -51,13 +51,19 @@ export function useNotifications() {
           filter: `clerk_id=eq.${userId}`
         },
         (payload) => {
-          setNotifications((prev) => [payload.new, ...prev]);
+          const newNotif = payload.new;
+          setNotifications((prev) => [newNotif, ...prev]);
           setUnreadCount((prev) => prev + 1);
-          setLatestNotification(payload.new);
+          setLatestNotification(newNotif);
           
-          // Auto-dismiss after 5 seconds
+          // Auto-dismiss safely after 5 seconds
           setTimeout(() => {
-            setLatestNotification(null);
+            setLatestNotification((current: any) => {
+              if (current && current.id === newNotif.id) {
+                return null;
+              }
+              return current;
+            });
           }, 5000);
         }
       )
