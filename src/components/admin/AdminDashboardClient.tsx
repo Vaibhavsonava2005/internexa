@@ -179,7 +179,6 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
           { id: "submissions", label: "Projects", icon: FolderGit2 },
           { id: "users", label: "Users", icon: Users },
           { id: "transactions", label: "Auto Payments", icon: CreditCard },
-          { id: "manualPayments", label: "Manual Verifications", icon: Shield },
           { id: "certificates", label: "Certificates", icon: Award },
           { id: "rewardClaims", label: "Reward Claims", icon: Gift },
           { id: "notifications", label: "Notifications", icon: Bell },
