@@ -55,8 +55,9 @@ export default function MyInternshipsPage() {
   }, [user]);
 
   const filtered = (() => {
+    let result: any[] = [];
     if (filter === "all") {
-      return allInternships.map(internship => {
+      result = allInternships.map(internship => {
         const matchingApp = applications.find(app => app.internship_id === internship.id);
         if (matchingApp) return matchingApp;
         
@@ -66,15 +67,26 @@ export default function MyInternshipsPage() {
           internships: internship
         };
       });
+    } else {
+      result = applications.filter(app => {
+        if (filter === "pending" && (app.status === "Submitted" || app.status === "Under Review" || app.status === "Payment Verification Pending")) return true;
+        if (filter === "accepted" && (app.status === "Accepted" || app.status === "Offer Accepted")) return true;
+        if (filter === "active" && (app.status === "Active" || app.status === "Enrolled")) return true;
+        if (filter === "completed" && app.status === "Completed") return true;
+        return false;
+      });
     }
-    
-    return applications.filter(app => {
-      if (filter === "pending" && (app.status === "Submitted" || app.status === "Under Review" || app.status === "Payment Verification Pending")) return true;
-      if (filter === "accepted" && (app.status === "Accepted" || app.status === "Offer Accepted")) return true;
-      if (filter === "active" && (app.status === "Active" || app.status === "Enrolled")) return true;
-      if (filter === "completed" && app.status === "Completed") return true;
-      return false;
-    });
+
+    const statusWeight = (status: string) => {
+      if (status === "Active" || status === "Enrolled") return 1;
+      if (status === "Accepted" || status === "Offer Accepted") return 2;
+      if (status === "Submitted" || status === "Under Review" || status === "Payment Verification Pending") return 3;
+      if (status === "Not Applied") return 4;
+      if (status === "Completed") return 5;
+      return 6;
+    };
+
+    return result.sort((a, b) => statusWeight(a.status) - statusWeight(b.status));
   })();
 
   return (

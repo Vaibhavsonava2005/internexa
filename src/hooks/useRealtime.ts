@@ -16,6 +16,7 @@ export function useNotifications() {
   const { userId } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
   const [latestNotification, setLatestNotification] = useState<any>(null);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   useEffect(() => {
     if (!userId) return;
@@ -23,20 +24,22 @@ export function useNotifications() {
     const supabase = getSupabase();
     if (!supabase) return;
 
-    // Fetch initial count
-    const fetchCount = async () => {
-      const { count } = await supabase
+    const fetchNotifications = async () => {
+      const { data } = await supabase
         .from('notifications')
-        .select('*', { count: 'exact', head: true })
+        .select('*')
         .eq('clerk_id', userId)
-        .eq('is_read', false);
+        .order('created_at', { ascending: false })
+        .limit(20);
       
-      setUnreadCount(count || 0);
+      if (data) {
+        setNotifications(data);
+        setUnreadCount(data.filter((n: any) => !n.is_read).length);
+      }
     };
 
-    fetchCount();
+    fetchNotifications();
 
-    // Subscribe to realtime changes
     const channel = supabase
       .channel('notifications_channel')
       .on(
@@ -48,6 +51,7 @@ export function useNotifications() {
           filter: `clerk_id=eq.${userId}`
         },
         (payload) => {
+          setNotifications((prev) => [payload.new, ...prev]);
           setUnreadCount((prev) => prev + 1);
           setLatestNotification(payload.new);
         }
@@ -61,8 +65,7 @@ export function useNotifications() {
           filter: `clerk_id=eq.${userId}`
         },
         () => {
-          // Simplistic re-fetch on any update (e.g. marking read)
-          fetchCount();
+          fetchNotifications();
         }
       )
       .subscribe();
@@ -74,6 +77,34 @@ export function useNotifications() {
 
   const clearLatestNotification = () => setLatestNotification(null);
 
-  return { unreadCount, latestNotification, clearLatestNotification };
+  const markAsRead = async (id: string) => {
+    const supabase = getSupabase();
+    if (!supabase) return;
+    
+    // Optimistic update
+    setNotifications((prev) => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+    setUnreadCount((prev) => Math.max(0, prev - 1));
+
+    await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('id', id);
+  };
+
+  const markAllAsRead = async () => {
+    const supabase = getSupabase();
+    if (!supabase) return;
+    
+    setNotifications((prev) => prev.map(n => ({ ...n, is_read: true })));
+    setUnreadCount(0);
+
+    await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('clerk_id', userId)
+      .eq('is_read', false);
+  };
+
+  return { unreadCount, notifications, latestNotification, clearLatestNotification, markAsRead, markAllAsRead };
 }
 

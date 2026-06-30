@@ -38,17 +38,16 @@ export default function ContactPage() {
               <div>
                 <h3 className="text-xl font-semibold text-brand-900 dark:text-white mb-3">Headquarters</h3>
                 <p className="text-gray-600 dark:text-gray-300">
-                  123 Innovation Drive<br />
-                  Tech District, CA 94103<br />
-                  United States
+                  22 B Navi Mumbai<br />
+                  Maharashtra, 400614<br />
+                  India
                 </p>
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-brand-900 dark:text-white mb-3">Email Us</h3>
                 <p className="text-gray-600 dark:text-gray-300">
                   General Inquiries: info.internexa@gmail.com<br />
-                  Support: info.internexa@gmail.com<br />
-                  Partnerships: partners@internexa.ai
+                  Support: info.internexa@gmail.com
                 </p>
               </div>
               <div>

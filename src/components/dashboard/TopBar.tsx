@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 
 import { Menu, Bell, Search, Sun, Moon, X, Info, CheckCircle, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,7 +18,8 @@ export function TopBar({ setIsMobileOpen }: TopBarProps) {
   const { user } = useUser();
   const { isDark, toggleTheme, mounted } = useTheme();
   const pathname = usePathname();
-  const { unreadCount, latestNotification, clearLatestNotification } = useNotifications();
+  const { unreadCount, notifications, latestNotification, clearLatestNotification, markAsRead, markAllAsRead } = useNotifications();
+  const [showNotifications, setShowNotifications] = useState(false);
 
   // Find current page title based on path
   const currentNav = DASHBOARD_NAV.find(item => pathname.startsWith(item.href)) || { label: "Dashboard" };
@@ -60,14 +62,71 @@ export function TopBar({ setIsMobileOpen }: TopBarProps) {
             {mounted ? (isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />) : <Sun className="w-4 h-4 opacity-0" />}
           </button>
 
-          <button className="relative p-1.5 text-brand-500 hover:text-brand-900 dark:text-brand-400 dark:hover:text-white rounded-md hover:bg-brand-100 dark:hover:bg-brand-800 transition-colors">
-            <Bell className="w-4 h-4" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[14px] h-[14px] bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 border border-white dark:border-brand-950">
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </span>
-            )}
-          </button>
+          <div className="relative">
+            <button 
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative p-1.5 text-brand-500 hover:text-brand-900 dark:text-brand-400 dark:hover:text-white rounded-md hover:bg-brand-100 dark:hover:bg-brand-800 transition-colors"
+            >
+              <Bell className="w-4 h-4" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[14px] h-[14px] bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 border border-white dark:border-brand-950">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </button>
+            
+            <AnimatePresence>
+              {showNotifications && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 mt-2 w-80 bg-white dark:bg-brand-900 border border-brand-200 dark:border-brand-800 shadow-xl rounded-2xl overflow-hidden z-50"
+                >
+                  <div className="p-4 border-b border-brand-100 dark:border-brand-800 flex justify-between items-center">
+                    <h3 className="font-bold text-brand-900 dark:text-white">Notifications</h3>
+                    {unreadCount > 0 && (
+                      <button onClick={markAllAsRead} className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">
+                        Mark all read
+                      </button>
+                    )}
+                  </div>
+                  <div className="max-h-80 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="p-6 text-center text-sm text-brand-500">No notifications yet.</div>
+                    ) : (
+                      notifications.map(n => (
+                        <div 
+                          key={n.id} 
+                          onClick={() => !n.is_read && markAsRead(n.id)}
+                          className={`p-4 border-b border-brand-100 dark:border-brand-800/50 last:border-0 cursor-pointer transition-colors ${n.is_read ? 'opacity-60' : 'bg-brand-50/50 dark:bg-brand-800/20 hover:bg-brand-50 dark:hover:bg-brand-800/40'}`}
+                        >
+                          <div className="flex gap-3">
+                            <div className={`mt-0.5 shrink-0 ${n.type === 'success' ? 'text-emerald-500' : n.type === 'warning' ? 'text-amber-500' : n.type === 'error' ? 'text-red-500' : 'text-indigo-500'}`}>
+                              {n.type === 'success' ? <CheckCircle className="w-4 h-4" /> : n.type === 'warning' ? <AlertTriangle className="w-4 h-4" /> : n.type === 'error' ? <AlertTriangle className="w-4 h-4" /> : <Info className="w-4 h-4" />}
+                            </div>
+                            <div className="min-w-0">
+                              <h4 className={`text-sm font-semibold truncate ${n.is_read ? 'text-brand-700 dark:text-brand-300' : 'text-brand-900 dark:text-white'}`}>{n.title}</h4>
+                              <p className="text-xs text-brand-500 mt-0.5 line-clamp-2">{n.message}</p>
+                              {n.link && (
+                                <Link href={n.link} onClick={() => setShowNotifications(false)} className="inline-block mt-1 text-xs text-indigo-600 dark:text-indigo-400 hover:underline">
+                                  View Details &rarr;
+                                </Link>
+                              )}
+                              <p className="text-[10px] text-brand-400 mt-2">
+                                {new Date(n.created_at).toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           <div className="w-px h-5 bg-brand-200 dark:border-brand-800 mx-2 hidden sm:block" />
 

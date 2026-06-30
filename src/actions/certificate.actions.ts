@@ -22,6 +22,30 @@ export async function generateCertificateAction(applicationId: string) {
       return { success: true, certificateId: existingId, fileId: `certificates/${app.id}.pdf` };
     }
 
+    // Check Timeline or Fast-Track
+    const isFastTrack = app.payment_status_99 === 'verified';
+    if (!isFastTrack) {
+      // Assuming duration in format "X Days" or "X Weeks"
+      const durationStr = app.internships.duration || "";
+      let daysRequired = 30; // default
+      if (durationStr.includes("Week")) {
+        daysRequired = parseInt(durationStr) * 7;
+      } else if (durationStr.includes("Month")) {
+        daysRequired = parseInt(durationStr) * 30;
+      } else if (durationStr.includes("Day")) {
+        daysRequired = parseInt(durationStr);
+      }
+      
+      const enrolledDate = new Date(app.created_at);
+      const currentDate = new Date();
+      const diffTime = Math.abs(currentDate.getTime() - enrolledDate.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays < daysRequired) {
+        return { success: false, error: `Timeline not completed. Required: ${daysRequired} days, Passed: ${diffDays} days. Fast-track (99₹) not verified.` };
+      }
+    }
+
     // 2. Generate unique Certificate ID (Deterministic based on application_id)
     const currentYear = new Date().getFullYear();
     const seq = Math.floor(100000 + Math.random() * 900000);
