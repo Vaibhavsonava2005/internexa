@@ -82,7 +82,6 @@ export function TopBar({ setIsMobileOpen }: TopBarProps) {
           </div>
         </div>
       </div>
-      </div>
 
       {/* Global Notification Toast */}
       <AnimatePresence>

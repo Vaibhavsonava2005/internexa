@@ -40,6 +40,7 @@ export default function OnboardingPage() {
           setOffer(res.data);
           if (res.data.status === "Enrolled" || res.data.status === "Active") {
             setSuccess(true);
+          }
         }
         
         // Fetch dynamic payment settings
