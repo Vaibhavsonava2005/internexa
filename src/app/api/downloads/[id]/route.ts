@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { supabaseAdmin } from "@/lib/supabase";
+import { generateAndUploadJoiningLetter } from "@/lib/pdf-generator";
 
 export async function GET(
   request: NextRequest,
@@ -23,11 +25,46 @@ export async function GET(
       filePath = `certificates/${id}`;
     } else if (type === "certificate_file") {
       bucket = "documents";
-      // The id here is the full path, decode it
       filePath = decodeURIComponent(id);
     } else if (type === "joining_letter") {
       bucket = "documents";
-      filePath = id;
+      
+      // If it's a raw application ID instead of a .pdf filename, generate it on the fly
+      if (!id.endsWith(".pdf")) {
+        const { data: application } = await supabaseAdmin
+          .from("applications")
+          .select("*, internships(title, duration)")
+          .eq("id", id)
+          .single();
+          
+        if (application) {
+          try {
+            const pdfResult = await generateAndUploadJoiningLetter({
+              offerId: application.offer_letter_id || `OFF-${application.id.substring(0,8).toUpperCase()}`,
+              applicationId: application.application_id || application.reference_number || application.id,
+              studentName: application.full_name,
+              internshipName: application.internships?.title || "Internship Program",
+              date: application.start_date ? new Date(application.start_date).toLocaleDateString() : new Date().toLocaleDateString(),
+              duration: application.internships?.duration || "N/A",
+            });
+            
+            if (pdfResult.success && pdfResult.fileId) {
+              filePath = pdfResult.fileId;
+              // Save it to the DB so next time it's fast
+              await supabaseAdmin.from("applications").update({ joining_letter_file_id: filePath }).eq("id", id);
+            } else {
+              filePath = id; // Fallback to raw id if generation fails
+            }
+          } catch (err) {
+            console.error("Fly generation error:", err);
+            filePath = id;
+          }
+        } else {
+          filePath = id;
+        }
+      } else {
+        filePath = id;
+      }
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
