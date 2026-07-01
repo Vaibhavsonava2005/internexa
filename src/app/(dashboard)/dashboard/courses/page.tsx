@@ -11,7 +11,8 @@ import Link from "next/link";
 
 export default function CoursesPage() {
   const [loading, setLoading] = useState(true);
-  const [application, setApplication] = useState<any>(null);
+  const [applications, setApplications] = useState<any[]>([]);
+  const [activeAppIndex, setActiveAppIndex] = useState(0);
   const [expandedModule, setExpandedModule] = useState<number | null>(0);
 
   useEffect(() => {
@@ -19,14 +20,14 @@ export default function CoursesPage() {
       // 1. Fetch applications
       const apps = await getUserApplications();
       
-      // 2. Determine active app
-      const activeApp = apps.success && apps.data ? apps.data.find((app: any) => app.status === "Active" || app.status === "Enrolled" || app.status === "Completed") : null;
-      setApplication(activeApp || null);
+      // 2. Determine active apps
+      const activeAppsList = apps.success && apps.data ? apps.data.filter((app: any) => app.status === "Active" || app.status === "Enrolled" || app.status === "Completed") : [];
+      setApplications(activeAppsList);
       
       // 3. Background graduation check (lazy evaluation)
-      if (activeApp && apps.success && apps.data && apps.data.length > 0) {
+      if (activeAppsList.length > 0) {
         // use the clerk_id from the first application
-        const clerkId = apps.data[0].clerk_id;
+        const clerkId = activeAppsList[0].clerk_id;
         checkAndProcessGraduations(clerkId).then(res => {
           // If graduations were processed, we might want to reload or we can just rely on the next visit
           if (res.success && res.processed > 0) {
@@ -48,7 +49,9 @@ export default function CoursesPage() {
     );
   }
 
-  if (!application) {
+  }
+
+  if (applications.length === 0) {
     return (
       <div className="text-center py-20">
         <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -60,22 +63,45 @@ export default function CoursesPage() {
     );
   }
 
+  const application = applications[activeAppIndex];
+  
   if (application.status === "Completed") {
     return (
-      <div className="text-center py-20">
-        <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-          <BadgeCheck className="w-10 h-10 text-emerald-500" />
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Course Tabs (if multiple) */}
+        {applications.length > 1 && (
+          <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+            {applications.map((app, idx) => (
+              <button
+                key={app.id}
+                onClick={() => setActiveAppIndex(idx)}
+                className={cn(
+                  "px-5 py-2.5 rounded-xl font-bold whitespace-nowrap transition-all border",
+                  activeAppIndex === idx 
+                    ? "bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-500/20"
+                    : "bg-white dark:bg-slate-900 text-slate-500 hover:text-slate-900 dark:hover:text-white border-slate-200 dark:border-slate-800"
+                )}
+              >
+                {app.internships?.title || `Course ${idx + 1}`}
+              </button>
+            ))}
+          </div>
+        )}
+        <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800">
+          <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <BadgeCheck className="w-10 h-10 text-emerald-500" />
+          </div>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Course Completed!</h2>
+          <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-8">
+            Congratulations! You have successfully completed this internship program. Your official certificates and documents have been generated.
+          </p>
+          <Link 
+            href="/dashboard/certificates"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-colors"
+          >
+            View My Certificates
+          </Link>
         </div>
-        <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Course Completed!</h2>
-        <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-8">
-          Congratulations! You have successfully completed this internship program. Your official certificates and documents have been generated.
-        </p>
-        <Link 
-          href="/dashboard/certificates"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-colors"
-        >
-          View My Certificates
-        </Link>
       </div>
     );
   }
@@ -88,6 +114,27 @@ export default function CoursesPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
+      
+      {/* Course Tabs (if multiple) */}
+      {applications.length > 1 && (
+        <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+          {applications.map((app, idx) => (
+            <button
+              key={app.id}
+              onClick={() => setActiveAppIndex(idx)}
+              className={cn(
+                "px-5 py-2.5 rounded-xl font-bold whitespace-nowrap transition-all border",
+                activeAppIndex === idx 
+                  ? "bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-500/20"
+                  : "bg-white dark:bg-slate-900 text-slate-500 hover:text-slate-900 dark:hover:text-white border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800"
+              )}
+            >
+              {app.internships?.title || `Course ${idx + 1}`}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
           <BookOpen className="w-48 h-48" />

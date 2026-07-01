@@ -258,7 +258,7 @@ export default function OfferPage() {
         )}
 
         {/* Success Step */}
-        {step === "success" && (
+        {(step === "success" || step === "accepted" || step === "payment") && (
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}>
             <div className="bg-gradient-to-br from-emerald-900/20 to-slate-900 rounded-2xl border border-emerald-500/30 p-8 sm:p-12 text-center">
               <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
