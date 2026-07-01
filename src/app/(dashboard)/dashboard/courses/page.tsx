@@ -49,8 +49,6 @@ export default function CoursesPage() {
     );
   }
 
-  }
-
   if (applications.length === 0) {
     return (
       <div className="text-center py-20">
