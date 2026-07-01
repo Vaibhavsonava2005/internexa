@@ -204,10 +204,10 @@ export default function CoursesPage() {
                         
                         {mod.days && Array.isArray(mod.days) && mod.days.length > 0 ? (
                           <div className="space-y-3">
-                            {mod.days.map((lesson: any, lIndex: number) => (
+                            {mod.days.map((lesson: any, dIndex: number) => (
                               <Link 
-                                href={`/dashboard/courses/player/${lesson.id || 'default'}`}
-                                key={lIndex} 
+                                href={`/dashboard/courses/player/${lesson.id || `mod-${index}-day-${dIndex}`}?appId=${application.id}`}
+                                key={dIndex} 
                                 className="flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-colors group cursor-pointer"
                               >
                                 <div className="mt-0.5">
@@ -223,7 +223,7 @@ export default function CoursesPage() {
                                 </div>
                                 <div className="flex-1">
                                   <h4 className="font-bold text-slate-900 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                    Day {lesson.day || lesson.globalIndex + 1 || lIndex + 1}: {lesson.title}
+                                    Day {lesson.day || lesson.globalIndex + 1 || dIndex + 1}: {lesson.title}
                                   </h4>
                                   {lesson.duration && (
                                     <p className="text-xs font-medium text-slate-500 mt-1">{lesson.duration}</p>

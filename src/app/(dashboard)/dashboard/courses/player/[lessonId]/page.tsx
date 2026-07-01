@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { getUserApplications } from "@/actions/application.actions";
 import { markLessonComplete, getCompletedLessons } from "@/actions/progress.actions";
 import { motion } from "framer-motion";
@@ -15,6 +15,8 @@ export default function CoursePlayerPage() {
   const params = useParams();
   const router = useRouter();
   const lessonId = params.lessonId as string;
+  const searchParams = useSearchParams();
+  const targetAppId = searchParams.get("appId");
 
   const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
@@ -29,7 +31,10 @@ export default function CoursePlayerPage() {
       try {
         const apps = await getUserApplications();
         const activeApp = apps.success && apps.data 
-          ? apps.data.find((app: any) => app.status === "Active" || app.status === "Enrolled" || app.status === "Completed") 
+          ? apps.data.find((app: any) => {
+              if (targetAppId) return app.id === targetAppId;
+              return app.status === "Active" || app.status === "Enrolled" || app.status === "Completed";
+            }) 
           : null;
 
         if (activeApp && activeApp.internships) {
@@ -77,11 +82,12 @@ export default function CoursePlayerPage() {
   
   let flatLessons: any[] = [];
   let gIndex = 0;
-  modules.forEach(mod => {
+  modules.forEach((mod, mIndex) => {
     if (!mod) return;
-    (mod.days || []).forEach((day: any) => {
+    (mod.days || []).forEach((day: any, dIndex: number) => {
       if (!day) return;
-      flatLessons.push({ ...day, moduleTitle: mod.title, globalIndex: gIndex });
+      const pseudoId = day.id || `mod-${mIndex}-day-${dIndex}`;
+      flatLessons.push({ ...day, id: pseudoId, moduleTitle: mod.title, globalIndex: gIndex });
       gIndex++;
     });
   });
