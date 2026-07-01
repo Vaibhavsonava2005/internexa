@@ -143,7 +143,7 @@ export default function CoursePlayerPage() {
   const renderContent = () => {
     if (!currentLesson) return <p>Select a lesson from the sidebar.</p>;
 
-    if (currentLesson.globalIndex > daysPassed) {
+    if (!isCompleted && currentLesson.globalIndex > daysPassed) {
       const unlockDate = addDays(startDate, currentLesson.globalIndex);
       return (
         <div className="w-full flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 text-center py-32 shadow-sm">
@@ -258,7 +258,7 @@ export default function CoursePlayerPage() {
                   if (!lesson) return null;
                   const isActive = lesson.id === currentLesson?.id;
                   const isDone = completedLessons.includes(lesson.id);
-                  const isLocked = (lesson.globalIndex ?? 0) > daysPassed;
+                  const isLocked = !isDone && (lesson.globalIndex ?? 0) > daysPassed;
                   
                   return (
                     <Link 
