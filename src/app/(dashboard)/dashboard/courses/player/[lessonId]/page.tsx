@@ -103,9 +103,14 @@ export default function CoursePlayerPage() {
   if (application) {
     const rawDate = application.start_date || application.submission_date;
     if (rawDate) {
-      const parsed = new Date(rawDate);
-      if (!isNaN(parsed.getTime())) {
-        startDate = parsed;
+      if (typeof rawDate === "string" && rawDate.includes("-") && !rawDate.includes("T")) {
+        const [year, month, day] = rawDate.split('-').map(Number);
+        startDate = new Date(year, month - 1, day);
+      } else {
+        const parsed = new Date(rawDate);
+        if (!isNaN(parsed.getTime())) {
+          startDate = parsed;
+        }
       }
     }
   }
