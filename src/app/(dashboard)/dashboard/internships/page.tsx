@@ -196,7 +196,7 @@ export default function MyInternshipsPage() {
                           </Link>
                           {app.status !== "Rejected" && (
                             <a
-                              href={`/api/downloads/${app.joining_letter_file_id || app.id}`}
+                              href={`/api/downloads/${app.joining_letter_file_id || app.id}?type=joining_letter`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="w-full flex items-center justify-center gap-2 h-14 rounded-2xl border-2 border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-900/10 text-emerald-700 dark:text-emerald-400 font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors shadow-sm"

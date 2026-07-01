@@ -25,6 +25,9 @@ export async function GET(
       bucket = "documents";
       // The id here is the full path, decode it
       filePath = decodeURIComponent(id);
+    } else if (type === "joining_letter") {
+      bucket = "documents";
+      filePath = id;
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
