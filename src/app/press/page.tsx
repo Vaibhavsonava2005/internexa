@@ -41,7 +41,7 @@ export default function PressPage() {
                 For press inquiries, interview requests, or high-resolution brand assets, please contact our media team.
               </p>
               <p className="text-gray-900 dark:text-white font-medium mb-1">Press Contact:</p>
-              <a href="mailto:press@internexa.ai" className="text-brand-500 hover:underline">press@internexa.ai</a>
+              <a href="mailto:info.internexa@gmail.com" className="text-brand-500 hover:underline">info.internexa@gmail.com</a>
               
               <div className="mt-8 pt-8 border-t border-brand-200 dark:border-brand-800/50">
                 <h3 className="text-lg font-bold text-brand-900 dark:text-white mb-4">Brand Kit</h3>
