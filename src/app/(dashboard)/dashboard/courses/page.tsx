@@ -23,6 +23,16 @@ export default function CoursesPage() {
       // 2. Determine active apps
       const activeAppsList = apps.success && apps.data ? apps.data.filter((app: any) => app.status === "Active" || app.status === "Enrolled" || app.status === "Completed") : [];
       setApplications(activeAppsList);
+
+      if (activeAppsList.length > 0) {
+        const storedAppId = sessionStorage.getItem("internexa_active_course_app_id");
+        if (storedAppId) {
+          const foundIdx = activeAppsList.findIndex((a: any) => a.id === storedAppId);
+          if (foundIdx !== -1) {
+            setActiveAppIndex(foundIdx);
+          }
+        }
+      }
       
       // 3. Background graduation check (lazy evaluation)
       if (activeAppsList.length > 0) {
@@ -119,7 +129,10 @@ export default function CoursesPage() {
           {applications.map((app, idx) => (
             <button
               key={app.id}
-              onClick={() => setActiveAppIndex(idx)}
+              onClick={() => {
+                setActiveAppIndex(idx);
+                sessionStorage.setItem("internexa_active_course_app_id", app.id);
+              }}
               className={cn(
                 "px-5 py-2.5 rounded-xl font-bold whitespace-nowrap transition-all border",
                 activeAppIndex === idx 
