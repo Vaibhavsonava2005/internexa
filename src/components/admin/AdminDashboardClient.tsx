@@ -34,6 +34,12 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
         subject: `Don't Break Your Learning Streak! 🔥`,
         body: `We noticed you haven't logged in today to continue your coursework. Consistency is the key to mastering your domain!\n\nJump back in now to maintain your daily streak and earn extra XP points on the leaderboard.`
       });
+    } else if (val === 'fast_track') {
+      setEmailForm({
+        templateType: val,
+        subject: `Exclusive Opportunity: Fast-Track Your InterNexa Certification! 🚀`,
+        body: `We have noticed your outstanding dedication and progress in your current internship program.\n\nBecause of your exceptional performance, we are offering you an exclusive opportunity to upgrade to our Fast-Track Certification! By fast-tracking, you can instantly bypass the remaining standard wait times, immediately receive your official verified certificates (including your prestigious Letter of Recommendation), and boost your resume ahead of your peers.\n\nDon't miss out on this opportunity to accelerate your career. Click the button below to secure your Fast-Track Certification now before this exclusive offer expires!`
+      });
     } else {
       setEmailForm({ templateType: val, subject: '', body: '' });
     }
@@ -44,10 +50,11 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
     if (!selectedUserForEmail || !emailForm.subject || !emailForm.body) return;
     
     setLoadingAction('sending_email');
+    const studentName = selectedUserForEmail.full_name || selectedUserForEmail.name || 'Student';
     const res = await sendUserManualEmail(
       selectedUserForEmail.clerk_id,
       selectedUserForEmail.email,
-      selectedUserForEmail.full_name,
+      studentName,
       emailForm.subject,
       emailForm.body,
       emailForm.templateType
@@ -1096,6 +1103,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                   <option value="custom">Custom (Write yourself)</option>
                   <option value="instant_certification">Instant Certification (Auto-Generated)</option>
                   <option value="streak_reminder">Daily Streak Reminder (Auto-Generated)</option>
+                  <option value="fast_track">Fast-Track Certification (Auto-Generated)</option>
                 </select>
               </div>
 

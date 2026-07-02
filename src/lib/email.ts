@@ -676,6 +676,11 @@ export async function sendAdminManualEmail({ email, studentName, subject, body, 
     <div style="text-align:center;margin:32px 0 16px;">
       <a href="${APP_URL}/dashboard/courses" style="display:inline-block;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#ffffff;padding:16px 40px;text-decoration:none;border-radius:12px;font-weight:700;font-size:16px;box-shadow:0 6px 20px rgba(79,70,229,0.3);">Continue Learning</a>
     </div>`;
+  } else if (templateType === 'fast_track') {
+    buttonHtml = `
+    <div style="text-align:center;margin:32px 0 16px;">
+      <a href="${APP_URL}/dashboard/certificates" style="display:inline-block;background:linear-gradient(135deg,#f59e0b,#d97706);color:#ffffff;padding:16px 40px;text-decoration:none;border-radius:12px;font-weight:700;font-size:16px;box-shadow:0 6px 20px rgba(245,158,11,0.3);">Unlock Fast-Track Now</a>
+    </div>`;
   } else {
     buttonHtml = `
     <div style="text-align:center;margin:32px 0 16px;">
