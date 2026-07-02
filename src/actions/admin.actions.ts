@@ -4,7 +4,7 @@ import { currentUser, clerkClient } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { sendOfferLetterEmail } from "@/lib/email";
 import { generateAndUploadOfferLetter, generateAndUploadJoiningLetter } from "@/lib/pdf-generator";
-import { sendJoiningLetterEmail, sendPaymentRejectedEmail } from "@/lib/email";
+import { sendJoiningLetterEmail, sendPaymentRejectedEmail, sendAdminManualEmail } from "@/lib/email";
 
 // Helper for Activity Log
 export async function logActivity(clerk_id: string, action: string, description?: string, metadata?: any) {
@@ -698,5 +698,41 @@ export async function uploadQRImage(formData: FormData) {
   } catch (error: any) {
     console.error("Upload QR Image error:", error);
     return { success: false, error: error.message };
+  }
+}
+
+export async function sendUserManualEmail(
+  targetClerkId: string, 
+  email: string, 
+  name: string, 
+  subject: string, 
+  body: string, 
+  templateType: string
+) {
+  const admin = await currentUser();
+  if (!admin) return { success: false, error: "Not authenticated" };
+
+  try {
+    const res = await sendAdminManualEmail({ email, studentName: name, subject, body, templateType });
+    if (!res.success) {
+      throw new Error(res.error || "Failed to send email via Brevo");
+    }
+
+    // Log the action in the newly requested SQL table
+    await supabaseAdmin.from('admin_email_logs').insert([{
+      clerk_id: targetClerkId,
+      recipient_email: email,
+      recipient_name: name,
+      subject,
+      template_type: templateType,
+      sent_by_admin: admin.id
+    }]);
+
+    await logAudit(admin.id, 'SENT_MANUAL_EMAIL', targetClerkId, `Sent email [${templateType}] to ${email}`);
+    
+    return { success: true };
+  } catch (err: any) {
+    console.error("Failed to send manual email", err);
+    return { success: false, error: err.message };
   }
 }

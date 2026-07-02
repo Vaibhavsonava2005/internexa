@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { approveApplication, rejectApplication, getAdminData, approveRewardClaim, approveManualPayment, rejectManualPayment, approveFastTrackPayment, rejectFastTrackPayment, updateAppSettings, getAppSettings, sendGlobalNotification, sendUserNotification, deleteUserCompletely, uploadQRImage } from "@/actions/admin.actions";
+import { approveApplication, rejectApplication, getAdminData, approveRewardClaim, approveManualPayment, rejectManualPayment, approveFastTrackPayment, rejectFastTrackPayment, updateAppSettings, getAppSettings, sendGlobalNotification, sendUserNotification, deleteUserCompletely, uploadQRImage, sendUserManualEmail } from "@/actions/admin.actions";
 import { generateCertificateAction } from "@/actions/certificate.actions";
 import { Button, Badge } from "@/components/shared";
 import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock, FolderGit2, Shield, Gift, Award, Download, RefreshCw, Bell, Settings, Send, Eye, MessageSquare, Trash2 } from "lucide-react";
@@ -16,6 +16,52 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
   const [settingsForm, setSettingsForm] = useState({ payment_199_upi: '', payment_199_qr: '', payment_99_upi: '', payment_99_qr: '' });
   const [notifForm, setNotifForm] = useState({ title: '', message: '', type: 'info' as any, link: '' });
   const [selectedUserForNotif, setSelectedUserForNotif] = useState<any>(null);
+
+  const [selectedUserForEmail, setSelectedUserForEmail] = useState<any>(null);
+  const [emailForm, setEmailForm] = useState({ subject: '', body: '', templateType: 'custom' });
+
+  const handleEmailTemplateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    if (val === 'instant_certification') {
+      setEmailForm({
+        templateType: val,
+        subject: `Your InterNexa Instant Certification is Ready!`,
+        body: `Congratulations on completing your program track!\n\nWe are thrilled to inform you that your instant certification has been automatically generated and is now available in your dashboard.\n\nYou can view and download your official certificate right now by clicking the button below. Keep pushing boundaries and learning!`
+      });
+    } else if (val === 'streak_reminder') {
+      setEmailForm({
+        templateType: val,
+        subject: `Don't Break Your Learning Streak! 🔥`,
+        body: `We noticed you haven't logged in today to continue your coursework. Consistency is the key to mastering your domain!\n\nJump back in now to maintain your daily streak and earn extra XP points on the leaderboard.`
+      });
+    } else {
+      setEmailForm({ templateType: val, subject: '', body: '' });
+    }
+  };
+
+  const handleSendManualEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedUserForEmail || !emailForm.subject || !emailForm.body) return;
+    
+    setLoadingAction('sending_email');
+    const res = await sendUserManualEmail(
+      selectedUserForEmail.clerk_id,
+      selectedUserForEmail.email,
+      selectedUserForEmail.full_name,
+      emailForm.subject,
+      emailForm.body,
+      emailForm.templateType
+    );
+    setLoadingAction(null);
+    
+    if (res.success) {
+      alert(`Email successfully sent to ${selectedUserForEmail.email}!`);
+      setSelectedUserForEmail(null);
+      setEmailForm({ subject: '', body: '', templateType: 'custom' });
+    } else {
+      alert(`Failed to send email: ${res.error}`);
+    }
+  };
 
   useEffect(() => {
     async function loadSettings() {
@@ -313,6 +359,9 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
                     <td className="px-6 py-4 text-right flex justify-end gap-2">
                       <Button size="sm" variant="outline" onClick={() => setSelectedUserForNotif(u)} className="border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-900 dark:text-indigo-400 dark:hover:bg-indigo-900/30">
                         <MessageSquare className="w-4 h-4 mr-1.5" /> Message
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => setSelectedUserForEmail(u)} className="border-emerald-200 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-900 dark:text-emerald-400 dark:hover:bg-emerald-900/30">
+                        <Send className="w-4 h-4 mr-1.5" /> Email
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => handleDeleteUser(u.clerk_id, u.full_name)} disabled={loadingAction === `delete_${u.clerk_id}`} className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-900/30">
                         <Trash2 className="w-4 h-4 mr-1.5" /> {loadingAction === `delete_${u.clerk_id}` ? "..." : "Delete Data"}
@@ -1015,6 +1064,72 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
               <Button type="submit" disabled={loadingAction === "notification"} className="w-full flex items-center justify-center gap-2 mt-2">
                 <Send className="w-4 h-4" /> {loadingAction === "notification" ? "Sending..." : "Send to User"}
               </Button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Manual Email Modal */}
+      {selectedUserForEmail && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Send className="w-5 h-5 text-emerald-500" /> Send Email
+                </h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">To: {selectedUserForEmail.full_name} ({selectedUserForEmail.email})</p>
+              </div>
+              <button onClick={() => setSelectedUserForEmail(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSendManualEmail} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">AI Template Options</label>
+                <select
+                  value={emailForm.templateType}
+                  onChange={handleEmailTemplateChange}
+                  className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm"
+                >
+                  <option value="custom">Custom (Write yourself)</option>
+                  <option value="instant_certification">Instant Certification (Auto-Generated)</option>
+                  <option value="streak_reminder">Daily Streak Reminder (Auto-Generated)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email Subject</label>
+                <input 
+                  type="text"
+                  required
+                  placeholder="Enter subject..."
+                  value={emailForm.subject}
+                  onChange={(e) => setEmailForm({...emailForm, subject: e.target.value})}
+                  className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email Body</label>
+                <textarea 
+                  required
+                  rows={6}
+                  placeholder="Type email body here (HTML/Markdown newlines allowed)..."
+                  value={emailForm.body}
+                  onChange={(e) => setEmailForm({...emailForm, body: e.target.value})}
+                  className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-mono"
+                ></textarea>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <Button variant="outline" type="button" onClick={() => setSelectedUserForEmail(null)}>Cancel</Button>
+                <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={loadingAction === 'sending_email'}>
+                  {loadingAction === 'sending_email' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
+                  {loadingAction === 'sending_email' ? 'Sending...' : 'Send Branded Email'}
+                </Button>
+              </div>
             </form>
           </div>
         </div>

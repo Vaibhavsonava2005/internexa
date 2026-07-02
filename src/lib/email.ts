@@ -650,3 +650,82 @@ export async function sendCertificateEmail({
     attachment: attachment.length > 0 ? attachment : undefined
   });
 }
+
+// -- Admin Manual Email
+interface AdminManualEmailProps {
+  email: string;
+  studentName: string;
+  subject: string;
+  body: string;
+  templateType: string;
+}
+
+export async function sendAdminManualEmail({ email, studentName, subject, body, templateType }: AdminManualEmailProps) {
+  // Use markdown-style conversion for the body to HTML paragraphs
+  const formattedBody = body.split('\n\n').map(p => `<p style="color:#334155;font-size:16px;line-height:1.6;margin:0 0 16px;">${p.replace(/\n/g, '<br/>')}</p>`).join('');
+  
+  let buttonHtml = '';
+  
+  if (templateType === 'instant_certification') {
+    buttonHtml = `
+    <div style="text-align:center;margin:32px 0 16px;">
+      <a href="${APP_URL}/dashboard/certificates" style="display:inline-block;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#ffffff;padding:16px 40px;text-decoration:none;border-radius:12px;font-weight:700;font-size:16px;box-shadow:0 6px 20px rgba(79,70,229,0.3);">Go to Certificates</a>
+    </div>`;
+  } else if (templateType === 'streak_reminder') {
+    buttonHtml = `
+    <div style="text-align:center;margin:32px 0 16px;">
+      <a href="${APP_URL}/dashboard/courses" style="display:inline-block;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#ffffff;padding:16px 40px;text-decoration:none;border-radius:12px;font-weight:700;font-size:16px;box-shadow:0 6px 20px rgba(79,70,229,0.3);">Continue Learning</a>
+    </div>`;
+  } else {
+    buttonHtml = `
+    <div style="text-align:center;margin:32px 0 16px;">
+      <a href="${APP_URL}/dashboard" style="display:inline-block;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#ffffff;padding:16px 40px;text-decoration:none;border-radius:12px;font-weight:700;font-size:16px;box-shadow:0 6px 20px rgba(79,70,229,0.3);">Open Dashboard</a>
+    </div>`;
+  }
+
+  const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;padding:40px 20px;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+  
+  <!-- Header -->
+  <tr><td style="background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);padding:32px 40px;text-align:center;">
+    <h1 style="color:#ffffff;margin:0;font-size:28px;font-weight:800;letter-spacing:-0.5px;">InterNexa Labs</h1>
+    <p style="color:rgba(255,255,255,0.85);margin:8px 0 0;font-size:14px;">Bridge the Gap Between Learning and Leading</p>
+  </td></tr>
+  
+  <!-- Body -->
+  <tr><td style="padding:40px;">
+    <h2 style="color:#0f172a;font-size:22px;margin:0 0 24px;">Hi ${studentName},</h2>
+    
+    ${formattedBody}
+    
+    ${buttonHtml}
+    
+    <p style="color:#334155;font-size:16px;line-height:1.6;margin:32px 0 0;">
+      Best regards,<br/>
+      <strong style="color:#0f172a;">The InterNexa Team</strong>
+    </p>
+  </td></tr>
+  
+  <!-- Footer -->
+  <tr><td style="padding:28px 40px;background-color:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;">
+    <p style="color:#4f46e5;font-size:18px;font-weight:800;margin:0 0 4px;">InterNexa Labs</p>
+    <p style="color:#64748b;font-size:13px;margin:0 0 4px;">For any questions, contact us at <a href="mailto:info.internexa@gmail.com" style="color:#4f46e5;text-decoration:none;font-weight:600;">info.internexa@gmail.com</a></p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+
+  return sendBrevoEmail({
+    to: [{ email, name: studentName }],
+    subject,
+    htmlContent
+  });
+}
