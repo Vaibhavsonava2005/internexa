@@ -122,7 +122,6 @@ export default function ReferAndEarnPage() {
                 <Share2 className="w-4 h-4" /> Share Now
               </button>
             </div>
-            </div>
           </div>
           <div className="hidden md:flex items-center justify-center w-32 h-32 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
             <Gift className="w-16 h-16 text-white animate-pulse" />
