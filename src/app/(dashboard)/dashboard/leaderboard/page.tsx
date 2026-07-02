@@ -6,15 +6,31 @@ import { Trophy, Flame, Target, Medal, Crown, Loader2 } from "lucide-react";
 import { PageHeader, Avatar, Badge } from "@/components/shared";
 import { cn } from "@/lib/utils";
 import { getGlobalLeaderboard, getMyPeersLeaderboard } from "@/actions/leaderboard.actions";
+import { getUserApplications } from "@/actions/application.actions";
+import { Lock } from "lucide-react";
 
 export default function LeaderboardPage() {
   const [activeTab, setActiveTab] = useState("Global");
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isLocked, setIsLocked] = useState(false);
 
   useEffect(() => {
     async function load() {
       setLoading(true);
+      
+      // Check if user is enrolled (verified payment)
+      const appsRes = await getUserApplications();
+      const hasActiveApp = appsRes.success && appsRes.data?.some((app: any) => 
+        ["Active", "Enrolled", "Completed"].includes(app.status)
+      );
+
+      if (!hasActiveApp) {
+        setIsLocked(true);
+        setLoading(false);
+        return;
+      }
+
       const res = activeTab === "Global" 
         ? await getGlobalLeaderboard() 
         : await getMyPeersLeaderboard();
@@ -33,6 +49,23 @@ export default function LeaderboardPage() {
     return (
       <div className="flex items-center justify-center py-32">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+      </div>
+    );
+  }
+
+  if (isLocked) {
+    return (
+      <div className="space-y-8">
+        <PageHeader title="Leaderboard" description="Compete with peers and climb the ranks by earning XP." />
+        <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm max-w-2xl mx-auto">
+          <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Lock className="w-8 h-8 text-slate-400" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Leaderboard Locked</h2>
+          <p className="text-slate-500 dark:text-slate-400 px-8">
+            You need to be fully enrolled and verified in an internship program to participate in the global ranking. Please complete your onboarding and fee payment to unlock this feature.
+          </p>
+        </div>
       </div>
     );
   }
