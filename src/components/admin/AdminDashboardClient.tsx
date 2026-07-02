@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { approveApplication, rejectApplication, getAdminData, approveRewardClaim, approveManualPayment, rejectManualPayment, approveFastTrackPayment, rejectFastTrackPayment, updateAppSettings, getAppSettings, sendGlobalNotification, sendUserNotification, deleteUserCompletely, uploadQRImage, sendUserManualEmail } from "@/actions/admin.actions";
 import { generateCertificateAction } from "@/actions/certificate.actions";
-import { Button, Badge } from "@/components/shared";
+import { Button, Badge, ToastContainer } from "@/components/shared";
 import { Users, FileText, CreditCard, CheckCircle, XCircle, Clock, FolderGit2, Shield, Gift, Award, Download, RefreshCw, Bell, Settings, Send, Eye, MessageSquare, Trash2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
@@ -19,6 +19,15 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
 
   const [selectedUserForEmail, setSelectedUserForEmail] = useState<any>(null);
   const [emailForm, setEmailForm] = useState({ subject: '', body: '', templateType: 'custom' });
+  const [toasts, setToasts] = useState<any[]>([]);
+
+  const addToast = (title: string, message?: string, type: 'success'|'error'|'info'|'warning' = 'info') => {
+    const id = Math.random().toString(36).substring(2, 9);
+    setToasts(prev => [...prev, { id, title, message, type }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 5000);
+  };
 
   const handleEmailTemplateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
@@ -65,11 +74,11 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
     setLoadingAction(null);
     
     if (res.success) {
-      alert(`Email successfully sent to ${selectedUserForEmail.email}!`);
+      addToast('Success', `Email successfully sent to ${selectedUserForEmail.email}!`, 'success');
       setSelectedUserForEmail(null);
       setEmailForm({ subject: '', body: '', templateType: 'custom' });
     } else {
-      alert(`Failed to send email: ${res.error}`);
+      addToast('Error', `Failed to send email: ${res.error}`, 'error');
     }
   };
 
@@ -92,7 +101,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
     await updateAppSettings('payment_199', { upi_link: settingsForm.payment_199_upi, qr_code_url: settingsForm.payment_199_qr });
     await updateAppSettings('payment_99', { upi_link: settingsForm.payment_99_upi, qr_code_url: settingsForm.payment_99_qr });
     setLoadingAction(null);
-    alert('Settings updated successfully!');
+    addToast('Success', 'Settings updated successfully!', 'success');
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: '199' | '99') => {
@@ -112,9 +121,9 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
         setSettingsForm(prev => ({ ...prev, payment_99_qr: res.url! }));
         await updateAppSettings('payment_99', { upi_link: settingsForm.payment_99_upi, qr_code_url: res.url! });
       }
-      alert('QR Code updated instantly!');
+      addToast('Success', 'QR Code uploaded and settings updated.', 'success');
     } else {
-      alert(res.error || 'Failed to upload QR Code');
+      addToast('Error', 'Failed to upload QR code', 'error');
     }
     setLoadingAction(null);
   };
@@ -1078,6 +1087,8 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
           </div>
         </div>
       )}
+
+      <ToastContainer toasts={toasts} onRemove={(id) => setToasts(prev => prev.filter(t => t.id !== id))} />
 
       {/* Manual Email Modal */}
       {selectedUserForEmail && (
