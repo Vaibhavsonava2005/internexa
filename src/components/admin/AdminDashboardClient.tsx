@@ -51,9 +51,12 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
     
     setLoadingAction('sending_email');
     const studentName = selectedUserForEmail.full_name || selectedUserForEmail.name || 'Student';
+    const safeClerkId = selectedUserForEmail.clerk_id || 'NO_CLERK_ID';
+    const safeEmail = selectedUserForEmail.email || 'no-email@internexa.online';
+
     const res = await sendUserManualEmail(
-      selectedUserForEmail.clerk_id,
-      selectedUserForEmail.email,
+      safeClerkId,
+      safeEmail,
       studentName,
       emailForm.subject,
       emailForm.body,
