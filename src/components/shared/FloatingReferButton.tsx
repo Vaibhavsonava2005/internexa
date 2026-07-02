@@ -5,8 +5,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Gift, Share2, Copy, CheckCircle, X } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { getOrCreateUserProfile } from "@/actions/user.actions";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export function FloatingReferButton() {
+  const router = useRouter();
   const { isLoaded, isSignedIn } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const [referralCode, setReferralCode] = useState<string | null>(null);
@@ -32,7 +35,7 @@ export function FloatingReferButton() {
 
   const handleShare = async () => {
     if (!isSignedIn) {
-      window.location.assign("/sign-up");
+      router.push("/sign-up");
       return;
     }
 
@@ -115,7 +118,7 @@ export function FloatingReferButton() {
                       Sign in to get your unique referral link and start earning rewards.
                     </p>
                     <button
-                      onClick={() => window.location.href = "/sign-in"}
+                      onClick={() => router.push("/sign-in")}
                       className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition-colors"
                     >
                       Sign In to Refer
@@ -162,9 +165,9 @@ export function FloatingReferButton() {
                     </button>
                     
                     <div className="text-center">
-                      <a href="/dashboard/refer-and-earn" className="text-sm text-indigo-600 dark:text-indigo-400 font-medium hover:underline">
+                      <Link href="/dashboard/refer-and-earn" onClick={() => setIsOpen(false)} className="text-sm text-indigo-600 dark:text-indigo-400 font-medium hover:underline">
                         View my referrals dashboard
-                      </a>
+                      </Link>
                     </div>
                   </div>
                 )}

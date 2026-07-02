@@ -48,10 +48,33 @@ export async function getGlobalLeaderboard() {
         xp: totalXP,
         level,
         avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`,
-        streak
+        streak,
+        isCurrentUser: false
       };
     });
     
+    // Add real current user
+    const user = await currentUser();
+    if (user) {
+      const { data: realUser } = await supabaseAdmin
+        .from('users')
+        .select('clerk_id, name, xp, level, avatar, streak')
+        .eq('clerk_id', user.id)
+        .single();
+        
+      if (realUser) {
+        fakes.push({
+          clerk_id: realUser.clerk_id,
+          name: realUser.name || user.firstName || 'Student',
+          xp: realUser.xp || 0,
+          level: realUser.level || 1,
+          avatar: realUser.avatar || user.imageUrl,
+          streak: realUser.streak || 0,
+          isCurrentUser: true
+        });
+      }
+    }
+
     // Sort descending by XP
     fakes.sort((a, b) => b.xp - a.xp);
     

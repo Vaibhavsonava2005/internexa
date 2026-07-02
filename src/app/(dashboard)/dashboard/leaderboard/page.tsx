@@ -10,7 +10,6 @@ import { getUserApplications } from "@/actions/application.actions";
 import { Lock } from "lucide-react";
 
 export default function LeaderboardPage() {
-  const [activeTab, setActiveTab] = useState("Global");
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isLocked, setIsLocked] = useState(false);
@@ -31,9 +30,7 @@ export default function LeaderboardPage() {
         return;
       }
 
-      const res = activeTab === "Global" 
-        ? await getGlobalLeaderboard() 
-        : await getMyPeersLeaderboard();
+      const res = await getGlobalLeaderboard(); 
         
       if (res.success && res.data) {
         // Add index as rank for rendering
@@ -43,7 +40,7 @@ export default function LeaderboardPage() {
       setLoading(false);
     }
     load();
-  }, [activeTab]);
+  }, []);
 
   if (loading) {
     return (
@@ -86,29 +83,9 @@ export default function LeaderboardPage() {
   return (
     <div className="space-y-8">
       <PageHeader 
-        title="Leaderboard" 
-        description="Compete with peers and climb the ranks by earning XP."
+        title="Global Leaderboard" 
+        description="Compete with students across India and climb the ranks by earning XP."
       />
-
-      {/* Tabs */}
-      <div className="flex justify-center mb-12">
-        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
-          {["Global", "My Peers (Classmates)"].map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={cn(
-                "px-6 py-2 rounded-lg text-sm font-medium transition-all",
-                activeTab === tab 
-                  ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm" 
-                  : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-              )}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-      </div>
 
       {/* Podium (Top 3) */}
       <div className="flex flex-col md:flex-row items-end justify-center gap-4 md:gap-8 mb-16 pt-10">
@@ -172,13 +149,15 @@ export default function LeaderboardPage() {
 
         <div className="divide-y divide-slate-100 dark:divide-slate-800">
           {leaderboard.slice(3).map((user, i) => (
-            <div key={user.rank} className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 items-center hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-              <div className="col-span-1 text-center font-bold text-slate-400">
+            <div key={user.clerk_id || user.rank} className={cn("grid grid-cols-1 md:grid-cols-12 gap-4 p-4 items-center transition-colors", user.isCurrentUser ? "bg-indigo-50 dark:bg-indigo-900/30 border-l-4 border-indigo-500" : "hover:bg-slate-50 dark:hover:bg-slate-800/50")}>
+              <div className={cn("col-span-1 text-center font-bold", user.isCurrentUser ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400")}>
                 #{user.rank}
               </div>
               <div className="col-span-4 flex items-center gap-3">
-                <Avatar src={user.avatar} name={user.name} size="sm" />
-                <span className="font-bold text-slate-900 dark:text-white truncate">{user.name}</span>
+                <Avatar src={user.avatar} name={user.name} size="sm" className={user.isCurrentUser ? "ring-2 ring-indigo-500 ring-offset-2" : ""} />
+                <span className="font-bold text-slate-900 dark:text-white truncate">
+                  {user.name} {user.isCurrentUser && <span className="text-xs text-indigo-500 ml-1">(You)</span>}
+                </span>
               </div>
               <div className="col-span-2 text-center font-bold text-indigo-600 dark:text-indigo-400">
                 {user.xp.toLocaleString()}
