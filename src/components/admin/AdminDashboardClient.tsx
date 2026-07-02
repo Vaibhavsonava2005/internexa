@@ -1106,7 +1106,7 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
               </button>
             </div>
             
-            <form onSubmit={handleSendManualEmail} className="space-y-4">
+            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">AI Template Options</label>
                 <select
@@ -1147,12 +1147,12 @@ export function AdminDashboardClient({ initialData }: { initialData: any }) {
 
               <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
                 <Button variant="outline" type="button" onClick={() => setSelectedUserForEmail(null)}>Cancel</Button>
-                <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={loadingAction === 'sending_email'}>
+                <Button type="button" onClick={handleSendManualEmail} className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={loadingAction === 'sending_email'}>
                   {loadingAction === 'sending_email' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
                   {loadingAction === 'sending_email' ? 'Sending...' : 'Send Branded Email'}
                 </Button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}

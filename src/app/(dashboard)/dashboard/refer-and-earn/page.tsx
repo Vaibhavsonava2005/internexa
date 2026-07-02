@@ -51,12 +51,28 @@ export default function ReferAndEarnPage() {
     ? `${typeof window !== 'undefined' ? window.location.origin : 'https://internexalabs.online'}/invite/${userProfile.referral_code}`
     : '';
 
+  const messageText = `🚀 *Boost Your Career with InterNexa Labs!* 🎓\n\nI just found this amazing AI-powered internship platform. You get:\n✅ 35+ Premium Virtual Internships\n✅ Real-world Capstone Projects\n✅ ISO-Verified Certificates & LORs\n✅ 1-on-1 Expert Mentorship\n\nSign up using my exclusive invite link and let's learn together! 👇\n${referralLink}`;
+
   const handleCopy = () => {
     if (referralLink) {
-      const message = `🚀 *Boost Your Career with InterNexa Labs!* 🎓\n\nI just found this amazing AI-powered internship platform. You get:\n✅ 35+ Premium Virtual Internships\n✅ Real-world Capstone Projects\n✅ ISO-Verified Certificates & LORs\n✅ 1-on-1 Expert Mentorship\n\nSign up using my exclusive invite link and let's learn together! 👇\n${referralLink}`;
-      navigator.clipboard.writeText(message);
+      navigator.clipboard.writeText(messageText);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleNativeShare = async () => {
+    if (navigator.share && referralLink) {
+      try {
+        await navigator.share({
+          title: '🚀 Launch Your Career with InterNexa!',
+          text: messageText,
+        });
+      } catch (error: any) {
+        if (error.name !== 'AbortError') handleCopy();
+      }
+    } else {
+      handleCopy();
     }
   };
 
@@ -95,10 +111,17 @@ export default function ReferAndEarnPage() {
                   readOnly 
                   className="bg-transparent border-none text-white w-full outline-none px-2 font-mono text-sm"
                 />
-                <button onClick={handleCopy} className="p-2 hover:bg-white/20 rounded-lg transition-colors">
+                <button onClick={handleCopy} className="p-2 hover:bg-white/20 rounded-lg transition-colors" title="Copy to clipboard">
                   {copied ? <CheckCircle className="w-5 h-5 text-emerald-400" /> : <Copy className="w-5 h-5" />}
                 </button>
               </div>
+              <button 
+                onClick={handleNativeShare} 
+                className="flex items-center justify-center gap-2 px-6 py-2 bg-white text-indigo-600 hover:bg-indigo-50 font-bold rounded-xl shadow-sm transition-colors whitespace-nowrap"
+              >
+                <Share2 className="w-4 h-4" /> Share Now
+              </button>
+            </div>
             </div>
           </div>
           <div className="hidden md:flex items-center justify-center w-32 h-32 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
